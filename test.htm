@@ -9,26 +9,28 @@
 		<style type="text/css">
 			/*<![CDATA[*/
 			body { white-space:pre; font-family:mono; }
+			h1,h2 { margin:0; }
 			/*]]>*/
 		</style>
 
 		<script type="text/javascript" src="matrico.js"></script>
-
-		<script type="text/javascript">
-//<![CDATA[
-
-A = matrico.zeros(4,4);
-
-//]]>
-		</script>
-
 	</head>
 
 	<body>
 		<h1>MATRICO</h1>
 		<h2>Output:</h2>
 
+		<p id="out"></p>
 
+		<script type="text/javascript">
+//<![CDATA[
+
+A = matrico.zeros(4,4);
+
+document.getElementById("out").innerHTML += "A = \n"+echo(A);
+
+//]]>
+		</script>
 	</body>
 </html>
 

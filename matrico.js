@@ -14,6 +14,28 @@ var matrico = (function(stdlib,foreign,heap)
 
 	var imul   = stdlib.Math.imul;
 
+	function size(m,d)
+	{
+		m = m|0;
+		d = d|0;
+
+		return ~~+mem[(m - d<<3)>>3]|0;
+	}
+
+	function get(m,i,j)
+	{
+		m = m|0;
+		i = i|0;
+		j = j|0;
+
+		var r = 0, c = 0, p = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		p = ((imul(i,r)|0)+j)|0;
+
+		return +mem[(m + p<<3)>>3];		
+	}
+
 	function zeros(r,c)
 	{
 		r = r|0;
@@ -31,7 +53,29 @@ var matrico = (function(stdlib,foreign,heap)
 	}
 
 	return {
+		size : size,
+		get : get,
 		zeros : zeros
 	};
 
-})(window, null, heap);
+})(window, document, heap);
+
+function echo(m)
+{
+	var o = "";
+
+	var r = matrico.size(m,1);
+	var c = matrico.size(m,2);
+
+	for(var i=0;i<r;i++)
+	{
+		for(var j=0;j<c;j++)
+		{
+			o = o + matrico.get(m,i,j).toFixed(4) + " ";
+		}
+		o = o + "\n";
+	}
+
+	return o;
+}
+
