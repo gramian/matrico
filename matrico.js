@@ -22,6 +22,17 @@ var matrico = (function(stdlib,foreign,heap)
 		return ~~+mem[(m - d<<3)>>3]|0;
 	}
 
+	function numel(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+
+		return imul(r,c)|0;
+	}
+
 	function get(m,i,j)
 	{
 		m = m|0;
@@ -52,10 +63,46 @@ var matrico = (function(stdlib,foreign,heap)
 		return m|0;
 	}
 
+	function ones(r,c)
+	{
+		r = r|0;
+		c = c|0;
+
+		var m = 0, t = 0, i = 0;
+		m = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(m + i<<3)>>3] = 1.0;
+		}
+
+		return m|0;
+	}
+
+	function eye(r)
+	{
+		r = r|0;
+
+		var m = 0, t = 0, i = 0;
+		m = zeros(r,r)|0;
+		t = imul(r,r)|0;
+
+		for(;(i|0)<(t|0);i=(i+r+1)|0)
+		{
+			mem[(m + i<<3)>>3] = 1.0;
+		}
+
+		return m|0;
+	}
+
 	return {
-		size : size,
-		get : get,
-		zeros : zeros
+		size  : size,
+		numel : numel,
+		get   : get,
+		zeros : zeros,
+		ones  : ones,
+		eye   : eye
 	};
 
 })(window, document, heap);
@@ -69,12 +116,14 @@ function echo(m)
 
 	for(var i=0;i<r;i++)
 	{
+		o = o + " ";
 		for(var j=0;j<c;j++)
 		{
 			o = o + matrico.get(m,i,j).toFixed(4) + " ";
 		}
 		o = o + "\n";
 	}
+	o = o + "\n";
 
 	return o;
 }

@@ -9,7 +9,7 @@
 		<style type="text/css">
 			/*<![CDATA[*/
 			body { white-space:pre; font-family:mono; }
-			h1,h2 { margin:0; }
+			p,h1,h2 { display:inline-block; margin:0; }
 			/*]]>*/
 		</style>
 
@@ -25,9 +25,13 @@
 		<script type="text/javascript">
 //<![CDATA[
 
-A = matrico.zeros(4,4);
+var out = document.getElementById("out");
 
-document.getElementById("out").innerHTML += "A = \n"+echo(A);
+A = matrico.zeros(4,4); out.innerHTML += "A = \n"+echo(A);
+B = matrico.ones(4,4); out.innerHTML += "B = \n"+echo(B);
+C = matrico.eye(4); out.innerHTML += "C = \n"+echo(C);
+
+
 
 //]]>
 		</script>
