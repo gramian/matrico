@@ -12,7 +12,27 @@ var matrico = (function(stdlib,foreign,heap)
 	var mem = new stdlib.Float64Array(heap);
 	var ptr = 0;
 
-	var imul   = stdlib.Math.imul;
+	var seed = 1.0;
+
+	var imul = stdlib.Math.imul;
+	var sin  = stdlib.Math.sin;
+
+	var floor = stdlib.Math.floor;
+
+	// private:
+
+	function rnd()
+	{
+		var x = 0.0;
+
+		seed = +(seed + 1.0);
+
+		x = +sin(seed)*10000.0;
+
+		return +(x - +floor(x));
+	}
+
+	// public:
 
 	function size(m,d)
 	{
@@ -96,13 +116,49 @@ var matrico = (function(stdlib,foreign,heap)
 		return m|0;
 	}
 
+	function rand(r,c)
+	{
+		r = r|0;
+		c = c|0;
+
+		var m = 0, t = 0, i = 0;
+		m = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(m + i<<3)>>3] = +rnd();
+		}
+
+		return m|0;
+	}
+
+	function randn(r,c)
+	{
+		r = r|0;
+		c = c|0;
+
+		var m = 0, t = 0, i = 0;
+		m = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(m + i<<3)>>3] = (+rnd()*2.0-1.0)+(+rnd()*2.0-1.0)+(+rnd()*2.0-1.0);
+		}
+
+		return m|0;
+	}
+
 	return {
 		size  : size,
 		numel : numel,
 		get   : get,
 		zeros : zeros,
 		ones  : ones,
-		eye   : eye
+		eye   : eye,
+		rand  : rand,
+		randn : randn
 	};
 
 })(window, document, heap);
@@ -113,13 +169,16 @@ function echo(m)
 
 	var r = matrico.size(m,1);
 	var c = matrico.size(m,2);
+	var v = 0;
 
 	for(var i=0;i<r;i++)
 	{
-		o = o + " ";
+		o += " ";
 		for(var j=0;j<c;j++)
 		{
-			o = o + matrico.get(m,i,j).toFixed(4) + " ";
+			v = matrico.get(m,i,j);
+			if(v>=0) { o += " "; }
+			o += v.toFixed(4) + " ";
 		}
 		o = o + "\n";
 	}
