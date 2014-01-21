@@ -14,8 +14,9 @@ var matrico = (function(stdlib,foreign,heap)
 
 	var seed = 1.0;
 
-	var imul = stdlib.Math.imul;
-	var sin  = stdlib.Math.sin;
+	var imul     = stdlib.Math.imul;
+	var math_abs = stdlib.Math.abs;
+	var math_sin = stdlib.Math.sin;
 
 	var floor = stdlib.Math.floor;
 
@@ -27,7 +28,7 @@ var matrico = (function(stdlib,foreign,heap)
 
 		seed = +(seed + 1.0);
 
-		x = +sin(seed)*10000.0;
+		x = +math_sin(seed)*10000.0;
 
 		return +(x - +floor(x));
 	}
@@ -150,15 +151,67 @@ var matrico = (function(stdlib,foreign,heap)
 		return m|0;
 	}
 
+	function vec(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, t = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		t = imul(r,c)|0;
+
+		mem[(m - 2<<3)>>3] = +~~t;
+		mem[(m - 1<<3)>>3] = 1.0;
+	}
+
+	function uminus(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = -mem[(m + i<<3)>>3];
+		}
+
+		return o|0;
+	}
+
+	function abs(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_abs(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
 	return {
-		size  : size,
-		numel : numel,
-		get   : get,
-		zeros : zeros,
-		ones  : ones,
-		eye   : eye,
-		rand  : rand,
-		randn : randn
+		size   : size,
+		numel  : numel,
+		get    : get,
+		zeros  : zeros,
+		ones   : ones,
+		eye    : eye,
+		rand   : rand,
+		randn  : randn,
+		vec    : vec,
+		uminus : uminus,
+		abs    : abs
 	};
 
 })(window, document, heap);
