@@ -14,9 +14,20 @@ var matrico = (function(stdlib,foreign,heap)
 
 	var seed = 1.0;
 
-	var imul     = stdlib.Math.imul;
-	var math_abs = stdlib.Math.abs;
-	var math_sin = stdlib.Math.sin;
+	var imul       = stdlib.Math.imul;
+	var math_abs   = stdlib.Math.abs;
+	var math_sin   = stdlib.Math.sin;
+	var math_cos   = stdlib.Math.cos;
+	var math_tan   = stdlib.Math.tan;
+	var math_asin  = stdlib.Math.asin;
+	var math_acos  = stdlib.Math.acos;
+	var math_atan  = stdlib.Math.atan;
+	var math_sqrt  = stdlib.Math.sqrt;
+	var math_exp   = stdlib.Math.exp;
+	var math_log   = stdlib.Math.log;
+	var math_pow   = stdlib.Math.pow;
+	var math_ceil  = stdlib.Math.ceil;
+	var math_floor = stdlib.Math.floor;
 
 	var floor = stdlib.Math.floor;
 
@@ -200,6 +211,168 @@ var matrico = (function(stdlib,foreign,heap)
 		return o|0;
 	}
 
+	function sin(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_sin(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function cos(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_cos(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function tan(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_tan(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function asin(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_asin(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function acos(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_acos(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function atan(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_atan(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function sqrt(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_sqrt(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function exp(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_exp(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
+	function log(m)
+	{
+		m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0)
+		{
+			mem[(o + i<<3)>>3] = +math_log(+mem[(m + i<<3)>>3]);
+		}
+
+		return o|0;
+	}
+
 	return {
 		size   : size,
 		numel  : numel,
@@ -211,7 +384,17 @@ var matrico = (function(stdlib,foreign,heap)
 		randn  : randn,
 		vec    : vec,
 		uminus : uminus,
-		abs    : abs
+		abs    : abs,
+		sin    : sin,
+		cos    : cos,
+		tan    : tan,
+		asin   : asin,
+		acos   : acos,
+		atan   : atan,
+		sqrt   : sqrt,
+		exp    : exp,
+		log    : log
+
 	};
 
 })(window, document, heap);
