@@ -9,18 +9,26 @@ asm.js is utilized for efficient computations.
 
 Thew following functions are implemented:
 
+* at
+
 * size(m,d)	, size of dimension d of array m 
 * numel(m)	, number of elements of array m
-* get
+
 * zeros(r,c)	, array filled with zeros with r rows and c columns
 * ones(r,c)	, array filled with ones with r rows and c columns
 * eye(r)	, unit matrix with r rows and columns
 * rand(r,c)	, array filled with uniformly distributed values with r rows and c columns
 * randn(r,c)	, array filled with normally distributed values with r rows and c columns
+
 * vec(m)	, vectorize array
+* trace(m)      , matrix trace
+
 * uminus(m)	, unary minus of array
+
+* round(m)      , round all array elements
 * abs(m)	, absolute value of all array elements
 * sign(m)	, sign of all array elements
+
 * sin(m)	, sine of all array elements 
 * cos(m)	, cosine of all array elements
 * tan(m)	, tangent of all array elements
@@ -30,26 +38,35 @@ Thew following functions are implemented:
 * sinh(m)	, hyperbolic sine of all array elements
 * cosh(m)	, hyperbolic cosine of all array elements
 * tanh(m)	, hyperbolic tangent of all array elements
+* asinh(m)      , area hyperbolic sine of all array elements
+* acosh(m)      , area hyperbolic cosine of all array elements
+* atanh(m)      , area hyperbolic tangent of all array elements
 * sqrt(m)	, squareroot of all array elements
 * exp(m)	, exponential of all array elements
 * log(m)	, natural logarithm of all array elements
 
+* horzcat(m,n)
+* vertcat(m,n)
+
+* plus(m,n)
+* minus(m,n)
+* times(m,n)
+* mtimes(m,n)
+* dot(m,n)
+
 ### TODO ###
 
-* asinh
-* acosh
-* atanh
+* col
+* row
+* page
 
 * pow
 
 * diag
-* horzcat
-* vertcat
 * bsxfun
 * sum
 * prod
 * diff
-* trace
 * permute
 * repmat
 * reshape
@@ -58,10 +75,6 @@ Thew following functions are implemented:
 * norm
 * svd
 
-* plus
-* minus
-* times
-* mtimes
 * rdivide
 * ldivide
 
@@ -88,14 +101,9 @@ Thew following functions are implemented:
 * lt
 * le
 
-* round
 * isnumeric
 * exist
-* isfunc
-* isempty
-* nargin
 * dec2bin
 * tic
 * toc
-
 
