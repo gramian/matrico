@@ -2,7 +2,7 @@
 
 var MATRICO_VERSION = '0.1.0';
 
-var size = 16*1024*1024;
+var size = 16*1024*1024; // 16MB for testing purposes
 var heap = new ArrayBuffer(size);
 
 var matrico = (function(stdlib,foreign,heap)
@@ -125,7 +125,7 @@ var matrico = (function(stdlib,foreign,heap)
 
 //	###  # #  ###
 //	#    # #  #
-//	##   ###  ##
+//	##   # #  ##
 //	#     #   #
 //	###   #   ###
 
@@ -476,16 +476,49 @@ var matrico = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
-	// ######## ######## ######## ######## ########
+//	###  #    # #  ###
+//	# #  #    # #  #
+//	###  #    # #  ###
+//	#    #    # #    #
+//	#    ###  ###  ###
 
-	/*function plus(m,n) {
+	function plus(m,n) { m = m|0; n = n|0;
 
-	}*/
+		var r = 0, c = 0, s = 0, d = 0, o = 0, t = 0, i = 0;
 
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		s = ~~+mem[(n - 2<<3)>>3];
+		d = ~~+mem[(n - 1<<3)>>3];
+		// if(r!=s || c!=d) { return -1; }  
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
 
-	/*function minus(m,n) {
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = mem[(m + i<<3)>>3] + mem[(n + i<<3)>>3]; }
 
-	}*/
+		return o|0; }
+
+//	#   #  ###  #   #  # #  ###
+//	## ##   #   ##  #  # #  #
+//	# # #   #   # # #  # #  ###
+//	# # #   #   #  ##  # #    #
+//	#   #  ###  #   #  ###  ###
+
+	function minus(m,n) { m = m|0; n = n|0;
+
+		var r = 0, c = 0, s = 0, d = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		s = ~~+mem[(n - 2<<3)>>3];
+		d = ~~+mem[(n - 1<<3)>>3];
+		// if(r!=s || c!=d) { return -1; }  
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = mem[(m + i<<3)>>3] - mem[(n + i<<3)>>3]; }
+
+		return o|0; }
 
 
 	/*function times(m,n) {
@@ -589,14 +622,14 @@ var matrico = (function(stdlib,foreign,heap)
 		tanh   : tanh,
 		sqrt   : sqrt,
 		exp    : exp,
-		log    : log
+		log    : log,
 		//diag   : diag
 		//horzcat
 		//vertcat
 		//bsxfun
 		//trace
-		//plus
-		//minus
+		plus  : plus,
+		minus : minus
 		//times
 		//mtimes
 		//dot
