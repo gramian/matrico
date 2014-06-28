@@ -5,7 +5,9 @@ var MATRICO_VERSION = '0.1.0';
 var size = 16*1024*1024; // 16MB for testing purposes
 var heap = new ArrayBuffer(size);
 
-var matrico = (function(stdlib,foreign,heap)
+// backend:
+
+var matrico_core = (function(stdlib,foreign,heap)
 {
 	"use asm";
 
@@ -648,12 +650,42 @@ var matrico = (function(stdlib,foreign,heap)
 
 // frontend:
 
+var matrico = (function()
+{
+	function uminus(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.uminus_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return -m; }
+	}
+
+	function abs(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.abs_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.abs(m); }
+	}
+
+	function sign(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.sign_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return (m>0) - (m<0); }
+	}
+
+
+	return {
+		uminus : uminus,
+		abs : abs,
+		sign : sign
+	};
+
+
+})();
+
 function echo(m)
 {
 	var o = "";
 
-	var r = matrico.size(m,1);
-	var c = matrico.size(m,2);
+	var r = matrico_core.size(m,1);
+	var c = matrico_core.size(m,2);
 	var v = 0;
 
 	for(var i=0;i<r;i++)
@@ -661,7 +693,7 @@ function echo(m)
 		o += " ";
 		for(var j=0;j<c;j++)
 		{
-			v = matrico.at(m,i,j);
+			v = matrico_core.at(m,i,j);
 			if(v>=0) { o += " "; }
 			o += v.toFixed(4) + " ";
 		}
