@@ -478,6 +478,25 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
+//	###  ###  #   #
+//	# #  # #  #   #
+//	###  # #  # # #
+//	#    # #  # # #
+//	#    ###  #####
+
+	function pow(m,n) { m = m|0; n = +n;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +math_pow(+mem[(m + i<<3)>>3],n); }
+
+		return o|0; }
+
 //	###  #    # #  ###
 //	# #  #    # #  #
 //	###  #    # #  ###
@@ -625,6 +644,7 @@ var matrico_core = (function(stdlib,foreign,heap)
 		sqrt   : sqrt,
 		exp    : exp,
 		log    : log,
+		pow    : pow,
 		//diag   : diag
 		//horzcat
 		//vertcat
@@ -670,11 +690,95 @@ var matrico = (function()
 		else if(typeof(m)==="number") { return (m>0) - (m<0); }
 	}
 
+	function sin(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.sin_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.sin(m); }
+	}
+
+	function cos(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.cos_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.cos(m); }
+	}
+
+	function tan(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.tan_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.tan(m); }
+	}
+
+	function asin(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.asin_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.asin(m); }
+	}
+
+	function acos(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.acos_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.acos(m); }
+	}
+
+	function atan(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.atan_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.atan; }
+	}
+
+	function sinh(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.sinh_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.sinh(m); }
+	}
+
+	function cosh(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.cosh_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.cosh(m); }
+	}
+
+	function tanh(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.tanh_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.tanh(m); }
+	}
+
+	function sqrt(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.sqrt_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.sqrt(m); }
+	}
+
+	function exp(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.exp_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.exp(m); }
+	}
+
+	function log(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.log_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return Math.log(m); }
+	}
+
 
 	return {
 		uminus : uminus,
 		abs : abs,
-		sign : sign
+		sign : sign,
+		sin : sin,
+		cos : cos,
+		tan : tan,
+		asin : asin,
+		acos : acos,
+		atan : atan,
+		sinh : sinh,
+		cosh : cosh,
+		tanh : tanh,
+		sqrt : sqrt,
+		exp : exp,
+		log : log
 	};
 
 
