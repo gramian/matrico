@@ -542,9 +542,18 @@ var matrico_core = (function(stdlib,foreign,heap)
 		return o|0; }
 
 
-	/*function times(m,n) {
+	function times(m,n) { m = m|0; n = +n;
 
-	}*/
+		var r = 0, c = 0, s = 0, d = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3]; 
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = mem[(m + i<<3)>>3] * n; }
+
+		return o|0; }
 
 
 	/*function mtimes(m,n) {
@@ -619,40 +628,40 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 
 	return {
-		size   : size,
-		numel  : numel,
-		at     : at,
-		zeros  : zeros,
-		ones   : ones,
-		eye    : eye,
-		rand   : rand,
-		randn  : randn,
-		vec    : vec,
+		  size : size,
+		 numel : numel,
+		    at : at,
+		 zeros : zeros,
+		  ones : ones,
+		   eye : eye,
+		  rand : rand,
+		 randn : randn,
+		   vec : vec,
 		uminus : uminus,
-		abs    : abs,
-		sign   : sign,
-		//round  : round,
-		sin    : sin,
-		cos    : cos,
-		tan    : tan,
-		asin   : asin,
-		acos   : acos,
-		atan   : atan,
-		sinh   : sinh,
-		cosh   : cosh,
-		tanh   : tanh,
-		sqrt   : sqrt,
-		exp    : exp,
-		log    : log,
-		pow    : pow,
-		//diag   : diag
+		   abs : abs,
+		  sign : sign,
+		//round : round,
+		   sin : sin,
+		   cos : cos,
+		   tan : tan,
+		  asin : asin,
+		  acos : acos,
+		  atan : atan,
+		  sinh : sinh,
+		  cosh : cosh,
+		  tanh : tanh,
+		  sqrt : sqrt,
+		   exp : exp,
+		   log : log,
+		   pow : pow,
+		//diag : diag
 		//horzcat
 		//vertcat
 		//bsxfun
 		//trace
-		plus  : plus,
-		minus : minus
-		//times
+		  plus : plus,
+		 minus : minus,
+		 times : times
 		//mtimes
 		//dot
 		//sum
@@ -672,6 +681,42 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 var matrico = (function()
 {
+	function zeros(r,c) {
+
+		if(r===1 && c===1) { return 0; }
+		else { return matrico_core.zero(r,c); }
+	}
+
+	function ones(r,c) {
+
+		if(r===1 && c===1) { return 1; }
+		else { return matrico_core.ones(r,c); }
+	}
+
+	function eye(r) {
+
+		if(r===1) { return 1; }
+		else { return ""+matrico_core.eye(r); }
+	}
+
+	function rand(r,c) {
+
+		if(r===1 && c===1) { return matrico_core.rnd(); }
+		else { return matrico_core.rand(r,c); }
+	}
+
+	function randn(r,c) {
+
+		if(r===1 && c===1) { return (rnd()*2.0-1.0)+(rnd()*2.0-1.0)+(rnd()*2.0-1.0); }
+		else { return matrico_core.randn(r,c); }
+	}
+
+	function vec(m) {
+
+		if(typeof(m)==="string") { return ""+matrico_core.vec_m(parseInt(m)); }
+		else if(typeof(m)==="number") { return m; }
+	}
+
 	function uminus(m) {
 
 		if(typeof(m)==="string") { return ""+matrico_core.uminus_m(parseInt(m)); }
@@ -762,23 +807,60 @@ var matrico = (function()
 		else if(typeof(m)==="number") { return Math.log(m); }
 	}
 
+	function times(m,n) {
+
+		if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.times_ms(parseInt(m),n); }
+		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.times_ms(parseInt(n),m); }
+		else if(typeof(m)==="number" && typeof(n)==="number") { return m*n; }
+	}
+
+	function plus(m,n) {
+
+		if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.plus_mm(parseInt(m),parseInt(n)); }
+		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.plus_ms(parseInt(m),n); }
+		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.plus_ms(parseInt(n),m); }
+	}
+
+	function minus(m,n) {
+
+		if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.minus_mm(parseInt(m),parseInt(n)); }
+		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.minus_ms(parseInt(m),n); }
+		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.minus_sm(m,parseInt(n)); }
+	}
+
+	function mtimes(m,n) {
+
+		return ""+matrico_core.mtimes(parseInt(m),parseInt(n));
+	}
+
 
 	return {
+		 zeros : zeros,
+		  ones : ones,
+		   eye : eye,
+		  rand : rand,
+		 randn : randn,
+		   vec : vec,
 		uminus : uminus,
-		abs : abs,
-		sign : sign,
-		sin : sin,
-		cos : cos,
-		tan : tan,
-		asin : asin,
-		acos : acos,
-		atan : atan,
-		sinh : sinh,
-		cosh : cosh,
-		tanh : tanh,
-		sqrt : sqrt,
-		exp : exp,
-		log : log
+		   abs : abs,
+		  sign : sign,
+		   sin : sin,
+		   cos : cos,
+		   tan : tan,
+		  asin : asin,
+		  acos : acos,
+		  atan : atan,
+		  sinh : sinh,
+		  cosh : cosh,
+		  tanh : tanh,
+		  sqrt : sqrt,
+		   exp : exp,
+		   log : log,
+
+		 times : times,
+		  plus : plus,
+		 minus : minus,
+		mtimes : mtimes
 	};
 
 
