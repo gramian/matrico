@@ -212,11 +212,11 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
-//	###  ###  ###
+//	###  ##   ###
 //	# #  # #  #
-//	###  ###  ###
+//	###  ##   ###
 //	# #  # #    #
-//	# #  ###  ###
+//	# #  ##   ###
 
 	function abs(m) { m = m|0;
 
@@ -482,7 +482,7 @@ var matrico_core = (function(stdlib,foreign,heap)
 //	# #  # #  #   #
 //	###  # #  # # #
 //	#    # #  # # #
-//	#    ###  #####
+//	#    ###   # #
 
 	function pow(m,n) { m = m|0; n = +n;
 
@@ -541,10 +541,15 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
+//	###  ###  #   #  ###  ###
+//	 #    #   ## ##  #    #
+//	 #    #   # # #  ##   ###
+//	 #    #   # # #  #      #
+//	 #   ###  #   #  ###  ###
 
 	function times(m,n) { m = m|0; n = +n;
 
-		var r = 0, c = 0, s = 0, d = 0, o = 0, t = 0, i = 0;
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
 
 		r = ~~+mem[(m - 2<<3)>>3];
 		c = ~~+mem[(m - 1<<3)>>3]; 
@@ -565,10 +570,37 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 	}*/
 
+//	###  # #  #   #
+//	#    # #  ## ##
+//	###  # #  # # #
+//	  #  # #  # # #
+//	###  ###  #   #
 
-	/*function sum(m) {
+	function sum_1(m) { m = m|0;
 
-	}*/
+		var r = 0, c = 0, o = 0, p = 0, i = 0, j = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(1,c)|0;
+
+		for(;(i|0)<(c|0);i=(i+1)|0) { p = (m + (imul(r,i<<3)|0))|0; for(;(j|0)<(r|0);j=(j+1)|0) { mem[(i<<3)>>3] = mem[(i<<3)>>3] + mem[(p + j<<3)>>3]; } }
+
+		return o|0; }
+
+	function sum_2(m) { m = m|0;
+
+		var r = 0, c = 0, o = 0, p = 0, i = 0, j = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,1)|0;
+
+		for(;(i|0)<(r|0);i=(i+1)|0) { p = i|0; for(;(j|0)<(c|0);j=(j+1)|0) { p = (p + c)|0; mem[(i<<3)>>3] = mem[(i<<3)>>3] + mem[(p<<3)>>3]; } }
+
+		return o|0; }
+
+
 
 
 	/*function prod(m) {
@@ -657,6 +689,8 @@ var matrico_core = (function(stdlib,foreign,heap)
 		//diag : diag
 		//horzcat
 		//vertcat
+		//subsref
+		//subsasgn
 		//bsxfun
 		//trace
 		  plus : plus,
@@ -713,117 +747,117 @@ var matrico = (function()
 
 	function vec(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.vec_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.vec_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return m; }
 	}
 
 	function uminus(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.uminus_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.uminus_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return -m; }
 	}
 
 	function abs(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.abs_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.abs_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.abs(m); }
 	}
 
 	function sign(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.sign_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.sign_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return (m>0) - (m<0); }
 	}
 
 	function sin(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.sin_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.sin_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.sin(m); }
 	}
 
 	function cos(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.cos_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.cos_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.cos(m); }
 	}
 
 	function tan(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.tan_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.tan_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.tan(m); }
 	}
 
 	function asin(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.asin_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.asin_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.asin(m); }
 	}
 
 	function acos(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.acos_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.acos_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.acos(m); }
 	}
 
 	function atan(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.atan_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.atan_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.atan; }
 	}
 
 	function sinh(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.sinh_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.sinh_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.sinh(m); }
 	}
 
 	function cosh(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.cosh_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.cosh_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.cosh(m); }
 	}
 
 	function tanh(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.tanh_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.tanh_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.tanh(m); }
 	}
 
 	function sqrt(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.sqrt_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.sqrt_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.sqrt(m); }
 	}
 
 	function exp(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.exp_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.exp_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.exp(m); }
 	}
 
 	function log(m) {
 
-		if(typeof(m)==="string") { return ""+matrico_core.log_m(parseInt(m)); }
+		     if(typeof(m)==="string") { return ""+matrico_core.log_m(parseInt(m)); }
 		else if(typeof(m)==="number") { return Math.log(m); }
 	}
 
 	function times(m,n) {
 
-		if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.times_ms(parseInt(m),n); }
+		     if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.times_ms(parseInt(m),n); }
 		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.times_ms(parseInt(n),m); }
 		else if(typeof(m)==="number" && typeof(n)==="number") { return m*n; }
 	}
 
 	function plus(m,n) {
 
-		if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.plus_mm(parseInt(m),parseInt(n)); }
+		     if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.plus_mm(parseInt(m),parseInt(n)); }
 		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.plus_ms(parseInt(m),n); }
 		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.plus_ms(parseInt(n),m); }
 	}
 
 	function minus(m,n) {
 
-		if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.minus_mm(parseInt(m),parseInt(n)); }
+		     if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.minus_mm(parseInt(m),parseInt(n)); }
 		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.minus_ms(parseInt(m),n); }
 		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.minus_sm(m,parseInt(n)); }
 	}
@@ -831,6 +865,13 @@ var matrico = (function()
 	function mtimes(m,n) {
 
 		return ""+matrico_core.mtimes(parseInt(m),parseInt(n));
+	}
+
+
+	function sum(m,n) {
+
+		     if(n==1) { return ""+matrico_core.sum_1(parseInt(m)); }
+		else if(n==2) { return ""+matrico_core.sum_2(parseInt(m)); }
 	}
 
 
@@ -860,7 +901,9 @@ var matrico = (function()
 		 times : times,
 		  plus : plus,
 		 minus : minus,
-		mtimes : mtimes
+		mtimes : mtimes,
+
+		   sum : sum
 	};
 
 
