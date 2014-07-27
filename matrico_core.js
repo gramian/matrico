@@ -48,21 +48,6 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 	// public:
 
-	function size(m,d) { m = m|0; d = d|0;
-
-		return ~~+mem[(m - d<<3)>>3]|0;	}
-
-
-	function numel(m) { m = m|0;
-
-		var r = 0, c = 0;
-
-		r = ~~+mem[(m - 2<<3)>>3];
-		c = ~~+mem[(m - 1<<3)>>3];
-
-		return imul(r,c)|0; }
-
-
 	function at(m,i,j) { m = m|0; i = i|0; j = j|0;
 
 		var r = 0, c = 0, p = 0;
@@ -89,6 +74,31 @@ var matrico_core = (function(stdlib,foreign,heap)
 	}*/
 
 	// global:
+
+//	###  ###  ###  ###
+//	#     #     #  #
+//	###   #    #   ##
+//	  #   #   #    #
+//	###  ###  ###  ###
+
+	function size(m,d) { m = m|0; d = d|0;
+
+		return ~~+mem[(m - d<<3)>>3]|0;	}
+
+//	#   #  # #  #   #  ###  #
+//	##  #  # #  ## ##  #    #
+//	# # #  # #  # # #  ##   #
+//	#  ##  # #  # # #  #    #
+//	#   #  ###  #   #  ###  ###
+
+	function numel(m) { m = m|0;
+
+		var r = 0, c = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+
+		return imul(r,c)|0; }
 
 //	###  ###  ###  ###  ###
 //	  #  #    # #  # #  #
@@ -193,24 +203,36 @@ var matrico_core = (function(stdlib,foreign,heap)
 		mem[(m - 2<<3)>>3] = +~~t;
 		mem[(m - 1<<3)>>3] = 1.0; }
 
-//	# #  #   #  ###  #  #  # #  ###
-//	# #  ## ##   #   ## #  # #  #
-//	# #  # # #   #   ## #  # #  ###
-//	# #  # # #   #   # ##  # #    #
-//	###  #   #  ###  #  #  ###  ###
+	/*function reshape(m,a,b)
+	{
 
-	function uminus(m) { m = m|0;
+	}*/
 
-		var r = 0, c = 0, o = 0, t = 0, i = 0;
+	/*function repmat(m,a,b)
+	{
+		m = m|0; a = a|0; b = b|0;
+		var r = 0; c = 0; o = 0; p = 0 ; t = 0; i = 0; j = 0; k = 0;
 
 		r = ~~+mem[(m - 2<<3)>>3];
 		c = ~~+mem[(m - 1<<3)>>3];
-		o = zeros(r,c)|0;
+		o = zeros(imul(a,r),imul(b,c));
 		t = imul(r,c)|0;
 
-		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = -mem[(m + i<<3)>>3]; }
+		for(;(i|0)<(a|0);i=(i+1)|0)
+		{
+			for(;(j|0)<(b|0);j=(j+1)|0)
+			{
+				p = 
+				for(;(k|0)<(k|0);k=(k+1)|0)
+				{
+					mem[(p + k<<3)>>3] = +mem[(m + k<<3)>>3];
+				}
+			}
+		}
 
-		return o|0; }
+
+		return o|0;
+	}*/
 
 //	###  ##   ###
 //	# #  # #  #
@@ -247,6 +269,25 @@ var matrico_core = (function(stdlib,foreign,heap)
 		t = imul(r,c)|0;
 
 		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +~~(+mem[(m + i<<3)>>3]>0.0) - +~~(+mem[(m + i<<3)>>3]<0.0); }
+
+		return o|0; }
+
+//	###  ###  # #  #   #  ##
+//	# #  # #  # #  ##  #  # #
+//	###  # #  # #  # # #  # #
+//	##   # #  # #  #  ##  # #
+//	# #  ###  ###  #   #  ##
+
+	function round(m) { m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +math_floor(+mem[(m + i<<3)>>3]+0.5); }
 
 		return o|0; }
 
@@ -484,7 +525,23 @@ var matrico_core = (function(stdlib,foreign,heap)
 //	#    # #  # # #
 //	#    ###   # #
 
-	function pow(m,n) { m = m|0; n = +n;
+	function pow_mm(m,n) { m = m|0; n = n|0;
+
+		var r = 0, c = 0, s = 0, d = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		s = ~~+mem[(n - 2<<3)>>3];
+		d = ~~+mem[(n - 1<<3)>>3];
+		// if(r!=s || c!=d) { return -1; }  
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +math_pow(+mem[(m + i<<3)>>3],+mem[(n + i<<3)>>3]); }
+
+		return o|0; }
+
+	function pow_ms(m,n) { m = m|0; n = +n;
 
 		var r = 0, c = 0, o = 0, t = 0, i = 0;
 
@@ -494,6 +551,57 @@ var matrico_core = (function(stdlib,foreign,heap)
 		t = imul(r,c)|0;
 
 		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +math_pow(+mem[(m + i<<3)>>3],n); }
+
+		return o|0; }
+
+	function pow_sm(m,n) { m = +m; n = n|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(n - 2<<3)>>3];
+		c = ~~+mem[(n - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = +math_pow(m,+mem[(n + i<<3)>>3]); }
+
+		return o|0; }
+
+//	# #  #   #  ###  #  #  # #  ###
+//	# #  ## ##   #   ## #  # #  #
+//	# #  # # #   #   ## #  # #  ###
+//	# #  # # #   #   # ##  # #    #
+//	###  #   #  ###  #  #  ###  ###
+
+	function uminus(m) { m = m|0;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3];
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = -mem[(m + i<<3)>>3]; }
+
+		return o|0; }
+
+//	###  ###  #   #  ###  ###
+//	 #    #   ## ##  #    #
+//	 #    #   # # #  ##   ###
+//	 #    #   # # #  #      #
+//	 #   ###  #   #  ###  ###
+
+	function times_ms(m,n) { m = m|0; n = +n;
+
+		var r = 0, c = 0, o = 0, t = 0, i = 0;
+
+		r = ~~+mem[(m - 2<<3)>>3];
+		c = ~~+mem[(m - 1<<3)>>3]; 
+		o = zeros(r,c)|0;
+		t = imul(r,c)|0;
+
+		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = mem[(m + i<<3)>>3] * n; }
 
 		return o|0; }
 
@@ -569,26 +677,6 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
-//	###  ###  #   #  ###  ###
-//	 #    #   ## ##  #    #
-//	 #    #   # # #  ##   ###
-//	 #    #   # # #  #      #
-//	 #   ###  #   #  ###  ###
-
-	function times_ms(m,n) { m = m|0; n = +n;
-
-		var r = 0, c = 0, o = 0, t = 0, i = 0;
-
-		r = ~~+mem[(m - 2<<3)>>3];
-		c = ~~+mem[(m - 1<<3)>>3]; 
-		o = zeros(r,c)|0;
-		t = imul(r,c)|0;
-
-		for(;(i|0)<(t|0);i=(i+1)|0) { mem[(o + i<<3)>>3] = mem[(m + i<<3)>>3] * n; }
-
-		return o|0; }
-
-
 	/*function mtimes(m,n) {
 
 	}*/
@@ -658,34 +746,6 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
-
-
-	/*function repmat(m,a,b)
-	{
-		m = m|0; a = a|0; b = b|0;
-		var r = 0; c = 0; o = 0; p = 0 ; t = 0; i = 0; j = 0; k = 0;
-
-		r = ~~+mem[(m - 2<<3)>>3];
-		c = ~~+mem[(m - 1<<3)>>3];
-		o = zeros(imul(a,r),imul(b,c));
-		t = imul(r,c)|0;
-
-		for(;(i|0)<(a|0);i=(i+1)|0)
-		{
-			for(;(j|0)<(b|0);j=(j+1)|0)
-			{
-				p = 
-				for(;(k|0)<(k|0);k=(k+1)|0)
-				{
-					mem[(p + k<<3)>>3] = +mem[(m + k<<3)>>3];
-				}
-			}
-		}
-
-
-		return o|0;
-	}*/
-
 //	#   #  ###  ###  #   #
 //	## ##  #    # #  ##  #
 //	# # #  ##   ###  # # #
@@ -713,16 +773,17 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 	}*/
 
+	/*function eig(m,n) {
+
+	}*/
 
 	/*function svd(m,n) {
 
 	}*/
 
-
-	/*function eig(m,n) {
+	/*function svds(m,n) {
 
 	}*/
-
 
 	/*function speye(m) {
 
@@ -730,19 +791,27 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 
 	return {
+		    at : at,
 		  size : size,
 		 numel : numel,
-		    at : at,
 		 zeros : zeros,
 		  ones : ones,
 		   eye : eye,
 		  rand : rand,
 		 randn : randn,
 		   vec : vec,
-		uminus : uminus,
+		//repmat
+		//reshape
+		//horzcat
+		//vertcat
+		//transpose : transpose,
+		//permute
+		//diag : diag,
+		//subsref
+		//subsasgn
 		   abs : abs,
 		  sign : sign,
-		//round : round,
+		 round : round,
 		   sin : sin,
 		   cos : cos,
 		   tan : tan,
@@ -755,31 +824,26 @@ var matrico_core = (function(stdlib,foreign,heap)
 		  sqrt : sqrt,
 		   exp : exp,
 		   log : log,
-		   pow : pow,
-		//transpose : transpose,
-		//diag : diag,
-		//horzcat
-		//vertcat
-		//subsref
-		//subsasgn
-		//bsxfun
-		//trace
+		pow_mm : pow_mm,
+		pow_ms : pow_ms,
+		pow_sm : pow_sm,
+		uminus : uminus,
+		times_ms : times_ms,
 		plus_mm : plus_mm,
 		plus_ms : plus_ms,
 		minus_mm : minus_mm,
 		minus_ms : minus_ms,
-		times_ms : times_ms,
-		//mtimes
-		//dot
+		//bsxfun
+		//mtimes : mtimes,
+		//dot : dot,
 		 sum_1 : sum_1,
 		 sum_2 : sum_2,
 		prod_1 : prod_1,
 		prod_2 : prod_2,
 		mean_1 : mean_1,
 		mean_2 : mean_2
-		//repmat
-		//reshape
 		//median
+		//trace
 		//eig
 		//svd
 		//svds
@@ -787,259 +851,4 @@ var matrico_core = (function(stdlib,foreign,heap)
 	};
 
 })(window, document, heap);
-
-// frontend:
-
-var matrico = (function()
-{
-	function numel(m) {
-		     if(typeof(m)==="string") { return matrico_core.numel(parseInt(m)); }
-		else if(typeof(m)==="number") { return 1; }
-	}
-
-	function size(m,d) {
-		     if(typeof(m)==="string") { return matrico_core.size(parseInt(m),d); }
-		else if(typeof(m)==="number") { return 1; }
-	}
-
-	function zeros(r,c) {
-
-		if(r===1 && c===1) { return 0; }
-		else { return matrico_core.zero(r,c); }
-	}
-
-	function ones(r,c) {
-
-		if(r===1 && c===1) { return 1; }
-		else { return matrico_core.ones(r,c); }
-	}
-
-	function eye(r) {
-
-		if(r===1) { return 1; }
-		else { return ""+matrico_core.eye(r); }
-	}
-
-	function rand(r,c) {
-
-		if(r===1 && c===1) { return matrico_core.rnd(); }
-		else { return matrico_core.rand(r,c); }
-	}
-
-	function randn(r,c) {
-
-		if(r===1 && c===1) { return (rnd()*2.0-1.0)+(rnd()*2.0-1.0)+(rnd()*2.0-1.0); }
-		else { return matrico_core.randn(r,c); }
-	}
-
-	function vec(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.vec_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return m; }
-	}
-
-	function uminus(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.uminus_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return -m; }
-	}
-
-	function abs(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.abs_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.abs(m); }
-	}
-
-	function sign(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.sign_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return (m>0) - (m<0); }
-	}
-
-	function sin(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.sin_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.sin(m); }
-	}
-
-	function cos(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.cos_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.cos(m); }
-	}
-
-	function tan(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.tan_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.tan(m); }
-	}
-
-	function asin(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.asin_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.asin(m); }
-	}
-
-	function acos(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.acos_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.acos(m); }
-	}
-
-	function atan(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.atan_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.atan; }
-	}
-
-	function sinh(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.sinh_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.sinh(m); }
-	}
-
-	function cosh(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.cosh_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.cosh(m); }
-	}
-
-	function tanh(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.tanh_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.tanh(m); }
-	}
-
-	function sqrt(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.sqrt_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.sqrt(m); }
-	}
-
-	function exp(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.exp_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.exp(m); }
-	}
-
-	function log(m) {
-
-		     if(typeof(m)==="string") { return ""+matrico_core.log_m(parseInt(m)); }
-		else if(typeof(m)==="number") { return Math.log(m); }
-	}
-
-	function times(m,n) {
-
-		     if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.times_ms(parseInt(m),n); }
-		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.times_ms(parseInt(n),m); }
-		else if(typeof(m)==="number" && typeof(n)==="number") { return m*n; }
-	}
-
-	function plus(m,n) {
-
-		     if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.plus_mm(parseInt(m),parseInt(n)); }
-		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.plus_ms(parseInt(m),n); }
-		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.plus_ms(parseInt(n),m); }
-	}
-
-	function minus(m,n) {
-
-		     if(typeof(m)==="string" && typeof(n)==="string") { return ""+matrico_core.minus_mm(parseInt(m),parseInt(n)); }
-		else if(typeof(m)==="string" && typeof(n)==="number") { return ""+matrico_core.minus_ms(parseInt(m),n); }
-		else if(typeof(m)==="number" && typeof(n)==="string") { return ""+matrico_core.minus_sm(m,parseInt(n)); }
-	}
-
-	function mtimes(m,n) {
-
-		return ""+matrico_core.mtimes(parseInt(m),parseInt(n));
-	}
-
-
-	function sum(m,n) {
-
-		     if(typeof(m)==="number") { return m; }
-		else if(typeof(m)==="string" && n==1 && size(m,2)==1) { return ""+matrico_core.sum_1s(parseInt(m)); }
-		else if(typeof(m)==="string" && n==2 && size(m,1)>1) { return ""+matrico_core.sum_2s(parseInt(m)); }
-		else if(typeof(m)==="string" && n==1 && size(m,2)==1) { return ""+matrico_core.sum_1m(parseInt(m)); }
-		else if(typeof(m)==="string" && n==2 && size(m,1)>1) { return ""+matrico_core.sum_2m(parseInt(m)); }
-	}
-
-	function prod(m,n) {
-
-		     if(typeof(m)==="number") { return m; }
-		else if(typeof(m)==="string" && n==1) { return ""+matrico_core.prod_1(parseInt(m)); }
-		else if(typeof(m)==="string" && n==2) { return ""+matrico_core.prod_2(parseInt(m)); }
-	}
-
-	function mean(m,n) {
-
-		     if(typeof(m)==="number") { return m; }
-		else if(typeof(m)==="string" && n==1) { return ""+matrico_core.mean_1(parseInt(m)); }
-		else if(typeof(m)==="string" && n==2) { return ""+matrico_core.mean_2(parseInt(m)); }
-	}
-
-
-	return {
-		 numel : numel,
-		  size : size,
-
-		 zeros : zeros,
-		  ones : ones,
-		   eye : eye,
-		  rand : rand,
-		 randn : randn,
-
-		   vec : vec,
-		uminus : uminus,
-
-		   abs : abs,
-		  sign : sign,
-		   sin : sin,
-		   cos : cos,
-		   tan : tan,
-		  asin : asin,
-		  acos : acos,
-		  atan : atan,
-		  sinh : sinh,
-		  cosh : cosh,
-		  tanh : tanh,
-		  sqrt : sqrt,
-		   exp : exp,
-		   log : log,
-
-		 times : times,
-		  plus : plus,
-		 minus : minus,
-		mtimes : mtimes,
-
-		   sum : sum,
-		  prod : prod
-	};
-
-
-})();
-
-function echo(m)
-{
-	var o = "";
-
-	var r = matrico_core.size(m,1);
-	var c = matrico_core.size(m,2);
-	var v = 0;
-
-	for(var i=0;i<r;i++)
-	{
-		o += " ";
-		for(var j=0;j<c;j++)
-		{
-			v = matrico_core.at(m,i,j);
-			if(v>=0) { o += " "; }
-			o += v.toFixed(4) + " ";
-		}
-		o = o + "\n";
-	}
-	o = o + "\n";
-
-	return o;
-}
 
