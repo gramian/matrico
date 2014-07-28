@@ -30,6 +30,8 @@ var matrico_core = (function(stdlib,foreign,heap)
 	var math_pow   = stdlib.Math.pow;
 	var math_ceil  = stdlib.Math.ceil;
 	var math_floor = stdlib.Math.floor;
+	var math_min   = stdlib.Math.min;
+	var math_max   = stdlib.Math.max;
 
 	var floor = stdlib.Math.floor;
 
@@ -232,6 +234,14 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 
 		return o|0;
+	}*/
+
+	/*function horzcat(m,n) { m = m|0; n = n|0;
+
+	}*/
+
+	/*function vertcat(m,n) { m = m|0; n = n|0;
+
 	}*/
 
 //	###  ##   ###
@@ -773,6 +783,26 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 	}*/
 
+//	###  ###  ###  ###  ###
+//	 #   # #  # #  #    #
+//	 #   ###  ###  #    ##
+//       #   ##   # #  #    #
+//	 #   # #  # #  ###  ###
+
+	function trace(m) { m = m|0;
+
+		var r = 0.0, c = 0.0, d = 0, o = 0.0, x = 0, i = 0;
+
+		r = +mem[(m - 2<<3)>>3];
+		c = +mem[(m - 1<<3)>>3];
+		d = ~~+c|0 + 1;
+		x = ~~+math_min(r,c);
+
+		for(;(i|0)<(x|0);i=(i+d)|0) { o = o + mem[(i<<3)>>3]; }
+
+		return +o; }
+
+
 	/*function eig(m,n) {
 
 	}*/
@@ -841,9 +871,9 @@ var matrico_core = (function(stdlib,foreign,heap)
 		prod_1 : prod_1,
 		prod_2 : prod_2,
 		mean_1 : mean_1,
-		mean_2 : mean_2
+		mean_2 : mean_2,
 		//median
-		//trace
+		 trace : trace
 		//eig
 		//svd
 		//svds

@@ -199,6 +199,12 @@ var matrico = (function()
 		else if(typeof(m)==="string" && n==2) { return ""+matrico_core.mean_2(parseInt(m)); }
 	}
 
+	function trace(m) {
+
+		     if(typeof(m)==="string") { return ""+matrico_core.trace(parseInt(m)); }
+		else if(typeof(m)==="number") { return m; }
+	}
+
 
 	return {
 		 numel : numel,
@@ -237,7 +243,10 @@ var matrico = (function()
 		mtimes : mtimes,
 
 		   sum : sum,
-		  prod : prod
+		  prod : prod,
+		  mean : mean,
+
+		 trace : trace
 	};
 
 

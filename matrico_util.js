@@ -23,3 +23,18 @@ function echo(m)
 	return o;
 }
 
+function tic()
+{
+
+}
+
+function toc()
+{
+
+}
+
+function isnumeric()
+{
+
+}
+
