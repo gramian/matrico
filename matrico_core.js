@@ -687,14 +687,31 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 		return o|0; }
 
+//	#   #  ###  ###  #   #  ###  ###
+//	## ##   #    #   ## ##  #    #
+//	# # #   #    #   # # #  ##   ###
+//	# # #   #    #   # # #  #      #
+//	#   #   #   ###  #   #  ###  ###
+
 	/*function mtimes(m,n) {
 
 	}*/
 
+//	##   ###  ###
+//	# #  # #   #
+//	# #  # #   #
+//	# #  # #   #
+//	##   ###   #
 
-	/*function dot(m,n) {
+	/*function dot_1(m,n) { m = m|0; n = n|0;
 
-	}*/
+
+		return o|0; }*/
+
+	/*function dot_2(m,n) { m = m|0; n = n|0;
+
+
+		return o|0; }*/
 
 //	###  # #  #   #
 //	#    # #  ## ##
