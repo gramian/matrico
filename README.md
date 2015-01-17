@@ -5,93 +5,66 @@ matrico is a web-based linear algebra library written in Javascript.
 The syntax is related to Matlab and Octave.
 asm.js is utilized for efficient computations.
 
+* Automatic Broadcasting (No bsxfun)
+* Assigment Operators
+
+
 ## Functions ##
 
-Thew following functions are implemented:
 
-* at
 
-* size(m,d)	, size of dimension d of array m 
-* numel(m)	, number of elements of array m
+### Core ###
 
-* zeros(r,c)	, array filled with zeros with r rows and c columns
-* ones(r,c)	, array filled with ones with r rows and c columns
-* eye(r)	, unit matrix with r rows and columns
-* rand(r,c)	, array filled with uniformly distributed values with r rows and c columns
-* randn(r,c)	, array filled with normally distributed values with r rows and c columns
+* at(matrix,row,column) ; element access (alpha)
+* row(matrix,row)       ; row access (0)
+* col(matrix,column)    ; column access (0)
+* page(matrix,page)     ; page access (0)
 
-* vec(m)	, vectorize array
-* trace(m)      , matrix trace
+* size(matrix,dimension) ; size of dimension (alpha)
+* numel(matrix)          ; number of elements (alpha)
 
-* uminus(m)	, unary minus of array
+* zeros(rows,columns) ; zero matrix
+* ones(rows,columns)  ; ones matrix
+* eye(dimension)      ; unit matrix
+* rand(rows,columns)  ; uniform random matrix
+* randn(rows,columns) ; normal random matrix
 
-* round(m)      , round all array elements
-* abs(m)	, absolute value of all array elements
-* sign(m)	, sign of all array elements
+* unit(rows,row) ; unit vector
 
-* sin(m)	, sine of all array elements 
-* cos(m)	, cosine of all array elements
-* tan(m)	, tangent of all array elements
-* asin(m)	, arcsine of all array elements
-* acos(m)	, arccosine of all array elements
-* atan(m)	, arctangent of all array elements
-* sinh(m)	, hyperbolic sine of all array elements
-* cosh(m)	, hyperbolic cosine of all array elements
-* tanh(m)	, hyperbolic tangent of all array elements
-* asinh(m)      , area hyperbolic sine of all array elements
-* acosh(m)      , area hyperbolic cosine of all array elements
-* atanh(m)      , area hyperbolic tangent of all array elements
-* sqrt(m)	, squareroot of all array elements
-* exp(m)	, exponential of all array elements
-* log(m)	, natural logarithm of all array elements
-
-* horzcat(m,n)
-* vertcat(m,n)
-
-* plus(m,n)
-* minus(m,n)
-* times(m,n)
-* mtimes(m,n)
-* dot(m,n)
-
-### TODO ###
-
-* col
-* row
-* page
-
-* pow
+* linspace
 
 * diag
-* bsxfun
-* sum
-* prod
-* diff
-* permute
-* repmat
-* reshape
-* transpose
-* dot
-* norm
-* svd
+* diag
 
-* rdivide
-* ldivide
+* vec(matrix)                  ; vectorize
+* reshape(matrix,rows,columns) ; reshape to
+* repmat(matrix,rows,columns)  ; repeat
+
+* horzcat(matrix,matrix) ; concatenate horizontally
+* vertcat(matrix,matrix) ; concatenate vertically
+
+* abs(matrix)            ; element-wise absolute value
+* sign(matrix)           ; element-wise sign
+* dirac
+* heaviside
+* kronecker
+
+* norm
+
+* round(matrix)          ; element-wise round
+* ceil
+* floor
+
+* min
+* max
 
 * and
 * or
 * not
 * xor
+
 * any
 * all
-
-* max
-* min
-* mean
-* median
-* var
-* cov
-* std
 
 * isequal
 * eq
@@ -101,9 +74,74 @@ Thew following functions are implemented:
 * lt
 * le
 
+* sin(matrix) ; element-wise sine
+* cos(matrix) ; element-wise cosine
+* tan(matrix) ; element-wise tangent
+
+* asin(matrix) ; element-wise arcsine
+* acos(matrix) ; element-wise arccosine
+* atan(matrix) ; element-wise arctangent
+
+* sinh(matrix) ; element-wise hyperbolic sine
+* cosh(matrix) ; element-wise hyperbolic cosine
+* tanh(matrix) ; element-wise hyperbolic tangent
+
+* sqrt(matrix) ; element-wise squareroot
+* exp(matrix)  ; element-wise exponential
+* log(matrix)  ; element-wise natural logarithm
+
+* pow(matrix,matrix) ; element-wise power
+* pow(matrix,number) ; element-wise power
+* pow(number,matrix) ; element-wise power
+
+* transpose
+
+* uminus(matrix) ; element-wise unary minus
+
+* times(matrix,number) ; element-wise scaling
+
+* plus(matrix,number) ; element-wise addition
+* plus(matrix,matrix) ; element-wise addition
+
+* minus(matrix,number) ; element-wise subtraction
+* minus(matrix,matrix) ; element-wise subtraction
+
+* mtimes
+
+* dot
+
+* sum
+
+* prod
+
+* diff
+
+* mean
+* median
+* var
+* cov
+* std
+
+* trace
+
+* eigs
+
+* svds
+
+* speye
+* sparse
+
+* permute
+
+
+
+
+### Util ###
+
 * isnumeric
 * exist
 * dec2bin
+* echo
 * tic
 * toc
 
