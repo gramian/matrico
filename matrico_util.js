@@ -1,7 +1,7 @@
 
-function echo(m)
+function echo(m,n)
 {
-	var o = "";
+	var o = n + " = \n";
 
 	var r = matrico_core.size(m,1);
 	var c = matrico_core.size(m,2);
@@ -16,11 +16,13 @@ function echo(m)
 			if(v>=0) { o += " "; }
 			o += v.toFixed(4) + " ";
 		}
-		o = o + "\n";
+		o += "\n";
 	}
-	o = o + "\n";
+	o += "\n";
 
-	return o;
+	document.getElementById("out").innerHTML += o;
+
+	return;
 }
 
 function tic()
