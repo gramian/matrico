@@ -25,18 +25,20 @@ function echo(m,n)
 	return;
 }
 
+var timer = 0;
+
 function tic()
 {
-
+	timer = Date.now();
 }
 
-function toc()
+function toc(t)
 {
-
+	return timer - Date.now();
 }
 
-function isnumeric()
+function isnumeric(s)
 {
-
+	return !isNaN(+s) && isFinite(s);
 }
 

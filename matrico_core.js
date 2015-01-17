@@ -824,10 +824,6 @@ var matrico_core = (function(stdlib,foreign,heap)
 
 	}*/
 
-	/*function svd(m,n) {
-
-	}*/
-
 	/*function svds(m,n) {
 
 	}*/
