@@ -14,13 +14,13 @@ var matrico = (function()
 	function zeros(r,c) {
 
 		if(r===1 && c===1) { return 0; }
-		else { return matrico_core.zero(r,c); }
+		else { return ""+matrico_core.zeros(r,c); }
 	}
 
 	function ones(r,c) {
 
 		if(r===1 && c===1) { return 1; }
-		else { return matrico_core.ones(r,c); }
+		else { return ""+matrico_core.ones(r,c); }
 	}
 
 	function eye(r) {
