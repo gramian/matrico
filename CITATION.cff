@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Himpe
+  given-names: Christian
+  orcid: https://orcid.org/0000-0003-2194-6754
+title: matrico
+type: software
+abstract: "A flonum matrix module for CHICKEN Scheme."
+version: 0.1
+date-released: 2022-??-??
+commit:
+license: zlib-Acknowledgement
+repository: https://github.com/gramian/matrico
+url: https://numerical-schemer.xyz
+keywords:
+  - "Scheme"
+  - "Chicken Scheme"
+  - "Matrix Calculations"
+  - "Matrix Computations"
+  - "Linear Algebra"
+  - "Numerical Mathematics"
+  - "Numerical Linear Algebra"
+

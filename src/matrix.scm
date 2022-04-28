@@ -1,0 +1,465 @@
+;;;; matrix.scm
+
+;;@project: matrico (numerical-schemer.xyz)
+;;@version: 0.1 (2022-??-??)
+;;@authors: Christian Himpe (0000-0003-2194-6754)
+;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
+;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.
+
+(include-relative "utils.scm")
+
+(functor (matrix
+           (column (column-id
+                    column
+                    make-column
+                    column-length
+                    column-ref column-set!
+                    subcolumn
+                    column-unfold
+                    column-concat
+                    column-any? column-all?
+                    column-map column-map-index
+                    column-foreach column-foreach-index
+                    column-fold column-fold*
+                    column-dot
+                    list->column)))
+
+  (matrix?
+   make-matrix* make-matrix** matrix-generate
+   matrix-horcat matrix-vercat matrix-vec
+   matrix-cols matrix-rows matrix-numel matrix-dims
+   matrix-ref00 matrix-ref matrix-col matrix-row matrix-submatrix matrix-diag
+   matrix-set!
+   matrix-col? matrix-row? matrix-scalar? matrix-vector? matrix-square?
+   matrix-samecols? matrix-samerows? matrix-samedims?
+   matrix-any? matrix-all?
+   matrix-colfold matrix-rowfold matrix-allfold
+   matrix-map matrix-broadcast
+   matrix-transpose matrix-dot* matrix-scalar matrix-explode matrix-implode
+   matrix-print matrix-export matrix-save matrix-load)
+
+  (import scheme (chicken base) (chicken module) (only (chicken memory representation) object-copy) utils column)
+
+;;; Matrix Type ################################################################
+
+;;@returns: **void**, provides make-matrix constructor, matrix? predicate, matrix-data and matrix-cols accessors.
+(define-record matrix data cols)
+
+;;; Private Functions ##########################################################
+
+;;@returns: **matrix** resulting from applying **procedure** `fun` to each column of each **matrix** `x`.
+(define-inline (matrix-map* fun x)
+  (make-matrix
+    (map fun (matrix-data x))
+    (matrix-cols x)))
+
+;;@returns: **matrix** resulting from applying **procedure** `fun` to each column of each **matrix**es `x` and `y`.
+(define-inline (matrix-map** fun x y)
+  (make-matrix
+    (map fun (matrix-data x) (matrix-data y))
+    (matrix-cols x)))
+
+;;; Matrix Generators ##########################################################
+
+;;@returns: `rows`-by-`cols` **matrix** with all entries set to `val` for **fixnum**s `rows`, `cols`.
+(define (make-matrix* rows cols val)
+  (must-be (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols))
+  (make-matrix
+    (do [(idx cols (fx-1 idx))
+         (dat nil  (cons (make-column rows val) dat))]
+      ((fx=0? idx) dat))
+    cols))
+
+;;@returns: **matrix** from row-major **list**-of-**list**s `lst`.
+(define (make-matrix** lst)
+  (must-be (list? lst) (not (empty? lst)) (list? (head lst)))
+  (define cols (length (head lst)))
+  (assert (all? (lambda (l)
+                  (and (list? l) (fx= cols (length l))))
+                (tail lst)))
+  (make-matrix
+    (apply map column lst)
+    cols))
+
+;;@returns: `rows`-by-`cols` **matrix** generated procedurally from applying **procedure** `fun`, and **fixnum**s `rows`, `cols`.
+(define (matrix-generate fun rows cols)
+  (must-be (procedure? fun) (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols))
+  (make-matrix
+    (let rho ([col (fx-1 cols)]
+              [lst nil])
+      (if (fx= col -1) lst
+                       (rho (fx-1 col) (cons (column-unfold rows (lambda (row)
+                                                                   (fun row col)))
+                                             lst))))
+    cols))
+
+;;; Matrix Combiners ###########################################################
+
+;;@returns: **matrix** of horizontally concatenating **matrix**es from **list**-of-**matrix**es `mat`.
+(define (matrix-horcat . mat)
+  (must-be (not (empty? mat)) (apply = (map matrix-rows mat)))
+  (make-matrix
+    (apply append (map (compose object-copy matrix-data) mat))
+    (foldl fx+ 0 (map matrix-cols mat))))
+
+;;@returns: **matrix** of vertically concatenating **matrix**es from **list**-of-**matrix**es `mat`.
+(define (matrix-vercat . mat)
+  (must-be (not (empty? mat)) (apply = (map matrix-cols mat)))
+  (make-matrix
+    (apply map column-concat (map (compose object-copy matrix-data) mat))
+    (matrix-cols (head mat))))
+
+;;@returns: column **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
+(define (matrix-vec mat)
+  (must-be (matrix? mat))
+  (make-matrix
+    (list (apply column-concat (object-copy (matrix-data mat))))
+    1))
+
+;;; Matrix Dimensions ##########################################################
+
+;;@notice: `matrix-cols` is provided by the **record** `matrix`
+
+;;@returns: **fixnum** number of rows of **matrix** `mat`.
+(define (matrix-rows mat)
+  (must-be (matrix? mat))
+  (column-length (head (matrix-data mat))))
+
+;;@returns: **fixnum** number of entries of **matrix** `mat`.
+(define (matrix-numel mat)
+  (must-be (matrix? mat))
+  (fx* (matrix-rows mat) (matrix-cols mat)))
+
+;;@returns: **fixnum** number of dimensions of **matrix** `mat`.
+(define (matrix-dims mat)
+  (must-be (matrix? mat))
+  (fx+ (if (matrix-row? mat) 0 1) (if (matrix-col? mat) 0 1)))
+
+;;; Matrix Accessors ###########################################################
+
+;;@returns: **flonum** being the top, left entry of **matrix** `mat`.
+(define (matrix-ref00 mat)
+  (must-be matrix? mat)
+  (column-ref (head (matrix-data mat)) 0))
+
+;;@returns: **any** being entry of **matrix** `mat` in **fixnum** `row` and **fixnum** `col`umn.
+(define (matrix-ref mat row col)
+  (must-be (matrix? mat) (fixnum? row) (fx>=0? row) (fixnum? col) (fx>=0? col))
+  (column-ref (list-ref (matrix-data mat) col) row))
+
+;;@returns: **matrix** being column of **matrix** `mat` specified by **fixnum** `col`.
+(define (matrix-col mat col)
+  (must-be (matrix? mat) (fixnum? col) (fx>=0? col))
+  (make-matrix
+    (list (list-ref (matrix-data mat) col)) 1))
+
+;;@returns: **matrix** being row of **matrix** `mat` specified by **fixnum** `row`.
+(define (matrix-row mat row)
+  (must-be (matrix? mat) (fixnum? row) (fx>=0? row))
+  (matrix-map* (lambda (col)
+                 (column (column-ref col row))) mat))
+
+;;@returns: **matrix** holding entries of **matrix** `mat` from rows **fixnum**s `row1` to `row2` in columns from **fixnum**s `col1` to `col2`.
+(define (matrix-submatrix mat row1 row2 col1 col2)
+  (must-be (matrix? mat) (fixnum? row1) (fixnum? row2) (fixnum? col1) (fixnum? col2) (fx>=0? row1) (fx>=0? col1) (fx<= row1 row2) (fx<= col1 col2))
+  (make-matrix
+    (let [(cols (if (and (fx=0? col1) (fx= (fx+1 col2) (matrix-cols mat))) (matrix-data mat)
+                                                                           (object-copy (sublist (matrix-data mat) col1 col2))))]
+      (if (and (fx=0? row1) (fx= (fx+1 row2) (matrix-rows mat))) cols
+                                                                 (map (lambda (col)
+                                                                        (subcolumn col row1 (fx+1 row2)))
+                                                                      cols)))
+    (fx+1 (fx- col2 col1))))
+
+;;@returns column-**matrix** holding **matrix** `mat` diagonal entries.
+(define (matrix-diag mat)
+  (must-be (matrix? mat) (matrix-square? mat))
+  (make-matrix
+    (list (let [(ret (make-column (matrix-cols mat)))]
+            (do [(idx 0 (fx+1 idx))
+                 (lst (matrix-data mat) (tail lst))]
+              ((empty? lst) ret)
+              (column-set! ret idx (column-ref (head lst) idx)))))
+    1))
+
+;;@returns: **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to argument `val`.
+(define (matrix-set! mat row col val)
+  (must-be (matrix? mat) (fixnum? row) (fx>=0? row) (fixnum? col) (fx>=0? col))
+  (column-set! (list-ref (matrix-data mat) col) row val))
+
+;;; Matrix Predicates ##########################################################
+
+;;@returns: **boolean** answering if **matrix** `mat` has only a single column.
+(define (matrix-col? mat)
+  (fx= (matrix-cols mat) 1))
+
+;;@returns: **boolean** **boolean** answering if **matrix** `mat` has only a single row.
+(define (matrix-row? mat)
+  (fx= (matrix-rows mat) 1))
+
+;;@returns: **boolean** answering if **matrix** `mat` has only a single row and single column, aka scalar.
+(define (matrix-scalar? mat)
+  (and (matrix-col? mat) (matrix-row? mat)))
+
+;;@returns: **boolean** answering if **matrix** `mat` has only a single row or single column, aka vector.
+(define (matrix-vector? mat)
+  (or (matrix-col? mat) (matrix-row? mat)))
+
+;;@returns: **boolean** answering if **matrix** `mat` has the same number of rows and columns.
+(define (matrix-square? mat)
+  (fx= (matrix-rows mat) (matrix-cols mat)))
+
+;;@returns: **boolean** answering if **matrix**es `x` and `y` have same number of columns.
+(define (matrix-samecols? x y)
+  (fx= (matrix-cols x) (matrix-cols y)))
+
+;;@returns: **boolean** answering if **matrix**es `x` and `y` have same number of rows.
+(define (matrix-samerows? x y)
+  (fx= (matrix-rows x) (matrix-rows y)))
+
+;;@returns: **boolean** answering if **matrix**es `x` and `y` have same number of columns and rows.
+(define (matrix-samedims? x y)
+  (and (matrix-samecols? x y) (matrix-samerows? x y)))
+
+;;@returns: **boolean** answering if any entry of **matrix** `mat` fulfills predicate **procedure** `pred`.
+(define (matrix-any? pred mat)
+  (must-be (procedure? pred) (matrix? mat))
+  (any? (lambda (x)
+          (column-any? pred x))
+        (matrix-data mat)))
+
+;;@returns: **boolean** answering if all entries of **matrix** `mat` fulfill predicate **procedure** `pred`.
+(define (matrix-all? pred mat)
+  (must-be (procedure? pred) (matrix? mat))
+  (all? (lambda (x)
+          (column-all? pred x))
+        (matrix-data mat)))
+
+;;; Matrix Reducers ############################################################
+
+;;@returns: row-**matrix** resulting from folding by two-argument **procedure** `fun` each column of **matrix** `mat`.
+(define (matrix-colfold fun ini mat)
+  (must-be (procedure? fun) (matrix? mat))
+  (matrix-map* (lambda (col)
+                 (column (column-fold fun ini col)))
+               mat))
+
+;;@returns: column-**matrix** resulting from folding by two-argument **procedure** `fun` each row of **matrix** `mat`.
+(define (matrix-rowfold fun ini mat)
+  (must-be (procedure? fun) (matrix? mat))
+  (make-matrix
+    (list (foldl (lambda (acc col)
+                   (column-map fun acc col))
+                 (make-column (matrix-rows mat) ini)
+                 (matrix-data mat)))
+    1))
+
+;;@returns: **any** resulting from folding by two-argument **procedure** `fun` all **matrix** `mat` entries.
+(define (matrix-allfold fun ini mat)
+  (must-be (procedure? fun) (matrix? mat))
+  (foldl (lambda (acc col)
+           (column-fold fun acc col))
+         ini
+         (matrix-data mat)))
+
+;;; Matrix Mappers #############################################################
+
+;;@returns: **matrix** resulting from applying function to each entry of **matrix** `mat`.
+(define (matrix-map fun mat)
+  (must-be (procedure? fun) (matrix? mat))
+  (matrix-map* (lambda (col)
+                 (column-map fun col))
+               mat))
+
+;;@returns: **matrix** resulting from applying **procedure** `fun` to each element of **matrix**es `x`, `y`, expanded if necessary.
+(define (matrix-broadcast fun x y)
+  (must-be (procedure? fun) (matrix? x) (matrix? y))
+  (let [(x-rows (matrix-rows x))
+        (y-rows (matrix-rows y))
+        (x-cols (matrix-cols x))
+        (y-cols (matrix-cols y))]
+    (cond [(and (fx= x-rows y-rows) (fx= x-cols y-cols))   ; matrix o matrix
+             (matrix-map** (lambda (x-col y-col)
+                             (column-map (lambda (x-row y-row)
+                                           (fun x-row y-row))
+                                         x-col y-col))
+                           x y)]
+
+          [(and (fx= 1 x-rows) (fx= 1 x-cols))             ; scalar o matrix
+             (let [(x0 (matrix-ref00 x))]
+               (matrix-map (lambda (yk)
+                             (fun x0 yk))
+                           y))]
+
+          [(and (fx= 1 y-rows) (fx= 1 y-cols))             ; matrix o scalar
+             (let [(y0 (matrix-ref00 y))]
+               (matrix-map (lambda (xk)
+                             (fun xk y0))
+                           x))]
+
+          [(and (fx= 1 x-rows) (fx= x-cols y-cols))        ; row o matrix
+             (matrix-map** (lambda (x-col y-col)
+                             (let [(x0 (column-ref x-col 0))]
+                               (column-map (lambda (y-row)
+                                              (fun x0 y-row))
+                                            y-col)))
+                           x y)]
+
+          [(and (fx= 1 y-rows) (fx= x-cols y-cols))        ; matrix o row
+             (matrix-map** (lambda (x-col y-col)
+                             (let [(y0 (column-ref y-col 0))]
+                                (column-map (lambda (x-row)
+                                               (fun x-row y0))
+                                             x-col)))
+                           x y)]
+
+          [(and (fx= 1 x-cols) (fx= x-rows y-rows))        ; column o matrix
+             (let [(x0 (head (matrix-data x)))]
+               (matrix-map* (lambda (y-col)
+                              (column-map fun x0 y-col))
+                            y))]
+
+          [(and (fx= 1 y-cols) (fx= x-rows y-rows))        ; matrix o column
+             (let [(y0 (head (matrix-data y)))]
+               (matrix-map* (lambda (x-col)
+                              (column-map fun x-col y0))
+                            x))]
+
+          [(and (fx= 1 x-rows) (fx= 1 y-cols))             ; row o column
+             (let [(y0 (head (matrix-data y)))]
+               (matrix-map* (lambda (x-col)
+                              (let [(x0 (column-ref x-col 0))]
+                                (column-map (lambda (y-row)
+                                               (fun x0 y-row))
+                                             y0)))
+                            x))]
+
+          [(and (fx= 1 x-cols) (fx= 1 y-rows))             ; column o row
+             (let [(x0 (head (matrix-data x)))]
+               (matrix-map* (lambda (y-col)
+                              (let [(y0 (column-ref y-col 0))]
+                                (column-map (lambda (x-row)
+                                               (fun x-row y0))
+                                             x0)))
+                            y))]
+
+          [else
+            (error 'matrix-broadcast "Dimension mismatch!")])))
+
+;;; Matrix Specifics ###########################################################
+
+;;@returns: **matrix** of entries of **matrix** `mat` with swapped row and column indices.
+(define (matrix-transpose mat)
+  (must-be (matrix? mat))
+  (make-matrix
+    (apply column-fold* (lambda (acc . vals)
+                          (cons (list->column vals) acc))
+                        nil
+                        (matrix-data mat))
+    (matrix-rows mat)))
+
+;;@returns: **matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`.
+(define (matrix-dot* xt y)
+  (must-be (matrix? xt) (matrix? y) (matrix-samerows? xt y))
+  (define xt-data (matrix-data xt))
+  (define xt-cols (matrix-cols xt))
+  (matrix-map* (lambda (y-col)
+                 (let [(ret (make-column xt-cols))]
+                   (do [(idx 0 (fx+1 idx))
+                        (lst xt-data (tail lst))]
+                     ((fx= idx xt-cols) ret)
+                     (column-set! ret idx (column-dot (head lst) y-col)))))
+               y))
+
+;;@returns: **any** resulting from the scalar product of column-**matrix**es `x` and `y`.
+(define (matrix-scalar x y)
+  (must-be (matrix-col? x) (matrix-col? y) (matrix-samerows? x y))
+  (column-dot (head (matrix-data x)) (head (matrix-data y))))
+
+;;@returns: **list**-of-column-**matrix**es from **matrix** `mat`.
+(define (matrix-explode mat)
+  (must-be (matrix? mat))
+  (map (lambda (col)
+         (make-matrix (list col) 1))
+       (matrix-data mat)))
+
+;;@returns: **matrix** of horizontally concatenation of **list**-of-column-**matrix**es `lst`.
+(define (matrix-implode lst)
+  (must-be (list? lst) (not (empty? lst)) (apply = (map matrix-rows lst)) (all? matrix-col? lst))
+  (make-matrix
+    (map (compose object-copy head matrix-data) lst)
+    (length lst)))
+
+;;; Matrix Utilities ###########################################################
+
+;;@returns: **void**, prints **matrix** to terminal.
+(define (matrix-print fun mat)
+  (must-be (procedure? fun) (matrix? mat))
+  (define rows (matrix-rows mat))
+  (define rows-1 (fx-1 rows))
+  (apply column-foreach-index (lambda (idx . row)
+                                (cond [(fx= rows 1)     (display "[")]
+                                      [(fx= idx 0)      (display "⎡")]
+                                      [(fx= idx rows-1) (display "⎣")]
+                                      [else             (display "⎢")])
+                                (do [(lst row (tail lst))]
+                                  ((empty? lst))
+                                  (begin
+                                    (display (fun (head lst)))
+                                    (when (not (empty? (tail lst))) (display " "))))
+                                (cond [(fx= rows 1)     (display "]")]
+                                      [(fx= idx 0)      (display "⎤")]
+                                      [(fx= idx rows-1) (display "⎦")]
+                                      [else             (display "⎥")])
+                                (newline)) (matrix-data mat))
+  (newline))
+
+;;@returns: **void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path (**string**) `str`.
+(define (matrix-export str mat)
+  (must-be (string? str) (matrix? mat))
+  (define (export-mat)
+    (apply column-foreach (lambda row
+                            (do [(lst row (tail lst))]
+                              ((empty? lst) (newline))
+                              (begin
+                                (display (head lst))
+                                (when (not (empty? (tail lst))) (display " "))))) (matrix-data mat)))
+  (with-output-to-file str export-mat #:text))
+
+;;@returns: **void**, writes matrix `mat` to new Scheme (SCM) file in relative path (**string**) `str`.
+(define (matrix-save str mat)
+  (must-be (string? str) (matrix? mat))
+  (let [(save-mat (lambda ()
+                    (display "'(;@matrico")
+                    (newline)
+                    (for-each print (matrix-data mat))
+                    (display ")")
+                    (newline)))]
+    (with-output-to-file str save-mat #:text)))
+
+;;@returns: **matrix** loaded from file in relative path (**string**) `str`.
+(define (matrix-load str)
+  (must-be (string? str))
+  (define data (load* str))
+  (make-matrix data (length data)))
+
+); end functor
+
+;;; References #################################################################
+
+;;@1: R.K. Dybvig: The Scheme Programming Language, 12.1 Matrix and Vector Multiplication. https://www.scheme.com/tspl4/examples.html#./examples:h1
+
+;;@2: B. Harvey, M. Wright: Simply Scheme: Introducing Computer Science, 23 Vectors. https://people.eecs.berkeley.edu/~bh/ssch23/vectors.html
+
+;;@3: G. Springer, D.P. Friedman: Scheme and the Art of Programming, 9.4 Matrices.
+
+;;@4: H. Abelson, G.J. Sussman, J. Sussman: Structure and Interpretation of Computer Programs, 2.2.3 Sequences as Conventional Interfaces. https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-15.html#%_sec_2.2.3
+
+;;@5: M. Eisenberg: Programming in Scheme, 8 (Ex. 23).
+
+;;@6: M. Watson: Programming in SCHEME, 6.3.1 Two-Dimensional Array Library. https://doi.org/10.1007/978-1-4612-2394-8
+
+;;@7: I. Ferguson, E. Martin, B. Kaufman: The Schemer's Guide (Second Edition), 4 Data Structures.
+
+;;@8: C. Hanson, G.J. Sussman: Software Design for Flexibility, 3 Variations on an Arithmetic Theme (Ex. 3.6). https://mitpress.mit.edu/books/software-design-flexibility
+

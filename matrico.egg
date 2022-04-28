@@ -1,0 +1,11 @@
+;;;; matrico.egg
+
+((version "0.1")
+ (synopsis "A matrix module egg for numerical schemers.")
+ (author "Christian Himpe")
+ (category math)
+ (license "ZLIB-Acknowledgement")
+ (platform (or linux))
+ (components (extension matrico (csc-options "-O4" "-d0" "-C" "-O2" "-C" "-fomit-frame-pointer" "-C" "-fno-strict-aliasing")))
+)
+
