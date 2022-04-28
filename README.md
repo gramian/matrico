@@ -13,7 +13,7 @@
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
-* **Website**: https://numerical-schemer.xyz (Development Blog)
+* **Website**: http://numerical-schemer.xyz (Development Blog)
 
 * **Reference**: http://
 
