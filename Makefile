@@ -21,7 +21,7 @@ test:
 test_egg_local:
 	tar cvzf matrico-$(VERSION).tar.gz \
                 ../matrico/AUTHORS ../matrico/CITATION.cff ../matrico/LICENSE ../matrico/README.md \
-                ../matrico/matrico.egg ../matrico/matrico.release-info ../matrico/matrico.wiki ../matrico/matrico-logo.svg \
+                ../matrico/matrico.egg ../matrico/matrico.release-info ../matrico/matrico-logo.svg \
                 ../matrico/matrico.scm ../matrico/RUNME.scm ../matrico/version.scm \
                 ../matrico/src/dense.scm ../matrico/src/f64vector.scm ../matrico/src/fpmath.scm ../matrico/src/matrix.scm ../matrico/src/mx.scm ../matrico/src/utils.scm \
                 ../matrico/tests/check.scm ../matrico/tests/run.scm ../matrico/tests/test-f64vector.scm ../matrico/tests/test-fpmath.scm ../matrico/tests/test-matrico.scm ../matrico/tests/test-utils.scm
@@ -29,7 +29,7 @@ test_egg_local:
 	test-new-egg matrico http://0.0.0.0:8000/matrico.release-info
 
 test_egg_remote:
-	test-new-egg https://raw.githubusercontent.com/gramian/matrico/main/matrico.release-info
+	test-new-egg matrico https://raw.githubusercontent.com/gramian/matrico/main/matrico.release-info
 
 test_install:
 	CHICKEN_INSTALL_REPOSITORY="/tmp/matrico" chicken-install -test matrico
