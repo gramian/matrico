@@ -32,7 +32,7 @@ test_egg_remote:
 	test-new-egg matrico https://raw.githubusercontent.com/gramian/matrico/main/matrico.release-info
 
 test_install:
-	CHICKEN_INSTALL_REPOSITORY="/tmp/matrico" chicken-install -test matrico
+	CHICKEN_INSTALL_REPOSITORY="/tmp/matrico" chicken-install -test
 	CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/tmp/matrico" $(CSI) -e "(import matrico) (matrico-help)"
 
 benchmark:
