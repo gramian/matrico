@@ -78,25 +78,23 @@
 ;;; Vector Mappers #############################################################
 
 ;;@returns: **f64vector** resulting from applying **procedure** `fun` to **f64vector**(s) `vec` elements.
-(define f64vector-map (case-lambda
-  [(fun vec)
-    (must-be (procedure? fun) (f64vector? vec))
-    (let* [(dim (f64vector-length vec))
-           (ret (make-f64vector dim))]
-      (let rho [(idx 0)]
-        (if (fx= idx dim) ret
-                          (begin
-                            (f64vector-set! ret idx (fun (f64vector-ref vec idx)))
-                            (rho (fx+1 idx))))))]
-  [(fun . vec)
-    (must-be (procedure? fun) (not (empty? vec)))
-    (let* [(dim (f64vector-length (head vec)))
-           (ret (make-f64vector dim))]
-      (let rho [(idx 0)]
-        (if (fx= idx dim) ret
-                          (begin
-                            (f64vector-set! ret idx (apply fun (map (cut f64vector-ref <> idx) vec)))
-                            (rho (fx+1 idx))))))]))
+(define f64vector-map
+  (case-lambda [(fun vec) (must-be (procedure? fun) (f64vector? vec))
+                          (let* [(dim (f64vector-length vec))
+                                 (ret (make-f64vector dim))]
+                            (let rho [(idx 0)]
+                              (if (fx= idx dim) ret
+                                (begin
+                                  (f64vector-set! ret idx (fun (f64vector-ref vec idx)))
+                                  (rho (fx+1 idx))))))]
+               [(fun . vec) (must-be (procedure? fun) (not (empty? vec)))
+                            (let* [(dim (f64vector-length (head vec)))
+                                   (ret (make-f64vector dim))]
+                              (let rho [(idx 0)]
+                                (if (fx= idx dim) ret
+                                  (begin
+                                    (f64vector-set! ret idx (apply fun (map (cut f64vector-ref <> idx) vec)))
+                                    (rho (fx+1 idx))))))]))
 
 ;;@returns: **f64vector** resulting from applying **procedure** `fun` to index and all corresponding **f64vector**s `vec` elements, see @1.
 (define (f64vector-map-index fun . vec)
