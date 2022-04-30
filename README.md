@@ -54,7 +54,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 `matrico` is a ...
 
-* ... matrix-based numerical computing environment for, and fully written in _Scheme_.
+* ... matrix-based numerical computing environment for, and fully written in, _Scheme_.
 
 * ... self-contained implementation with minimal dependencies.
 
@@ -72,9 +72,9 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 ### Design Concepts
 
-* Provide two-dimensional dense floating-point (flonum) arrays for _CHICKEN Scheme_.
+* Provide dense two-dimensional arrays (matrix) of floating-point numbers (flonum) for _CHICKEN Scheme_.
 
-* Provide typical calculator and linear algebra functions.
+* Provide linear algebra and typical calculator functions for matrixes.
 
 * Use only [included modules](http://wiki.call-cc.org/man/5/Included%20modules) of _CHICKEN Scheme_.
 
@@ -86,7 +86,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * A Matrix can only have real-valued flonum entries.
 
-* Everything is a matrix, particularly, matrices are incompatible with _Scheme_'s (homogeneous) vectors.
+* Everything is a matrix, particularly, matrixes are incompatible with _Scheme_'s (homogeneous) vectors.
 
 * Matrix transformations are based on functional map-reduce approach.
 
@@ -116,7 +116,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 #### Module Properties
 
-* `(matrico-ver)` returns **pair** holding major and minor version number of the **matrico** module.
+* `(matrico-ver)` returns **pair** holding major and minor version numbers of the **matrico** module.
 
 * `(matrico-help)` returns **void**, prints help text to terminal.
 
