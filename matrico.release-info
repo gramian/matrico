@@ -3,4 +3,5 @@
 (uri targz "https://github.com/gramian/{egg-name}/archive/refs/tags/{egg-name}-{egg-release}.tar.gz")
 
 (release "0.1rc1")
+(release "0.1rc2")
 
