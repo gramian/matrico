@@ -15,7 +15,7 @@
 
 * **Website**: http://numerical-schemer.xyz (Development Blog)
 
-* **Reference**: http://wiki.call-cc.org/eggref/5/matrico
+* **Reference**: http://wiki.call-cc.org/eggref/5/matrico (User Reference)
 
 * **Repository**: https://github.com/gramian/matrico (Developer Documentation)
 
@@ -33,7 +33,7 @@
 
 ## Getting Started
 
-`matrico` is a Scheme module for numerical matrix computations encapsulated in a CHICKEN Scheme egg.
+`matrico` is a _Scheme_ module for numerical matrix computations encapsulated in a _CHICKEN Scheme_ egg.
 
 ### Install and Test `matrico` Egg
 ```
@@ -675,7 +675,7 @@ Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 * `(fptaper x)` returns **string** representation of **flonum** `x` formatted to 8 character fixed width.
 
 #### Utilities Module
-Provides a few simple functions, macros and aliases for convenience.
+Provides a few base functions, macros and aliases for convenience.
 
 * `(define-syntax-rule (name args) (body ...))` returns **macro** generating single-rule macro.
 
@@ -751,7 +751,7 @@ current numerical environments, which predominantly utilize the highly tuned
 [BLAS](https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms)
 and [LAPACK](https://en.wikipedia.org/wiki/LAPACK) libraries.
 The following `matrico` benchmarks in turn are meant as an indicator to track
-version-by-version performance evolution of this _pure_ Scheme implementation.
+version-by-version performance evolution of this **pure** _Scheme_ implementation.
 
 ### Benchmarks
 
@@ -776,21 +776,6 @@ make benchmark
 ```
 
 ### Systems
-
-#### ARM-64 Notebook / Laptop
-
-* `CPU:` M1 (4+4 Cores @ 3.2Ghz)
-* `RAM:` 16GB (LPDDR4X @ 4266MT/s)
-* `SYS:` macOS (12.3)
-* `SCM:` CHICKEN Scheme (5.3)
-
-##### LINPACK
-
-`47.6` Megaflops/s
-
-##### Matrix Multiplication
-
-![benchmark plot](doc/benchmark_m1.svg)
 
 #### ARM-64 Single-Board-Computer
 
@@ -819,7 +804,7 @@ make benchmark
 
 * [`matrico`] Add transport equation benchmark
 
-* [`matrico`] Add examples for documentation
+* [`matrico`] Add examples and links to documentation
 
 * [`mx`]      Add rank-revealing QR and pseudo-inverse via QR
 
