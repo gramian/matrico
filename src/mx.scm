@@ -1,7 +1,7 @@
 ;;;; mx.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-??-??)
+;;@version: 0.1 (2022-05-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type front-end
@@ -249,7 +249,7 @@
   (returns "**flonum** being the top, left entry of **matrix** `mat`.")
   (matrix-ref00 mat))
 
-;;@returns: **flonum** being **matrix** `mat` entry in and column specified by positive **fixnum**s `row`, `col`.
+;;@returns: **flonum** being **matrix** `mat` entry in row and column specified by positive **fixnum**s `row`, `col`.
 (define* (mx-ref mat row col)
   (returns "**flonum** being **matrix** `mat` entry in and column specified by positive **fixnum**s `row`, `col`.")
   (matrix-ref mat (translate-rows mat row) (translate-cols mat col)))

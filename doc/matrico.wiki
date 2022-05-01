@@ -1,5 +1,5 @@
 
-A Matrix Module Egg for Numerical Schemers
+A flonum matrix module for CHICKEN Scheme.
 
 [[toc:]]
 
@@ -93,7 +93,7 @@ returns ''boolean'' answering if ''matrix'' {{mat}} has only a single row and si
 returns ''boolean'' answering if ''matrix'' {{mat}} has only a single row or single column.
 
 <procedure>(mx-square? mat)</procedure>
-returns ''boolean'' answering if ''matrix'' {{mat}} has the same number of rows as columns.
+returns ''boolean'' answering if ''matrix'' {{mat}} has the same number of rows and columns.
 
 <procedure>(mx-samecols? x y)</procedure>
 returns ''boolean'' answering if ''matrix''es {{x}} and {{y}} have same number of columns.
@@ -111,7 +111,7 @@ returns ''boolean'' answering if any entry of ''matrix'' {{mat}} fulfills predic
 returns ''boolean'' answering if all entries of ''matrix'' {{mat}} fulfills predicate ''procedure'' {{pred}}.
 
 <procedure>(mx=? x y tol)</procedure>
-returns ''boolean'' answering if all entry-wise distances between ''matrix''es {{x}} and {{y}} are below tolerance **flonum** `tol`.
+returns ''boolean'' answering if all entry-wise distances between ''matrix''es {{x}} and {{y}} are below tolerance ''flonum'' `tol`.
 
 == Matrix Accessors
 
@@ -119,7 +119,7 @@ returns ''boolean'' answering if all entry-wise distances between ''matrix''es {
 returns ''flonum'' being the top, left entry of ''matrix'' {{mat}}.
 
 <procedure>(mx-ref mat row col)</procedure>
-returns ''flonum'' being ''matrix'' {{mat}} entry in and column specified by positive ''fixnum''s {{row}}, {{col}}.
+returns ''flonum'' being ''matrix'' {{mat}} entry in row and column specified by positive ''fixnum''s {{row}}, {{col}}.
 
 <procedure>(mx-col mat col)</procedure>
 returns ''matrix'' being ''matrix'' {{mat}} column specified by positive ''fixnum'' {{col}}.
@@ -399,13 +399,13 @@ returns diagonal ''matrix'' from column ''matrix'' {{mat}}.
 === Linear Problems
 
 <procedure>(mx-qr mat)</procedure>
-returns ''pair'' of orthogonal ''matrix'' (Q) and upper right triangular ''matrix'' (R) factoring full column rank argument ''matrix'' {{mat}}, via QR.
-
-<procedure>(mx-solve mat vec)</procedure>
-returns column-''matrix'' solving the linear problem of ''matrix'' {{mat}} and column-''matrix'' {{vec}}.
+returns ''pair'' of orthogonal ''matrix'' (Q) and upper right triangular ''matrix'' (R) factoring full column rank argument ''matrix'' {{mat}}.
 
 <procedure>(mx-solver mat)</procedure>
 function returning column-''matrix'' solving the linear (least-squares) problem of ''matrix'' {{mat}} and for argument column-''matrix'' {{vec}}.
+
+<procedure>(mx-solve mat vec)</procedure>
+returns column-''matrix'' solving the linear problem of ''matrix'' {{mat}} and column-''matrix'' {{vec}}.
 
 <procedure>(mx-absdet mat)</procedure>
 returns ''flonum'' being absolute value of the determinant of ''matrix'' {{mat}}.

@@ -1,7 +1,7 @@
 ;;;; check.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.0 (2022-??-??)
+;;@version: 0.1 (2022-05-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: testing helpers

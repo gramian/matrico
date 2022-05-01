@@ -1,7 +1,10 @@
 (repo git "git://github.com/gramian/{egg-name}.git")
 
-(uri targz "https://github.com/gramian/{egg-name}/archive/refs/tags/{egg-name}-{egg-release}.tar.gz")
+;(uri targz "https://github.com/gramian/{egg-name}/archive/refs/tags/{egg-name}-{egg-release}.tar.gz")
+
+(uri targz "http://0.0.0.0:8000/matrico-0.1.tar.gz")
 
 (release "0.1rc1")
 (release "0.1rc2")
+(release "0.1rel")
 

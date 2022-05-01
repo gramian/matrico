@@ -1,7 +1,7 @@
 ;;;; matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-??-??)
+;;@version: 0.1 (2022-05-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: A CHICKEN Scheme flonum matrix module.
@@ -92,7 +92,7 @@
 `matrico` is a flonum matrix module for CHICKEN Scheme, providing real-valued,
 two-dimensional, double-precision floating-point arrays in column-major ordering
 and one-based indexing together with calculator and linear algebra functions.")
-  (print #\newline "For documentation see: http://" #\newline)) ; TODO: add url
+  (print #\newline "For documentation see: http://wiki.call-cc.org/eggref/5/matrico" #\newline))
 
 ;;@returns: **boolean** answering if **symbol** `proc` is an existing function, starting with "mx" and prints its docstring.
 (define (matrico? proc)

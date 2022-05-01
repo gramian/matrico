@@ -1,7 +1,7 @@
 ;;;; matrix.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-??-??)
+;;@version: 0.1 (2022-05-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.

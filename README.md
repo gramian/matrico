@@ -9,13 +9,13 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.1 (2022-??-??)
+* **Version**: 0.1 (2022-05-01)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
 * **Website**: http://numerical-schemer.xyz (Development Blog)
 
-* **Reference**: http://
+* **Reference**: http://wiki.call-cc.org/eggref/5/matrico
 
 * **Repository**: https://github.com/gramian/matrico (Developer Documentation)
 
@@ -172,7 +172,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-vector? mat)` returns **boolean** answering if **matrix** `mat` has only a single row or single column.
 
-* `(mx-square? mat)` returns **boolean** answering if **matrix** `mat` has the same number of rows as columns.
+* `(mx-square? mat)` returns **boolean** answering if **matrix** `mat` has the same number of rows and columns.
 
 * `(mx-samecols? x y)` returns **boolean** answering if **matrix**es `x` and `y` have same number of columns.
 
@@ -190,7 +190,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-ref11 mat)` returns **flonum** being the top, left entry of **matrix** `mat`.
 
-* `(mx-ref mat row col)` **flonum** being **matrix** `mat` entry in and column specified by positive **fixnum**s `row`, `col`.
+* `(mx-ref mat row col)` **flonum** being **matrix** `mat` entry in row and column specified by positive **fixnum**s `row`, `col`.
 
 * `(mx-col mat col)` returns **matrix** being **matrix** `mat` column specified by positive **fixnum** `col`.
 
@@ -394,9 +394,9 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-qr mat)` returns **pair** of orthogonal **matrix** Q and upper right triangular **matrix** R factoring full column rank argument **matrix** `mat`, via QR.
 
-* `(mx-solve mat vec)` returns column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and column-**matrix** `vec`.
-
 * `(mx-solver mat)` returns function returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and for argument column-**matrix** `vec`.
+
+* `(mx-solve mat vec)` returns column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and column-**matrix** `vec`.
 
 * `(mx-absdet mat)` returns **flonum** being absolute value of the determinant of **matrix** `mat`.
 
@@ -811,13 +811,15 @@ make benchmark
 
 ### Changelog
 
-* **0.1** (2022-??-??) Initial Release
+* **0.1** (2022-05-01) Initial Release
 
 ### Roadmap
 
 * [`matrico`] Add heat equation benchmark
 
 * [`matrico`] Add transport equation benchmark
+
+* [`matrico`] Add examples for documentation
 
 * [`mx`]      Add rank-revealing QR and pseudo-inverse via QR
 

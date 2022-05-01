@@ -4,7 +4,7 @@ CSC = csc
 CSI = csi
 
 LEVEL = -O4
-FLAGS = -d0 -C -O2 -C -fomit-frame-pointer -C -pipe
+FLAGS = -d0 -C -O2 -C -pipe
 
 VERSION = $(shell csi -b version.scm -p "(matrico-version)")
 
