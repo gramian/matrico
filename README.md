@@ -801,7 +801,7 @@ make benchmark
 
 ##### LINPACK
 
-`3.1` Megaflops/s
+`18.9` Megaflops/s
 
 ##### Matrix Multiplication
 
