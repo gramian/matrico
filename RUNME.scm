@@ -1,20 +1,24 @@
 ;;;; RUNME.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: demo code
 
 (import matrico)
 
-;; `matrico` info
+;; `matrico` about
 
-(matrico-help)
+(matrico-about)
 
 ;; `matrico` version
 
 (matrico-ver)
+
+;; `matrico` cite
+
+(matrico-cite)
 
 ;; Using the REPL help
 

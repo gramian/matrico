@@ -1,7 +1,7 @@
 ;;;; fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: floating-point add-on module
@@ -11,24 +11,25 @@
 (module fpmath
 
   (fp fp%
-   fpzero??
-   fpdbl fpsqr fprec fpdist fp+*
+   fpzero?? fpzero?
+   fp*2 fp^2 fprec fp*+
    fptau fpeul fpphi
-   fpdirac fpheaviside fpsign
-   fplog2 fplog10 fplogb
+   fpdelta fpheaviside fpsign
+   fpln fplb fplg fplogb
    fpsinh fpcosh fptanh
    fpasinh fpacosh fpatanh
    fphsin fphcos
-   fpgauss fpsignsqrt fpsinc fpsigm fpstirling
+   fpsignsqrt fpsinc fpsigm fpgauss fpstirling
    fptaper)
 
   (import scheme (chicken base) (chicken module) (chicken flonum) utils)
+
   (reexport (chicken flonum))
 
 ;;; Converter ##################################################################
 
-;;@returns: **flonum** from **fixnum** `n`.
-(alias fp exact->inexact)
+;;@assigns: **alias** for `exact->inexact`.
+(define fp exact->inexact)
 
 ;;@returns: **flonum** fraction with numerator **fixnum** `n` and denominator **fixnum** `d`.
 (define (fp% n d)
@@ -40,27 +41,30 @@
 (define (fpzero?? x)
   (fp= 0.0 x))
 
+;;returns: **boolean** answering if absolute value of **flonum** `x` is less or equal than positive **flonum** `tol`.
+(define (fpzero? x tol)
+  (fp<= (fpabs x) tol))
+
 ;;; Operators ##################################################################
 
 ;;@returns: **flonum** double of **flonum** `x`.
-(define (fpdbl x)
+(define (fp*2 x)
   (fp+ x x))
 
 ;;@returns: **flonum** square of **flonum** `x`.
-(define (fpsqr x)
+(define (fp^2 x)
   (fp* x x))
 
 ;;@returns: **flonum** reciprocal of **flonum** `x`.
 (define (fprec x)
   (fp/ 1.0 x))
 
-;;@returns: **flonum** absolute difference: `|x - y|` of **flonum**s `x`, `y`.
-(define (fpdist x y)
-  (fpabs (fp- x y)))
-
-;;@returns: **flonum** sum with product: `z + x * y` of **flonum**s `x`, `y`, `z`, see @1, @2, @3.
-(define (fp+* z x y)
-  (fp+ z (fp* x y)))
+;;@returns: **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`, see @1, @2, @3.
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fp*+ x y z)
+       (fp+ (fp* x y) z))]
+  [else])
 
 ;;; Constants Thunks ###########################################################
 
@@ -75,8 +79,8 @@
 
 ;;; Generalized Functions ######################################################
 
-;;@returns: **flonum** Dirac delta of **flonum** `x`.
-(define (fpdirac x)
+;;@returns: **flonum** Kronecker delta of **flonum** `x`.
+(define (fpdelta x)
   (if (fpzero?? x) 1.0
                    0.0))
 
@@ -93,17 +97,20 @@
 
 ;;; Logarithms #################################################################
 
+;;@assigns: **alias** for `fplog`.
+(define fpln fplog)
+
 ;;@returns: **flonum** base-2 logarithm of **flonum** `x`.
-(define fplog2
-  (let [(ln2 (fplog 2.0))]
+(define fplb
+  (let [(log2 (fplog 2.0))]
     (lambda (x)
-      (fp/ (fplog x) ln2))))
+      (fp/ (fplog x) log2))))
 
 ;;@returns: **flonum** base-10 logarithm of **flonum** `x`.
-(define fplog10
-  (let [(ln10 (fplog 10.0))]
+(define fplg
+  (let [(log10 (fplog 10.0))]
     (lambda (x)
-      (fp/ (fplog x) ln10))))
+      (fp/ (fplog x) log10))))
 
 ;;@returns: **flonum** base `b` logarithm of **flonum** `x`.
 (define (fplogb b x)
@@ -121,17 +128,17 @@
 
 ;;@returns: **flonum** hyperbolic tangent of **flonum** `x`: `tanh(x) = 1 - 2 / (exp(2 * x) + 1)`.
 (define (fptanh x)
-  (fp- 1.0 (fp/ 2.0 (fp+ (fpexp (fpdbl x)) 1.0))))
+  (fp- 1.0 (fp/ 2.0 (fp+ (fpexp (fp*2 x)) 1.0))))
 
 ;;; Inverse Hyperbolic Functions ###############################################
 
 ;;@returns: **flonum** area hyperbolic sine of **flonum** `x`: `asinh(x) = log(x + sqrt(x^2 + 1))`.
 (define (fpasinh x)
-  (fp* (fpsign x) (fplog (fp+ (fpabs x) (fpsqrt (fp+ (fpsqr x) 1.0))))))
+  (fp* (fpsign x) (fplog (fp+ (fpabs x) (fpsqrt (fp+ (fp^2 x) 1.0))))))
 
 ;;@returns: **flonum** area hyperbolic cosine of **flonum** `x`: `acosh(x) = log(x + sqrt(x^2 - 1))`.
 (define (fpacosh x)
-  (fplog (fp+ x (fpsqrt (fp- (fpsqr x) 1.0)))))
+  (fplog (fp+ x (fpsqrt (fp- (fp^2 x) 1.0)))))
 
 ;;@returns: **flonum** area hyperbolic tangent of **flonum** `x`: `atanh(x) = 0.5 * log((1 + x) / (1 - x))`.
 (define (fpatanh x)
@@ -149,10 +156,6 @@
 
 ;;; Special Functions ##########################################################
 
-;;@returns: **flonum** Gauss bell curve function evaluation of **flonum** `x`: `gauss(x) = exp(-0.5 * x^2)`.
-(define (fpgauss x)
-  (fpexp (fp* -0.5 (fpsqr x))))
-
 ;;@returns: **flonum** sign times square root of absolute value of **flonum** `x`: `signsqrt(x) = sign(x) * sqrt(abs(x))`.
 (define (fpsignsqrt x)
   (fp* (fpsign x) (fpsqrt (fpabs x))))
@@ -166,7 +169,11 @@
 (define (fpsigm x)
   (fprec (fp+ 1.0 (fpexp (fpneg x)))))
 
-;;@returns: **flonum** Stirling approximation of factorial of **flonum** `x`: `x! ≈ sqrt(tau * x) * (x / e)^x`.
+;;@returns: **flonum** Gauss bell curve function evaluation of **flonum** `x`: `gauss(x) = exp(-0.5 * x^2)`.
+(define (fpgauss x)
+  (fpexp (fp* -0.5 (fp^2 x))))
+
+;;@returns: **flonum** Stirling's approximation of factorial of **flonum** `x`: `x! ≈ sqrt(tau * x) * (x / e)^x`.
 (define (fpstirling x)
   (fpround (fp* (fpsqrt (fp* (fptau) x)) (fpexpt (fp/ x (fpeul)) x))))
 
@@ -178,17 +185,21 @@
   (let* [(prc  (flonum-print-precision 17))
          (sgnx (cond [(fp> x 0.0) "+"]
                      [(fp< x 0.0) "-"]
-                     [else        " "]))
+                     [else        ""]))
          (absx (fpabs x))
-         (lgx  (fplog10 absx))
+         (lgx  (fplg absx))
          (strx (number->string absx))
          (lenx (string-length strx))]
     (flonum-print-precision prc)
-    (apply string-append sgnx (cond [(fpzero?? x)    '("   0   ")]
-                                    [(fp<= lgx -5.0) '("0.0000\u2026")]
-                                    [(fp<= lgx -4.0) `("0.0000" ,(substring strx 0 1))]
-                                    [(fp>= lgx  6.0) `(,(substring strx 0 5) "\u2026.")]
-                                    [else            `(,(substring strx 0 (min 7 lenx)) ,(make-string (max 0 (- 7 lenx)) #\0))]))))
+    (apply string-append (if (finite? x) "" "   ")
+                         sgnx
+                         (cond [(nan? x)          '("NaN  ")]
+                               [(fpzero?? x)      '("    0   ")]
+                               [(not (finite? x)) '("\u221E   ")]  ; `infinite?` does not work with chicken-5.1
+                               [(fp<= lgx -5.0)   '("0.0000\u2026")]
+                               [(fp<= lgx -4.0)   `("0.0000" ,(substring strx 0 1))]
+                               [(fp>= lgx  6.0)   `(,(substring strx 0 5) "\u2026.")]
+                               [else              `(,(substring strx 0 (min 7 lenx)) ,(make-string (max 0 (- 7 lenx)) #\0))]))))
 
 );end module
 

@@ -1,7 +1,7 @@
 ;;;; utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: helper utilities module
@@ -10,13 +10,13 @@
 
   (define-syntax-rule alias must-be comment
    nil head tail empty?
-   make-list sublist any? all?
    fx+1 fx-1 fx=0? fx<0? fx>0? fx<=0? fx>=0?
+   append* sublist any? all?
    factorial binomial
-   define* load*
-   defined?)
+   define* load*)
 
   (import scheme (chicken base) (chicken module) (chicken plist) (chicken fixnum) (chicken condition))
+
   (reexport (chicken fixnum))
 
 ;;; Meta Helpers ###############################################################
@@ -42,7 +42,7 @@
   (syntax-rules ()
     [(_ args ...) (assert (and args ...))]))
 
-;;@returns: **void**, see @3.
+;;@returns: **void**, see @3, @4.
 (define-syntax comment
   (syntax-rules ()
     [(_ . any) (void)]))
@@ -93,11 +93,10 @@
 
 ;;; List Functions #############################################################
 
-;;@returns: **list** containing **fixnum** `num` number of elements `any`.
-(define (make-list num any)
-  (must-be (fixnum? num) (fx>=0? num))
-  (if (fx=0? num) nil
-                  (cons any (make-list (fx-1 num) any))))
+;;@returns: **list** of **list** argument `lst` with appended argument `any`.
+(define (append* lst any)
+  (must-be (list? lst))
+  (foldr cons (list any) lst))
 
 ;;@returns: **list** containing elements of **list** `lst` from indices **fixnum**s `start` to `end`.
 (define (sublist lst start end)
@@ -125,11 +124,11 @@
 ;;@returns: **fixnum** multiplying consecutive integers up to **fixnum** `n`: `n! = 1 * 2 * ...`.
 (define (factorial n)
   (must-be (fixnum? n))
-  (if (negative? n) 0
-                    (let rho [(idx n)
-                              (acc 1)]
-                      (if (fx=0? idx) acc
-                                      (rho (fx-1 idx) (fx* idx acc))))))
+  (if (fx<0? n) 0
+                (let rho [(idx n)
+                          (acc 1)]
+                  (if (fx=0? idx) acc
+                                  (rho (fx-1 idx) (fx* idx acc))))))
 
 ;;@returns: **fixnum** binomial coefficient for **integer**s `n` and `k` based on Pascal's rule: `(n k) = (n-1 k) + (n-1 k-1)`.
 (define (binomial n k)
@@ -160,21 +159,12 @@
         (put! 'name 'returns str)
         (define name (body ...)))]))
 
-;;@returns: **any** terminal result from loaded and evaluated file with path **string** `str`, see @4.
+;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @5.
 (define (load* str)
   (define ret nil)
   (load str (lambda (x)
               (set! ret (eval x))))
   ret)
-
-;;; Environment ################################################################
-
-;;@returns: **boolean** answering if unquoted **symbol** `sym` is defined, see @5.
-(define (defined? sym)
-  (let [(warn (enable-warnings))]
-    (enable-warnings #f)
-    (handle-exceptions exn #f (eval `(procedure? ,sym)))
-    (enable-warnings warn)))
 
 );end module
 
@@ -184,9 +174,9 @@
 
 ;;@2: PC Scheme User's Guide & Software, 7-9.
 
-;;@3: Miscellaneous Features. The T Manual, 13.
+;;@3: Miscellaneous Features. The T Manual, 13. http://mumble.net/~jar/tproject/
 
-;;@4: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
+;;@4: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
 
-;;@5: Querying variable bindings. Guile Reference Manual, 6.10.4. https://www.gnu.org/software/guile/manual/html_node/Binding-Reflection.html
+;;@5: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
 

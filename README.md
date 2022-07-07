@@ -1,4 +1,4 @@
-![matrico 0.1](matrico-logo.svg) matrico
+![matrico 0.2](matrico-logo.svg) matrico
 ========================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.1 (2022-05-01)
+* **Version**: 0.2 (2022-07-07)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -21,7 +21,7 @@
 
 * **Category**: math (numerical mathematics)
 
-* **Audience**: MATLAB, Octave, Scilab, Julia, NumPy users
+* **Audience**: MATLAB, Octave, Scilab, Julia, NumPy (Python) users
 
 ## Table of Contents
 
@@ -78,13 +78,13 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * Use only [included modules](http://wiki.call-cc.org/man/5/Included%20modules) of _CHICKEN Scheme_.
 
-* A Matrix is a list of (homogeneous) vectors.
+* A matrix is a list of (homogeneous) vectors.
 
-* A Matrix uses column-major ordering of entries.
+* A matrix uses column-major ordering of entries.
 
-* A Matrix uses one-based indexing.
+* A matrix uses one-based indexing.
 
-* A Matrix can only have real-valued flonum entries.
+* A matrix can only have real-valued flonum entries.
 
 * Everything is a matrix, particularly, matrixes are incompatible with _Scheme_'s (homogeneous) vectors.
 
@@ -92,11 +92,17 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 ### Similar Projects
 
-* [MatLisp](http://matlisp.sourceforge.net/)
+* Common Lisp [MatLisp](http://matlisp.sourceforge.net/)
 
-* [Lisplab](https://common-lisp.net/project/lisplab/)
+* Common Lisp [Lisplab](https://common-lisp.net/project/lisplab/)
 
-* [CLEM](https://github.com/slyrus/clem)
+* Common Lisp [CLEM](https://github.com/slyrus/clem)
+
+* Racket [math/matrix](https://docs.racket-lang.org/math/matrices.html)
+
+* Racket [flomat](https://docs.racket-lang.org/manual-flomat/)
+
+* Clojure [core.matrix](https://mikera.github.io/core.matrix/doc/clojure.core.matrix.html)
 
 ## Function Reference
 
@@ -118,7 +124,9 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(matrico-ver)` returns **pair** holding major and minor version numbers of the **matrico** module.
 
-* `(matrico-help)` returns **void**, prints help text to terminal.
+* `(matrico-cite)` returns **void**, prints citation to terminal.
+
+* `(matrico-about)` returns **void**, prints help text to terminal.
 
 * `(matrico? proc)` returns **boolean** answering if **symbol** `proc` is an existing function starting with "`mx`" and prints its docstring.
 
@@ -204,11 +212,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 #### Matrix Expanders
 
-* `(mx+ x)` returns **matrix** of entry-wise doubling of **matrix** `x`.
-
 * `(mx+ x y)` returns **matrix** of entry-wise addition of **matrix**es `x` and `y`.
-
-* `(mx* x)` returns **matrix** of entry-wise squaring of **matrix** `x`.
 
 * `(mx* x y)` returns **matrix** of entry-wise multiplication of **matrix**es `x` and `y`.
 
@@ -220,6 +224,10 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx/ x y)` returns **matrix** of entry-wise division of **matrix**es `x` by `y`.
 
+* `(mx*2 x)` returns **matrix** of entry-wise doubling of **matrix** `x`.
+
+* `(mx^2 x)` returns **matrix** of entry-wise squaring of **matrix** `x`.
+
 * `(mx^ x y)` returns **matrix** of entry-wise exponentiation **matrix**es `x` to the `y`.
 
 * `(mx-log b x)` returns **matrix** of entry-wise base **matrix** `b` logarithms of **matrix** `x`.
@@ -228,7 +236,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-where pred x y)` returns **matrix** of entries of **matrix**es `x` or `y` based on predicate **procedure** `pred`.
 
-* `(mx+* x a y)` returns **matrix** of entry-wise generalized addition of **matrix** `x` with **flonum** `a` and **matrix** `y`, aka axpy.
+* `(mx*+ a x y)` returns **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka axpy.
 
 #### Matrix Mappers
 
@@ -246,7 +254,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-sign mat)` returns **matrix** with entry-wise sign of **matrix** `mat`.
 
-* `(mx-dirac mat)` returns **matrix** with entry-wise Dirac delta of **matrix** `mat`.
+* `(mx-delta mat)` returns **matrix** with entry-wise Kronecker delta of **matrix** `mat`.
 
 ##### Entry-Wise Trigonometric Functions
 
@@ -377,8 +385,6 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 * `(mx-horcat x y)` returns **matrix** of horizontally concatenated **matrix**es `x` and `y`.
 
 * `(mx-vercat x y)` returns **matrix** of vertically concatenated **matrix**es `x` and `y`.
-
-* `(mx-repeat mat rows cols)` returns **matrix** of **fixnum** `rows` times row-wise, and **fixnum** `cols` times columns-wise repeated **matrix** `mat`.
 
 * `(mx-vec mat)` returns **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
 
@@ -511,9 +517,9 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-dims mat)` returns **fixnum** number of dimensions of **matrix** `mat`.
 
-* `(matrix-ref mat row col)` returns **any** being **matrix** `mat` entry in **fixnum** `row` and **fixnum** `col`umnS.
+* `(matrix-ref mat row col)` returns **any** being **matrix** `mat` entry in **fixnum** `row` and **fixnum** `col`umns.
 
-* `(matrix-ref00 mat)` returns: **flonum** being the top, left entry of **matrix** `mat`.
+* `(matrix-ref00 mat)` returns: **any** being the top, left entry of **matrix** `mat`.
 
 * `(matrix-col mat col)` returns **matrix** being **matrix** `mat` column specified by **fixnum** `col`.
 
@@ -612,21 +618,21 @@ Provides homogeneous vector transformations analogous to vectors.
 #### Floating-Point Module
 Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 
-* `(fp n)` returns **flonum** from **fixnum** `n`.
+* `fp` is **alias** for `exact->inexact`.
 
 * `(fp% n d)` returns **flonum** fraction with numerator **fixnum** `n` and denominator **fixnum** `d`.
 
+* `(fpzero? x tol)` returns **boolean** answering if absolute value of **flonum** `x` is less than **flonum** `tol`.
+
 * `(fpzero?? x)` returns **boolean** answering if **flonum** `x` is exactly zero.
 
-* `(fpdbl x)` returns **flonum** double of **flonum** `x`.
+* `(fp*2 x)` returns **flonum** double of **flonum** `x`.
 
-* `(fpsqr x)` returns **flonum** square of **flonum** `x`.
+* `(fp^2 x)` returns **flonum** square of **flonum** `x`.
 
 * `(fprec x)` returns **flonum** reciprocal of **flonum** `x`.
 
-* `(fpdist x y)` returns **flonum** absolute difference: `|x - y|` of **flonum**s `x`, `y`.
-
-* `(fp+* z x y)` returns **flonum** sum with product: `z + x * y` of **flonum**s `x`, `y`, `z`.
+* `(fp*+ z x y)` returns **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`.
 
 * `(fptau)` returns **flonum** circle constant Tau via fraction.
 
@@ -634,15 +640,17 @@ Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 
 * `(fpphi)` returns **flonum** golden ratio via fraction of consecutive Fibonacci numbers.
 
-* `(fpdirac x)` returns **flonum** Dirac delta of **flonum** `x`.
+* `(fpdelta x)` returns **flonum** Kronecker delta of **flonum** `x`.
 
 * `(fpheaviside x)` returns **flonum** Heaviside step function of **flonum** `x`.
 
 * `(fpsign x)` returns **flonum** sign of **flonum** `x`.
 
-* `(fplog2 x)` returns **flonum** base-2 logarithm of **flonum** `x`.
+* `(fpln x)` returns **flonum** natural logarithm of **flonum** `x`.
 
-* `(fplog10 x)` returns **flonum** base-10 logarithm of **flonum** `x`.
+* `(fplb x)` returns **flonum** base-2 logarithm of **flonum** `x`.
+
+* `(fplg x)` returns **flonum** base-10 logarithm of **flonum** `x`.
 
 * `(fplogb b x)` returns **flonum** base `b` logarithm of **flonum** `x`.
 
@@ -707,7 +715,7 @@ Provides a few base functions, macros and aliases for convenience.
 
 * `(fx>=0? x)` returns **boolean** answering if **fixnum** `x` is greater or equal to zero.
 
-* `(make-list num any)` returns **list** containing **fixnum** `num` number of elements `any`.
+* `(append* lst any)` returns **list** of **list** argument `lst` with appended argument `any`.
 
 * `(sublist lst start end)` returns **list** containing elements of **list** `lst` from indices **fixnum**s `start` to `end`.
 
@@ -723,9 +731,7 @@ Provides a few base functions, macros and aliases for convenience.
 
 * `(define* name (returns str) (body ...))` returns **macro** generating function binding with docstring.
 
-* `(load* str)` returns **any** terminal result from loaded and evaluated file with path **string** `str`.
-
-* `(defined? sym)` returns **boolean** answering if unquoted **symbol** `sym` is defined.
+* `(load* str)` returns **any** result of the last expressions in loaded and evaluated file with path **string** `str`.
 
 </details>
 
@@ -755,6 +761,16 @@ version-by-version performance evolution of this **pure** _Scheme_ implementatio
 
 ### Benchmarks
 
+#### MATMUL
+
+* Matrix dimension: 1000x1000
+* Optimization level: `-O5`
+
+Run by:
+```
+make matmul
+```
+
 #### LINPACK
 
 * Matrix dimension: 1000x1000
@@ -763,16 +779,6 @@ version-by-version performance evolution of this **pure** _Scheme_ implementatio
 Run by:
 ```
 make linpack
-```
-
-#### Matrix Multiplication
-
-* Matrix dimension: 125x125, 250x250, 500x500, 1000x1000
-* Optimization level: `-O0`, `-O1`, `-O2`, `-O3`, `-O4`, `-O5`
-
-Run by:
-```
-make benchmark
 ```
 
 ### Systems
@@ -784,21 +790,34 @@ make benchmark
 * `SYS:` Raspberry Pi OS Lite (22-04-04)
 * `SCM:` CHICKEN Scheme (5.3)
 
-##### LINPACK
-
-`18.9` Megaflops/s
-
-##### Matrix Multiplication
-
-![benchmark plot](doc/benchmark_rpi.svg)
+* MATMUL: `34.5` Megaflops
+* LINPACK: `9.0` Megaflops
 
 ## Development
 
 ### Changelog
 
-* **0.1** (2022-05-01) Initial Release
+* **0.2** (2022-07-07)
+  * **ADDED** `matrico-cite`
+  * **ADDED** (re)export of `fpmath` by `matrico`
+  * **ADDED** instrumentation and statistical profiling targets
+  * **CHANGED** rename `matrico-help` to `matrico-about`
+  * **CHANGED** rename and adapt `fp+*` and `mx+*` to `fp*+` and `mx*+`
+  * **CHANGED** rename `fpdirac` and `mx-dirac` to `fpdelta` and `mx-delta`
+  * **IMPROVED** argument checking
+  * **IMPROVED** performance
+  * **REMOVED** `mx-dist`
+  * **REMOVED** `mx-repeat`
+  * ... and many minor updates and fixes.
+
+* **0.1** (2022-05-01)
+  * Initial Release
 
 ### Roadmap
+
+* Test -prelude "(declare (extended bindings))" and -explicit-use
+
+* [`check`]   Add more `matrico` tests
 
 * [`matrico`] Add heat equation benchmark
 
@@ -812,13 +831,25 @@ make benchmark
 
 * [`mx`]      Add [`asciichart`](https://github.com/kroitor/asciichart) interface or functionality
 
-* [`fpmath`]  Use native `fp+*` (CHICKEN Scheme 5.4)
+### Coding Guidelines
 
-* [`utils`]   Add `map*` ["parallel" map](https://lists.nongnu.org/archive/html/chicken-users/2010-12/msg00213.html)
+* Every source file states: project, author, license, version, summary
 
-* [`check`]   Add more `matrico` tests
+* Every function has a one-line summary
 
-* [`check`]   Add inexact approximate equality tests
+* Import only included modules
+
+* Avoid `do`, prefer named let-recursion
+
+* Avoid `set-car!` and `set-cdr!`
+
+* Avoid "multiple values"
+
+### Notes
+
+* `matrico` should be build with `-O4` if used as a shared object (default).
+
+* `matrico` can be build with `-O5` if `matrico.scm` is included into the source.
 
 ### Ideas
 

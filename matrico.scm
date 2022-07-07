@@ -1,7 +1,7 @@
 ;;;; matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: A CHICKEN Scheme flonum matrix module.
@@ -9,30 +9,23 @@
 (include-relative "src/dense.scm")
 
 (module matrico
-  (
-   ;; Matrico Properties
-   matrico-ver matrico-help matrico?
-   ;; Matrix Constructors
+
+  (matrico-ver matrico-cite matrico-about matrico?
    mx mx%
    mx-identity mx-exchange mx-hilbert mx-pascal mx-lehmer mx-random mx-tridiag
-   mx-linspace mx-logspace
    mx-unit mx-iota
-   ;; Matrix Dimensions
+   mx-linspace mx-logspace
    mx-cols mx-rows mx-numel mx-dims
-   ;; Matrix Predicates
    mx?
    mx-col? mx-row? mx-scalar? mx-vector? mx-square?
    mx-samecols? mx-samerows? mx-samedims?
    mx-any? mx-all? mx=?
-   ;; Matrix Accessors
    mx-ref11 mx-ref mx-col mx-row mx-diag mx-submatrix
    mx-set!
-   ;; Matrix Expanders
-   mx+ mx* mx- mx/
-   mx^ mx-log mx-dist mx-where mx+*
-   ;; Matrix Mappers
+   mx+ mx* mx- mx/ mx*2 mx^2
+   mx^ mx-log mx-where mx*+
    mx-round mx-floor mx-ceil
-   mx-abs mx-sign mx-dirac
+   mx-abs mx-sign mx-delta
    mx-sin mx-cos mx-tan
    mx-asin mx-acos mx-atan
    mx-sinh mx-cosh mx-tanh
@@ -42,7 +35,6 @@
    mx-ln mx-lb mx-lg
    mx-exp mx-gauss
    mx-sinc mx-sigm mx-stirling
-   ;; Matrix Reducers
    mx-rowsum mx-colsum mx-sum
    mx-rowprod mx-colprod mx-prod
    mx-rowmin mx-colmin mx-min
@@ -50,8 +42,7 @@
    mx-rowmidr mx-colmidr mx-midr
    mx-rowmean mx-colmean mx-mean
    mx-rownorm mx-colnorm mx-norm
-   ;; Matrix Algebra
-   mx-horcat mx-vercat mx-repeat
+   mx-horcat mx-vercat
    mx-vec mx-transpose
    mx-sympart mx-skewpart
    mx-diagonal
@@ -61,46 +52,56 @@
    mx-scalar mx-dot* mx-dot mx-gram mx-gram* mx-square
    mx-xcov mx-cov mx-std
    mx-xcor mx-cor mx-coher
-   ;; Matrix Analysis
    mx-diff mx-trapz mx-ode2-hyp mx-ode2-ssp
-   ;; Matrix Utilities
-   mx-print mx-export mx-save mx-load
-  )
-  (import scheme (chicken base) (chicken plist) (chicken random) utils fpmath dense)
+   mx-print mx-export mx-save mx-load)
+
+  (import scheme (chicken module) (chicken base) (chicken plist) (chicken random) utils fpmath dense)
+
+  (reexport (except fpmath fptaper))
 
 (include-relative "src/mx.scm")
 
 ;;; Matrico About ##############################################################
 
 ;;@assigns: matrico version number as pair.
-(define-constant version '(0 . 1))
+(define-constant version '(0 . 2))
 
 ;; Print matrico banner
 (newline)
-(print                " ⎡ ('>⎤  ╔═══════════════╗")
-(print (string-append " ⎢({ )⎥  ║ matrico (" (number->string (head version)) "." (number->string (tail version)) ") ║"))
-(print                " ⎣ ][ ⎦  ╚═══════════════╝")
+(print " ⎡ ('>⎤  ╔═══════════════╗")
+(print " ⎢({ )⎥  ║ matrico (" (number->string (head version)) "." (number->string (tail version)) ") ║")
+(print " ⎣ ][ ⎦  ╚═══════════════╝")
 (newline)
 
 ;;@returns: **pair** holding version and prints library name and version number of **matrico**.
 (define (matrico-ver)
   version)
 
-;;@returns: **void**, prints help text to terminal.
-(define (matrico-help)
+;;@returns: **void**, prints citation to terminal.
+(define (matrico-cite)
+  (newline)
+  (print "C. Himpe: \"matrico - A matrix module for CHICKEN Scheme\", Version "
+         (number->string (head version)) "." (number->string (tail version)))
+  (newline))
+
+;;@returns: **void**, prints info text to terminal.
+(define (matrico-about)
+  (newline)
   (print "\
 `matrico` is a flonum matrix module for CHICKEN Scheme, providing real-valued,
 two-dimensional, double-precision floating-point arrays in column-major ordering
 and one-based indexing together with calculator and linear algebra functions.")
-  (print #\newline "For documentation see: http://wiki.call-cc.org/eggref/5/matrico" #\newline))
+  (print #\newline "For documentation see: http://wiki.call-cc.org/eggref/5/matrico")
+  (newline))
 
-;;@returns: **boolean** answering if **symbol** `proc` is an existing function, starting with "mx" and prints its docstring.
-(define (matrico? proc)
-  (must-be (symbol? proc))
-  (let [(docstring (get proc 'returns))]
-    (if (and (string=? "mx" (substring (symbol->string proc) 0 2)) docstring)
+;;@returns: **boolean** answering if **symbol** `sym` is an existing function, starting with "mx" and prints its docstring.
+(define (matrico? sym)
+  (must-be (symbol? sym))
+  (let [(procname (symbol->string sym))
+        (docstring (get sym 'returns))]
+    (if (and (string=? "mx" (substring procname 0 2)) docstring)
         (begin
-          (print "returns: " docstring #\newline)
+          (print "`" procname "`" " returns: " docstring #\newline)
           #t)
         #f)))
 

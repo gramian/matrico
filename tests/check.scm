@@ -1,12 +1,12 @@
 ;;;; check.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: testing helpers
 
-(import (chicken condition) (chicken load))
+(import (chicken base) (chicken condition) (chicken load))
 
 ;;@returns: **boolean** answering if all elements of **list** `lst` are not false.
 (define-inline (every? lst)
@@ -35,6 +35,6 @@
 (define (load-test str)
   (define ret '())
   (load-relative str (lambda (x)
-              (set! ret (eval x))))
+                       (set! ret (eval x))))
   ret)
 

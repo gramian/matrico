@@ -1,7 +1,7 @@
 ;;;; test-utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.1 (2022-05-01)
+;;@version: 0.2 (2022-07-07)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: utils module unit tests
@@ -16,19 +16,19 @@
 
 (run-tests
 
-; TODO load*
-
-;;make-list
-(check 'make-list '(((0 1) . ())
-                    ((1 1) . (1))
-                    ((2 1) . (1 1))))
+;; append*
+(check 'append* '((('(0 1 2 3) 4) . (0 1 2 3 4))
+                  (('(0) 1) . (0 1))
+                  (('() 0) . (0))))
 
 ;; sublist
 (check 'sublist '((('(0 1 2 3 4) 0 4) . (0 1 2 3 4))
                   (('(0 1 2 3 4) 2 4) . (2 3 4))
                   (('(0 1 2 3 4) 0 2) . (0 1 2))
                   (('(0 1 2 3 4) 0 0) . (0))
-                  (('(0 1 2 3 4) 4 4) . (4))))
+                  (('(0 1 2 3 4) 4 4) . (4))
+                  (('(0 1 2 3 4) 4 5) . xfail)
+                  (('(0 1 2 3 4) 5 6) . xfail)))
 
 ;; any?
 (check 'any? '(((zero? '(0 1 2)) . #t)
