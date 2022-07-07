@@ -815,8 +815,6 @@ make linpack
 
 ### Roadmap
 
-* Test -prelude "(declare (extended bindings))" and -explicit-use
-
 * [`check`]   Add more `matrico` tests
 
 * [`matrico`] Add heat equation benchmark
