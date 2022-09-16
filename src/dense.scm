@@ -1,7 +1,7 @@
 ;;;; dense.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: dense column function aliases
@@ -14,8 +14,7 @@
 
   (import (chicken module) f64vector)
 
-  (reexport (rename f64vector (f64vector-id column-id)
-                              (f64vector column)
+  (reexport (rename f64vector (f64vector column)
                               (make-f64vector make-column)
                               (f64vector-length column-length)
                               (f64vector-ref column-ref)

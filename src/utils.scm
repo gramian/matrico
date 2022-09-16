@@ -1,7 +1,7 @@
 ;;;; utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: helper utilities module
@@ -15,7 +15,7 @@
    factorial binomial
    define* load*)
 
-  (import scheme (chicken base) (chicken module) (chicken plist) (chicken fixnum) (chicken condition))
+  (import scheme (chicken base) (chicken module) (chicken plist) (chicken fixnum) (chicken load))
 
   (reexport (chicken fixnum))
 
@@ -29,7 +29,7 @@
        (syntax-rules ()
          ((_ args ...) (body ...))))]))
 
-;;@returns: **macro** replacing `aka` with `name`, see @2.
+;;@returns: **macro** replacing `aka` with `name`, see @2 , @3.
 (define-syntax alias
   (syntax-rules ()
     [(_ aka name)
@@ -42,7 +42,7 @@
   (syntax-rules ()
     [(_ args ...) (assert (and args ...))]))
 
-;;@returns: **void**, see @3, @4.
+;;@returns: **void**, see @4, @5.
 (define-syntax comment
   (syntax-rules ()
     [(_ . any) (void)]))
@@ -95,26 +95,22 @@
 
 ;;@returns: **list** of **list** argument `lst` with appended argument `any`.
 (define (append* lst any)
-  (must-be (list? lst))
   (foldr cons (list any) lst))
 
 ;;@returns: **list** containing elements of **list** `lst` from indices **fixnum**s `start` to `end`.
 (define (sublist lst start end)
-  (must-be (list? lst) (fixnum? start) (fixnum? end) (fx>=0? start) (fx>= end start))
   (cond [(fx>0? start) (sublist (tail lst) (fx-1 start) (fx-1 end))]
         [(fx>0? end)   (cons (head lst) (sublist (tail lst) 0 (fx-1 end)))]
         [else          (cons (head lst) nil)]))
 
 ;;@returns: **boolean** answering if any element of **list** `lst` fulfills predicate **procedure** `pred`.
 (define (any? pred lst)
-  (must-be (procedure? pred) (list? lst))
   (cond [(empty? lst)      #f]
         [(pred (head lst)) #t]
         [else              (any? pred (tail lst))]))
 
 ;;@returns: **boolean** answering if all elements of **list** `lst` fulfill predicate **procedure** `pred`.
 (define (all? pred lst)
-  (must-be (procedure? pred) (list? lst))
   (cond [(empty? lst)      #t]
         [(pred (head lst)) (all? pred (tail lst))]
         [else              #f]))
@@ -123,7 +119,6 @@
 
 ;;@returns: **fixnum** multiplying consecutive integers up to **fixnum** `n`: `n! = 1 * 2 * ...`.
 (define (factorial n)
-  (must-be (fixnum? n))
   (if (fx<0? n) 0
                 (let rho [(idx n)
                           (acc 1)]
@@ -132,7 +127,6 @@
 
 ;;@returns: **fixnum** binomial coefficient for **integer**s `n` and `k` based on Pascal's rule: `(n k) = (n-1 k) + (n-1 k-1)`.
 (define (binomial n k)
-  (must-be (fixnum? n) (fixnum? k))
   (let rho [(a n)
             (b k)]
     (cond [(fx<0? a)  0]
@@ -148,23 +142,25 @@
   (syntax-rules (returns)
     [(_ (name args ...) (returns str) body ...)
       (begin
-        (put! 'name 'returns str)
+        (put! 'returns 'name str)
         (define (name args ...) body ...))]
     [(_ (name . args) (returns str) body ...)
       (begin
-        (put! 'name 'returns str)
+        (put! 'returns 'name str)
         (define (name . args) body ...))]
     [(_ name (returns str) (body ...))
       (begin
-        (put! 'name 'returns str)
+        (put! 'returns 'name str)
         (define name (body ...)))]))
 
-;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @5.
+;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @6 , @7.
 (define (load* str)
-  (define ret nil)
-  (load str (lambda (x)
-              (set! ret (eval x))))
-  ret)
+  (let [(ret nil)
+        (vrb (load-verbose #f))]
+    (load str (lambda (x)
+                (set! ret (eval x))))
+    (load-verbose vrb)
+    ret))
 
 );end module
 
@@ -174,9 +170,13 @@
 
 ;;@2: PC Scheme User's Guide & Software, 7-9.
 
-;;@3: Miscellaneous Features. The T Manual, 13. http://mumble.net/~jar/tproject/
+;;@3: Aliases. Chez Scheme User Guide, 11. https://cisco.github.io/ChezScheme/csug9.5/syntax.html#./syntax:s38
 
-;;@4: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
+;;@4: Miscellaneous Features. The T Manual, 13. http://mumble.net/~jar/tproject/
 
-;;@5: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
+;;@5: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
+
+;;@6: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
+
+;;@7: What load returns. https://docs.scheme.org/surveys/what-load-returns/
 

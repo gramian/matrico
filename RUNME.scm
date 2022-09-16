@@ -1,7 +1,7 @@
 ;;;; RUNME.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: demo code
@@ -10,23 +10,23 @@
 
 ;; `matrico` about
 
-(matrico-about)
+(matrico 'about)
 
 ;; `matrico` version
 
-(matrico-ver)
+(matrico 'version)
 
 ;; `matrico` cite
 
-(matrico-cite)
+(matrico 'citation)
 
 ;; Using the REPL help
 
-(matrico? 'mx)
+(matrico 'mx)
 
 ;; Assigning matrices and vectors
 
-(matrico? 'mx-tridiag)
+(matrico 'mx-tridiag)
 
 (define A (mx-tridiag 3 1.0 -2.0 0.5)) ; Assign a 3x3 tridiagonal matrix to A
 
@@ -46,7 +46,7 @@
 
 ;; Multiplying matrices
 
-(matrico? 'mx-dot)
+(matrico 'mx-dot)
 
 (mx-print (mx-dot A b)) ; Print matrix-vector probuct of A and b
 

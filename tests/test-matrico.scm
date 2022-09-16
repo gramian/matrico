@@ -1,14 +1,12 @@
 ;;;; test-matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrico (compounding matrix/dense/mx) module unit tests
 
 (import (chicken load))
-
-(load-relative "check.scm")
 
 (load-relative "../matrico.scm")
 
@@ -26,11 +24,6 @@
 
 (define m11 (mx% '((8.0))))
 
-(mx-print m33)
-(mx-print m31)
-(mx-print m13)
-(mx-print m11)
-
 (define u33 (mx% '((1.0 0.0 0.0)
                    (0.0 1.0 0.0)
                    (0.0 0.0 1.0))))
@@ -41,20 +34,6 @@
 
 (define u23 (mx% '((1.0 0.0 0.0)
                    (0.0 1.0 0.0))))
-
-(run-tests
-
-;; matrico-ver
-(check 'matrico-ver (list '(() . (0 . 2))))
-
-;; matrico-cite
-;not tested automatically
-
-;; matrico-about
-;not tested automatically
-
-;; matrico?
-;not tested automatically
 
 ;; mx
 (check 'mx `(((3 2 1.0) . ,(mx% '((1.0 1.0)
@@ -69,7 +48,8 @@
 (check 'mx% `((('((1.0 1.0) (1.0 1.0))) . ,(mx 2 2 1.0))
                         (('((1.0 1.0))) . ,(mx 1 2 1.0))
                       (('((1.0) (1.0))) . ,(mx 2 1 1.0))
-                            (('((1.0))) . ,(mx 1 1 1.0))))
+                            (('((1.0))) . ,(mx 1 1 1.0))
+                  (('((1.0 1.0) (1.0))) . ,'xfail)))
 
 ;; mx-identity
 (check 'mx-identity `(((3) . ,(mx% '((1.0 0.0 0.0)
@@ -245,6 +225,11 @@
 
 ;; mx=? TODO
 
+;; mx-ref11
+(check 'mx-ref11 `(((m33) . 8.0)
+                   ((m31) . 8.0)
+                   ((m13) . 8.0)
+                   ((m11) . 8.0)))
 
 ;; mx-ref
 (check 'mx-ref `(((m33 1 1) . 8.0)
@@ -254,12 +239,6 @@
                  ((m33 0 0) . ,'xfail)
                  ((m33 4 4) . ,'xfail)
                  ((m33 -4 -4) . ,'xfail)))
-
-;; mx-ref11
-(check 'mx-ref11 `(((m33) . 8.0)
-                   ((m31) . 8.0)
-                   ((m13) . 8.0)
-                   ((m11) . 8.0)))
 
 ;; mx-col
 (check 'mx-col `(((m33 1) . ,m31)
@@ -312,7 +291,12 @@
                   ((m13) . ,'xfail)
                   ((m11) . ,m11)))
 
-;; mx-set! TODO
+(check 'mx-set `(((m33 3 3 0.0) . ,(mx% '((8.0 1.0 6.0)
+                                          (3.0 5.0 7.0)
+                                          (4.0 9.0 0.0))))
+                 ((m31 1 2 0.0) . ,'xfail)
+                 ((m13 2 1 0.0) . ,'xfail)
+                 ((m11 1 1 1.0) . ,(mx% '((1.0))))))
 
 ;; mx+
 (check 'mx+ `(((m33 m33) . ,(mx% '((16.0 2.0 12.0)
@@ -358,7 +342,6 @@
                                    (-4.0))))
               (    (m13) . ,(mx% '((-8.0 -1.0 -6.0))))
               (    (m11) . ,(mx% '((-8.0))))
-              (    (1.0) . ,(mx% '((-1.0))))
               ((m33 m33) . ,(mx% '((0.0 0.0 0.0)
                                    (0.0 0.0 0.0)
                                    (0.0 0.0 0.0))))
@@ -437,7 +420,6 @@
                                (,(/ 4.0)))))
               ((m13) . ,(mx% `((,(/ 8.0) 1.0 ,(/ 6.0)))))
               ((m11) . ,(mx% `((,(/ 8.0)))))
-              ((1.0) . ,(mx% '((1.0))))
               ((m33 m33) . ,(mx% '((1.0 1.0 1.0)
                                    (1.0 1.0 1.0)
                                    (1.0 1.0 1.0))))
@@ -483,8 +465,7 @@
                                    (6.0)
                                    (8.0))))
               (    (m13) . ,(mx% '((16.0 2.0 12.0))))
-              (    (m11) . ,(mx% '((16.0))))
-              (    (1.0) . ,(mx% '((2.0))))))
+              (    (m11) . ,(mx% '((16.0))))))
 
 ;; mx^2
 (check 'mx^2 `((    (m33) . ,(mx% '((64.0 1.0 36.0)
@@ -494,8 +475,7 @@
                                    (9.0)
                                    (16.0))))
               (    (m13) . ,(mx% '((64.0 1.0 36.0))))
-              (    (m11) . ,(mx% '((64.0))))
-              (    (1.0) . ,(mx% '((1.0))))))
+              (    (m11) . ,(mx% '((64.0))))))
 
 ;; mx^
 (check 'mx^ `(((m33 m33) . ,(mx% '((16777216.0 1.0 46656.0)
@@ -531,8 +511,6 @@
               ((m13 m31) . ,(mx% '((16777216.0 1.0 1679616.0)
                                    (512.0 1.0 216.0)
                                    (4096.0 1.0 1296.0))))))
-
-;; mx-log TODO
 
 ;; mx-where
 (check 'mx-where `(((fp< m33 m33) . ,(mx% '((8.0 1.0 6.0)
@@ -941,6 +919,15 @@
                     ((m13 m13) . ,'xfail)
                     ((m33 m33) . ,'xfail)))
 
+;; mx-dyadic
+(check 'mx-dyadic `(((m11 m11) . ,(mx% '((64.0))))
+                    ((m31 m13) . ,(mx% '((64.0 8.0 48.0)
+                                         (24.0 3.0 18.0)
+                                         (32.0 4.0 24.0))))
+                    ((m13 m13) . ,'xfail)
+                    ((m31 m31) . ,'xfail)
+                    ((m33 m33) . ,'xfail)))
+
 ;; mx-dot*
 (check 'mx-dot* `(((m13 m13) . ,(mx% '((64.0 8.0 48.0)
                                        (8.0 1.0 6.0)
@@ -1045,6 +1032,4 @@
 (mx-export "test.csv" m33)
 
 (check 'mx-load `((("test.mx") . ,m33)))
-
-)
 

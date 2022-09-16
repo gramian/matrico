@@ -1,4 +1,4 @@
-![matrico 0.2](matrico-logo.svg) matrico
+![matrico 0.3](matrico-logo.svg) matrico
 ========================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.2 (2022-07-07)
+* **Version**: 0.3 (2022-09-16)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -36,16 +36,19 @@
 `matrico` is a _Scheme_ module for numerical matrix computations encapsulated in a _CHICKEN Scheme_ egg.
 
 ### Install and Test `matrico` Egg
+
 ```
 CHICKEN_INSTALL_REPOSITORY="/my/egg/directory/" chicken-install -test matrico
 ```
 
 ### Locate and Provide `matrico` Egg
+
 ```
 CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 ```
 
 ### Run Demo Code
+
 ```
 (load "RUNME.scm")
 ```
@@ -64,7 +67,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 ### Why `matrico`
 
-* Provide numerical capabilities to _CHICKEN Scheme_ community.
+* Provide more numerical capabilities to _CHICKEN Scheme_ community.
 
 * Contribute scientific computing knowledge as _Scheme_ code.
 
@@ -74,7 +77,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * Provide dense two-dimensional arrays (matrix) of floating-point numbers (flonum) for _CHICKEN Scheme_.
 
-* Provide linear algebra and typical calculator functions for matrixes.
+* Provide linear algebra and typical calculator functions for matrices.
 
 * Use only [included modules](http://wiki.call-cc.org/man/5/Included%20modules) of _CHICKEN Scheme_.
 
@@ -120,15 +123,18 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 <details><summary markdown="span">User-Facing Function Reference (click to expand)</summary>
 
-#### Module Properties
+#### Meta Function
 
-* `(matrico-ver)` returns **pair** holding major and minor version numbers of the **matrico** module.
+* `(matrico)` returns **void**, prints help message on `matrico` function.
 
-* `(matrico-cite)` returns **void**, prints citation to terminal.
-
-* `(matrico-about)` returns **void**, prints help text to terminal.
-
-* `(matrico? proc)` returns **boolean** answering if **symbol** `proc` is an existing function starting with "`mx`" and prints its docstring.
+* `(matrico sym)` returns **any**, depending on argument symbol `sym`:
+  * `'list` - returns **void**, prints list of "mx" functions;
+  * `'about` - returns **void**, prints summary about `matrico`;
+  * `'banner` - returns **void**, prints the `matrico` banner;
+  * `'version` - returns **pair** holding major and minor version numbers of `matrico`;
+  * `'citation` - returns **void**, prints citation information for `matrico`;
+  * `'benchmark` - returns **fixnum**, prints approximated million-instrictions-per-second for current machine;
+  * otherwise - returns **boolean** answering if argument is an exisiting function starting with "`mx`" and prints its docstring.
 
 #### Matrix Generators
 
@@ -208,6 +214,8 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-diag mat)` returns column-**matrix** holding **matrix** `mat` diagonal entries.
 
+* `(mx-set mat row col val)` returns **matrix** copy of **matrix** `mat` but with entry in row **fixnum** `row` and column **fixnum** `col` set to **flonum** or one-by-one **matrix** `val`.
+
 * `(mx-set! mat row col val)` returns **void**, sets entry of **matrix** `mat` in row and column specified by positive **fixnum**s `row` and `col` to **flonum** or one-by-one **matrix** `val`.
 
 #### Matrix Expanders
@@ -256,6 +264,8 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-delta mat)` returns **matrix** with entry-wise Kronecker delta of **matrix** `mat`.
 
+* `(mx-heaviside mat)` returns **matrix** with entry-wise Heaviside step of **matrix** `mat`.
+
 ##### Entry-Wise Trigonometric Functions
 
 * `(mx-sin mat)` returns **matrix** with entry-wise sine of **matrix** `mat`.
@@ -293,6 +303,12 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 * `(mx-hsin mat)` returns **matrix** with entry-wise haversed sine of **matrix** `mat`.
 
 * `(mx-hcos mat)` returns **matrix** with entry-wise haversed cosine of **matrix** `mat`.
+
+##### Entry-Wise Haversed Trigonometric Functions
+
+* `(mx-lnsinh mat)` returns **matrix** with entry-wise log-sinh of **matrix** `mat`.
+
+* `(mx-lncosh mat)` returns **matrix** with entry-wise log-cosh of **matrix** `mat`.
 
 ##### Entry-Wise Roots
 
@@ -420,13 +436,15 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 ##### Matrix Multiplication
 
-* `(mx-scalar x y)` returns **flonum** resulting from scalar product of column-**matrix**es `x` and `y`.
+* `(mx-scalar xt y)` returns **flonum** resulting from scalar product of column-**matrix**es `xt` and `y`.
+
+* `(mx-dyadic x y)` returns **flonum** resulting from dyadic product of column-**matrix** `x` and row-**matrix** `y`.
 
 * `(mx-dot* xt y)` returns **matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`.
 
 * `(mx-dot x y)` returns **matrix** resulting from matrix multiplication of **matrix**es `x` and `y`.
 
-* `(mx-gram mat)` returns **matrix** resulting from matrix multiplication of transposed **matrix** `mat` with itself, aka Gram matrix.
+* `(mx-gram mat)` returns **matrix** resulting from matrix multiplication of (transposed) **matrix** `mat` with itself, aka Gram matrix.
 
 * `(mx-gram* mat)` returns **matrix** resulting from matrix multiplication of **matrix** `mat` with itself transposed.
 
@@ -507,8 +525,6 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-vercat . mat)` returns **matrix** of vertically concatenating **matrix**es from **list**-of-**matrix**es `mat`.
 
-* `(matrix-vec mat)` returns column **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
-
 * `(matrix-cols mat)` returns **fixnum** number of columns of **matrix** `mat`, generated by `define-record`.
 
 * `(matrix-rows mat)` returns **fixnum** number of rows of **matrix** `mat`.
@@ -517,9 +533,11 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-dims mat)` returns **fixnum** number of dimensions of **matrix** `mat`.
 
-* `(matrix-ref mat row col)` returns **any** being **matrix** `mat` entry in **fixnum** `row` and **fixnum** `col`umns.
+* `(matrix-ref00 mat)` returns: **any** being the entry of **matrix** `mat` in the first row and first column.
 
-* `(matrix-ref00 mat)` returns: **any** being the top, left entry of **matrix** `mat`.
+* `(matrix-ref*0 mat row)` returns **any** being **matrix** `mat` entry in **fixnum** `row` and the first column.
+
+* `(matrix-ref mat row col)` returns **any** being **matrix** `mat` entry in **fixnum** `row` and **fixnum** `col`umns.
 
 * `(matrix-col mat col)` returns **matrix** being **matrix** `mat` column specified by **fixnum** `col`.
 
@@ -528,6 +546,8 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 * `(matrix-submatrix mat row1 row2 col1 col2)` returns **matrix** holding entries of **matrix** `mat` from rows **fixnum**s `row1` to `row2` in columns **fixnum**s `col1` to `col2`.
 
 * `(matrix-diag mat)` returns **matrix** holding **matrix** `mat` diagonal entries as column-**matrix**.
+
+* `(matrix-set mat row col val)` returns **matrix** copy of **matrix** `mat` but with entry in row **fixnum** `row` and column **fixnum** `col` set to `val`.
 
 * `(matrix-set! mat row col val)` returns **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
 
@@ -561,11 +581,13 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-broadcast fun x y)` returns **matrix** resulting from applying **procedure** `fun` to each element of matrix `x`, `y`, expanded if necessary.
 
+* `(matrix-vec mat)` returns column **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
+
 * `(matrix-transpose mat)` returns **matrix** of entries of **matrix** `mat` with swapped row and column indices.
 
-* `(matrix-dot* xt y)` returns **matrix** resulting from matrix multiplication of transposed of **matrix** `xt` and **matrix** `y`.
+* `(matrix-scalar xt y)` returns **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
 
-* `(matrix-scalar x y)` returns **any** resulting from the scalar product of column-**matrix**es `x` and `y`.
+* `(matrix-dot* xt y)` returns **matrix** resulting from matrix multiplication of transposed of **matrix** `xt` and **matrix** `y`.
 
 * `(matrix-explode mat)` returns **list**-of-column-**matrix** from **matrix** `mat`.
 
@@ -595,23 +617,23 @@ Provides homogeneous vector transformations analogous to vectors.
 
 * `(f64vector-unfold dim fun)` returns **f64vector** of dimension **fixnum** `dim` with procedurally generated elements by **procedure** `fun`.
 
-* `(f64vector-concat . vec)` returns **f64vector** of concatenated **list**-of-**f64vector**s `vec`.
+* `(f64vector-concat . vecs)` returns **f64vector** of concatenated **list**-of-**f64vector**(s) `vecs`.
 
 * `(f64vector-any? pred vec)` returns **boolean** answering if any element of **f64vector** `vec` fulfills predicate **procedure** `pred` from left to right.
 
 * `(f64vector-all? pred vec)` returns **boolean** answering if all elements of **f64vector** `vec` fulfill predicate **procedure** `pred` from left to right.
 
-* `(f64vector-map fun . vec)` returns **f64vector** resulting from applying **procedure** `fun` to all corresponding **f64vector**s `vec` elements.
+* `(f64vector-map fun . vecs)` returns **f64vector** resulting from applying **procedure** `fun` to all corresponding **f64vector**(s) `vecs` elements.
 
-* `(f64vector-map-index fun . vec)` returns **f64vector** resulting from applying **procedure** `fun` to index and all corresponding **f64vector**s `vec` elements.
+* `(f64vector-map-index fun . vecs)` returns **f64vector** resulting from applying **procedure** `fun` to index and all corresponding **f64vector**(s) `vecs` elements.
 
-* `(f64vector-foreach fun . vec)` returns **void**, applies **procedure** `fun` to all corresponding **f64vector**s `vec` elements.
+* `(f64vector-foreach fun . vecs)` returns **void**, applies **procedure** `fun` to all corresponding **f64vector**(s) `vecs` elements.
 
-* `(f64vector-foreach-index fun . vec)` returns **void**, applies **procedure** `fun` to index and all corresponding **f64vector** `vec` elements.
+* `(f64vector-foreach-index fun . vecs)` returns **void**, applies **procedure** `fun` to index and all corresponding **f64vector**(s) `vecs` elements.
 
-* `(f64vector-fold fun ini . vec)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**s `vec` elements from left to right.
+* `(f64vector-fold fun ini . vecs)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**(s) `vecs` elements from left to right.
 
-* `(f64vector-fold* fun ini . vec)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**s `vec` elements from right to left.
+* `(f64vector-fold* fun ini . vecs)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**(s) `vecs` elements from right to left.
 
 * `(f64vector-dot x y)` returns **flonum** resulting from applying fused-multiply-add to zero initialized accumulator and sequentially to all **f64vector**s `x`, `y` elements from left to right.
 
@@ -669,6 +691,10 @@ Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 * `(fphsin x)` returns **flonum** haversed sine of **flonum** `x`.
 
 * `(fphcos x)` returns **flonum** haversed cosine of **flonum** `x`.
+
+* `(fplnsinh x)` returns **flonum** log-sinh of **flonum** `x`.
+
+* `(fplncosh x)` returns **flonum** log-cosh of **flonum** `x`.
 
 * `(fpgauss x)` returns **flonum** Gauss bell curve function evaluation of **flonum** `x`.
 
@@ -739,13 +765,9 @@ Provides a few base functions, macros and aliases for convenience.
 
 <details><summary markdown="span">Tools Reference (click to expand)</summary>
 
-* `(every? lst)` returns **boolean** answering if all elements of **list** `lst` are not false.
+* `(ok?)` returns **boolean** answering if all test passed.
 
 * `(check exe arg-ret-lst)` returns **boolean** answering if **procedure** `exe` evaluated for _car_ of each element of **list**-of-**pairs** `arg-ret-lst` corresponds to its _cdr_.
-
-* `(run-tests . tst)` returns `1` if any test argument `tst` fails, `0` otherwise.
-
-* `(load-test str)` returns **any**, the value of the last expression of the source file (**string**) `str`.
 
 </details>
 
@@ -760,6 +782,16 @@ The following `matrico` benchmarks in turn are meant as an indicator to track
 version-by-version performance evolution of this **pure** _Scheme_ implementation.
 
 ### Benchmarks
+
+#### MIPS
+
+* Based on [BogoMips](https://de.wikipedia.org/wiki/BogoMips)
+* Optimization level: `-O5`
+
+Run by:
+```
+make mips
+```
 
 #### MATMUL
 
@@ -787,18 +819,57 @@ make linpack
 
 * `CPU:` Cortex-A72 (4 Cores @ 1.5Ghz)
 * `RAM:` 4GB (LPDDR4 @ 2400MT/s)
-* `SYS:` Raspberry Pi OS Lite (22-04-04)
+* `SYS:` Raspberry Pi OS Lite (22-09-06)
 * `SCM:` CHICKEN Scheme (5.3)
 
-* MATMUL: `34.5` Megaflops
-* LINPACK: `9.0` Megaflops
+* MATMUL: `35` Megaflops
+* LINPACK: `9` Megaflops
+* BOGOMIPS: `550` Mips
+
+#### ARM-64 Laptop-Notebook
+
+* `CPU:` M2 (4+4 Cores @ 3.5Ghz)
+* `RAM:` 16GB (LPDDR5 @ 6400MT/s)
+* `SYS:` MacOS Monterey (12.5.1)
+* `SCM:` CHICKEN Scheme (5.3)
+
+* MATMUL: `250` Megaflops
+* LINPACK: `140` Megaflops
+* BOGOMIPS: `280` Mips
 
 ## Development
 
+### Roadmap
+
+* [`check`]   Add more `matrico` tests
+
+* [`matrico`] Add examples, equation images and links to documentation
+
+* [`mx`]      Add rank-revealing QR and pseudo-inverse via QR
+
+* [`mx`]      Add Eigenvalue decomposition and singular value decomposition
+
+* [`mx`]      Add [`asciichart`](https://github.com/kroitor/asciichart) interface or functionality
+
 ### Changelog
+
+* **0.3** (2022-09-16)
+  * **ADDED** `matrico` function
+  * **ADDED** `mx-set`
+  * **ADDED** `mx-lnsinh`, `mx-lncosh`
+  * **ADDED** `mx-dyadic`
+  * **ADDED** `mx-heaviside`
+  * **CHANGED** default optimization level to `-O3`
+  * **CHANGED** inlining of local functions
+  * **CHANGED** testing framework
+  * **IMPROVED** argument checking
+  * **IMPROVED** performance
+  * **REMOVED** `matrico-ver`, `matrico-cite`, `matrico-about`, `matrico?`
+  * ... and many minor updates and fixes.
 
 * **0.2** (2022-07-07)
   * **ADDED** `matrico-cite`
+  * **ADDED** `mx-scalar`
   * **ADDED** (re)export of `fpmath` by `matrico`
   * **ADDED** instrumentation and statistical profiling targets
   * **CHANGED** rename `matrico-help` to `matrico-about`
@@ -813,39 +884,25 @@ make linpack
 * **0.1** (2022-05-01)
   * Initial Release
 
-### Roadmap
-
-* [`check`]   Add more `matrico` tests
-
-* [`matrico`] Add heat equation benchmark
-
-* [`matrico`] Add transport equation benchmark
-
-* [`matrico`] Add examples and links to documentation
-
-* [`mx`]      Add rank-revealing QR and pseudo-inverse via QR
-
-* [`mx`]      Add Eigenvalue decomposition and singular value decomposition
-
-* [`mx`]      Add [`asciichart`](https://github.com/kroitor/asciichart) interface or functionality
-
 ### Coding Guidelines
 
-* Every source file states: project, author, license, version, summary
+* Every source file states: project, author, license, version, summary!
 
-* Every function has a one-line summary
+* Every function has a one-line summary!
 
-* Import only included modules
+* Import only included modules!
 
-* Avoid `do`, prefer named let-recursion
+* Avoid `do`, prefer named `let`-recursion!
 
-* Avoid `set-car!` and `set-cdr!`
+* Avoid `set-car!` and `set-cdr!`!
 
-* Avoid "multiple values"
+* Avoid "multiple values"!
+
+* Avoid `mx-ref` for non-column matrices if possible!
 
 ### Notes
 
-* `matrico` should be build with `-O4` if used as a shared object (default).
+* `matrico` should be build with `-O3` if used as a shared object (default).
 
 * `matrico` can be build with `-O5` if `matrico.scm` is included into the source.
 

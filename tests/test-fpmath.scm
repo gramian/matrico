@@ -1,20 +1,16 @@
 ;;;; test-fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: fpmath module unit tests
 
 (import (chicken load))
 
-(load-relative "check.scm")
-
 (load-relative "../src/fpmath.scm")
 
 (import fpmath)
-
-(run-tests
 
 ;; fp
 (check 'fp '((         (0) . 0.0)
@@ -200,6 +196,15 @@
                  (((- (fptau))) . 1.0)
                  (    ((fptau)) . 1.0)))
 
+;; fphsin
+(check 'fplnsinh '((   (0.0) . -inf.0)
+                   ((+inf.0) . +inf.0)))
+
+;; fphcos
+(check 'fplncosh '((   (0.0) . 0.0)
+                   ((-inf.0) . +inf.0)
+                   ((+inf.0) . +inf.0)))
+
 ;; fpsignsqrt
 (check 'fpsignsqrt '((   (0.0) . 0.0)
                      (   (1.0) . 1.0)
@@ -237,17 +242,17 @@
                   ((1.0) .        "+1.00000")
                   ((0.00002) .    "+0.00002")
                   ((0.000001) .   "+0.0000…")
+                  ((99999.8) .    "+99999.8")
                   ((999999.0) .   "+999999.")
                   ((1000001.0) .  "+10000….")
                   ((-0.0) .       "    0   ")
                   ((-1.0) .       "-1.00000")
                   ((-0.00002) .   "-0.00002")
                   ((-0.000001) .  "-0.0000…")
+                  ((-99999.8) .   "-99999.8")
                   ((-999999.0) .  "-999999.")
                   ((-1000001.0) . "-10000….")
                   ((+nan.0) .     "   NaN  ")
                   ((+inf.0) .     "   +∞   ")
                   ((-inf.0) .     "   -∞   ")))
-
-)
 

@@ -1,7 +1,7 @@
 ;;;; fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: floating-point add-on module
@@ -19,6 +19,7 @@
    fpsinh fpcosh fptanh
    fpasinh fpacosh fpatanh
    fphsin fphcos
+   fplnsinh fplncosh
    fpsignsqrt fpsinc fpsigm fpgauss fpstirling
    fptaper)
 
@@ -146,13 +147,23 @@
 
 ;;; Haversed Trigonometric Functions ###########################################
 
-;;@returns: **flonum** haversed sine of **flonum** `x`: `hsin(x) = 0.5 * (1 - cos(x))`.
+;;@returns: **flonum** haversed sine of **flonum** `x`: `hsin(x) = 0.5 * (1 - cos(x))`, see @11.
 (define (fphsin x)
   (fp* 0.5 (fp- 1.0 (fpcos x))))
 
-;;@returns: **flonum** haversed cosine of **flonum** `x`: `cosh(x) = 0.5 * (1 + cos(x))`.
+;;@returns: **flonum** haversed cosine of **flonum** `x`: `cosh(x) = 0.5 * (1 + cos(x))`, see @11.
 (define (fphcos x)
   (fp* 0.5 (fp+ 1.0 (fpcos x))))
+
+;;; Logarithmic Hyperbolic Functions ###########################################
+
+;;@returns: **flonum** log-sinh **flonum** `x`: `lnsinh(x) = ln(sinh(x))`, see @12.
+(define (fplnsinh x)
+  (fplog (fpsinh x)))
+
+;;@returns: **flonum** log-cosh **flonum** `x`: `lncosh(x) = ln(cosh(x))`, see @12.
+(define (fplncosh x)
+  (fplog (fpcosh x)))
 
 ;;; Special Functions ##########################################################
 
@@ -181,7 +192,6 @@
 
 ;;@returns **string** representation of **flonum** `x` formatted to 8 character fixed width.
 (define (fptaper x)
-  (must-be (flonum? x))
   (let* [(prc  (flonum-print-precision 17))
          (sgnx (cond [(fp> x 0.0) "+"]
                      [(fp< x 0.0) "-"]
@@ -224,4 +234,8 @@
 ;;@9: Number of correct decimal digits given by the n-th convergent to e. The On-Line Encyclopedia of Integer Sequences, A114539. https://oeis.org/A114539
 
 ;;@10: Fibonacci numbers. The On-Line Encyclopedia of Integer Sequences, A000045. https://oeis.org/A000045
+
+;;@11: Versine. Wikipedia. https://en.wikipedia.org/wiki/Versine
+
+;;@12: Hyperbolic Trigonometric Functions. GNU Scientific Library. https://www.gnu.org/software/gsl/doc/html/specfunc.html#hyperbolic-trigonometric-functions
 

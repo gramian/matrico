@@ -1,7 +1,7 @@
 ;;;; matrix.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.
@@ -9,33 +9,28 @@
 (include-relative "utils.scm")
 
 (functor (matrix
-           (column (column-id
-                    column
-                    make-column
+           (column (column
+                    make-column column-unfold column-concat
                     column-length
-                    column-ref column-set!
-                    subcolumn
-                    column-unfold
-                    column-concat
+                    column-ref subcolumn
+                    column-set!
                     column-any? column-all?
-                    column-map column-map-index
-                    column-foreach column-foreach-index
-                    column-fold column-fold*
-                    column-dot
+                    column-map column-map-index column-foreach column-foreach-index
+                    column-fold column-fold* column-dot
                     list->column)))
 
   (matrix?
    make-matrix* make-matrix** matrix-generate
-   matrix-horcat matrix-vercat matrix-vec
+   matrix-horcat matrix-vercat
    matrix-cols matrix-rows matrix-numel matrix-dims
-   matrix-ref00 matrix-ref matrix-col matrix-row matrix-submatrix matrix-diag
-   matrix-set!
+   matrix-ref00 matrix-ref*0 matrix-ref matrix-set matrix-set!
+   matrix-col matrix-row matrix-diag matrix-submatrix
    matrix-col? matrix-row? matrix-scalar? matrix-vector? matrix-square?
    matrix-samecols? matrix-samerows? matrix-samedims?
    matrix-any? matrix-all?
    matrix-colfold matrix-rowfold matrix-allfold
    matrix-map matrix-broadcast
-   matrix-transpose matrix-dot* matrix-scalar matrix-explode matrix-implode
+   matrix-vec matrix-transpose matrix-scalar matrix-dot* matrix-explode matrix-implode
    matrix-print matrix-export matrix-save matrix-load)
 
   (import scheme (chicken base) (chicken module) (only (chicken memory representation) object-copy) utils column)
@@ -63,7 +58,6 @@
 
 ;;@returns: `rows`-by-`cols` **matrix** with all entries set to `val` for **fixnum**s `rows`, `cols`.
 (define (make-matrix* rows cols val)
-  (must-be (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols))
   (make-matrix
     (let rho [(idx cols)
               (dat nil)]
@@ -96,71 +90,79 @@
 
 ;;@returns: **matrix** of horizontally concatenating **matrix**es from **list**-of-**matrix**es `mat`.
 (define (matrix-horcat . mat)
-  (must-be (not (empty? mat)) (apply = (map matrix-rows mat)))
   (make-matrix
     (apply append (map (compose object-copy matrix-data) mat))
     (foldl fx+ 0 (map matrix-cols mat))))
 
 ;;@returns: **matrix** of vertically concatenating **matrix**es from **list**-of-**matrix**es `mat`.
 (define (matrix-vercat . mat)
-  (must-be (not (empty? mat)) (apply = (map matrix-cols mat)))
   (make-matrix
     (apply map column-concat (map (compose object-copy matrix-data) mat))
     (matrix-cols (head mat))))
 
-;;@returns: column **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
-(define (matrix-vec mat)
-  (must-be (matrix? mat))
-  (make-matrix
-    (list (apply column-concat (object-copy (matrix-data mat))))
-    1))
-
 ;;; Matrix Dimensions ##########################################################
 
-;;@notice: `matrix-cols` is provided by the **record** `matrix`
+;;@note: `matrix-cols` is provided by the **record** `matrix`
 
 ;;@returns: **fixnum** number of rows of **matrix** `mat`.
 (define (matrix-rows mat)
-  (must-be (matrix? mat))
   (column-length (head (matrix-data mat))))
 
 ;;@returns: **fixnum** number of entries of **matrix** `mat`.
 (define (matrix-numel mat)
-  (must-be (matrix? mat))
   (fx* (matrix-rows mat) (matrix-cols mat)))
 
 ;;@returns: **fixnum** number of dimensions of **matrix** `mat`.
 (define (matrix-dims mat)
-  (must-be (matrix? mat))
   (fx+ (if (matrix-row? mat) 0 1) (if (matrix-col? mat) 0 1)))
 
 ;;; Matrix Accessors ###########################################################
 
-;;@returns: **any** being the top, left entry of **matrix** `mat`.
+;;@returns: **any** being the entry of **matrix** `mat` in the first row and first column.
 (define (matrix-ref00 mat)
-  (must-be matrix? mat)
   (column-ref (head (matrix-data mat)) 0))
 
-;;@returns: **any** being entry of **matrix** `mat` in **fixnum** `row` and **fixnum** `col`umn.
+;;@returns: **any** being the entry of **matrix** `mat` in **fixnum** `row` and the first column.
+(define (matrix-ref*0 mat row)
+  (column-ref (head (matrix-data mat)) row))
+
+;;@returns: **any** being the entry of **matrix** `mat` in **fixnum** `row` and **fixnum** `col`umn.
 (define (matrix-ref mat row col)
-  (must-be (matrix? mat) (fixnum? row) (fx>=0? row) (fx< row (matrix-rows mat)) (fixnum? col) (fx>=0? col) (fx< col (matrix-cols mat)))
   (column-ref (list-ref (matrix-data mat) col) row))
+
+;;@returns: **matrix** copy of **matrix** `mat` but with entry in row **fixnum** `row` and column **fixnum** `col` set to `val`.
+(define (matrix-set mat row col val)
+  (let [(ret (object-copy mat))]
+    (column-set! (list-ref (matrix-data ret) col) row val)
+    ret))
+
+;;@returns: **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
+(define (matrix-set! mat row col val)
+  (column-set! (list-ref (matrix-data mat) col) row val))
 
 ;;@returns: **matrix** being column of **matrix** `mat` specified by **fixnum** `col`.
 (define (matrix-col mat col)
-  (must-be (matrix? mat) (fixnum? col) (fx>=0? col) (fx< col (matrix-cols mat)))
   (make-matrix
-    (list (list-ref (matrix-data mat) col)) 1))
+    (list (object-copy (list-ref (matrix-data mat) col))) 1))
 
 ;;@returns: **matrix** being row of **matrix** `mat` specified by **fixnum** `row`.
 (define (matrix-row mat row)
-  (must-be (matrix? mat) (fixnum? row) (fx>=0? row) (fx< row (matrix-rows mat)))
   (matrix-map* (lambda (col)
                  (column (column-ref col row))) mat))
 
+;;@returns column-**matrix** holding **matrix** `mat` diagonal entries.
+(define (matrix-diag mat)
+  (let* [(rows (matrix-rows mat))
+         (col  (make-column rows))]
+    (let rho [(idx 0)
+              (lst (matrix-data mat))]
+      (if (fx= idx rows) (make-matrix (list col) 1)
+                         (begin
+                           (column-set! col idx (column-ref (head lst) idx))
+                           (rho (fx+1 idx) (tail lst)))))))
+
 ;;@returns: **matrix** holding entries of **matrix** `mat` from rows **fixnum**s `row1` to `row2` in columns from **fixnum**s `col1` to `col2`.
 (define (matrix-submatrix mat row1 row2 col1 col2)
-  (must-be (matrix? mat) (fixnum? row1) (fixnum? row2) (fixnum? col1) (fixnum? col2) (fx>=0? row1) (fx>=0? col1) (fx<= row1 row2) (fx<= col1 col2) (fx< col2 (matrix-cols mat)) (fx< row2 (matrix-rows mat)))
   (make-matrix
     (object-copy (let [(cols (if (and (fx=0? col1) (fx= (fx+1 col2) (matrix-cols mat))) (matrix-data mat)
                                                                                         (sublist (matrix-data mat) col1 col2)))]
@@ -169,19 +171,6 @@
                                                                                      (subcolumn col row1 (fx+1 row2)))
                                                                                    cols))))
     (fx+1 (fx- col2 col1))))
-
-;;@returns column-**matrix** holding **matrix** `mat` diagonal entries.
-(define (matrix-diag mat)
-  (must-be (matrix? mat) (matrix-square? mat))
-  (make-matrix
-    (list (column-unfold (matrix-rows mat) (lambda (row)
-                                             (matrix-ref mat row row))))
-    1))
-
-;;@returns: **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
-(define (matrix-set! mat row col val)
-  (must-be (matrix? mat) (fixnum? row) (fx>=0? row) (fx< row (matrix-rows mat)) (fixnum? col) (fx>=0? col) (fx< col (matrix-cols mat)))
-  (column-set! (list-ref (matrix-data mat) col) row val))
 
 ;;; Matrix Predicates ##########################################################
 
@@ -219,14 +208,12 @@
 
 ;;@returns: **boolean** answering if any entry of **matrix** `mat` fulfills predicate **procedure** `pred`.
 (define (matrix-any? pred mat)
-  (must-be (procedure? pred) (matrix? mat))
   (any? (lambda (x)
           (column-any? pred x))
         (matrix-data mat)))
 
 ;;@returns: **boolean** answering if all entries of **matrix** `mat` fulfill predicate **procedure** `pred`.
 (define (matrix-all? pred mat)
-  (must-be (procedure? pred) (matrix? mat))
   (all? (lambda (x)
           (column-all? pred x))
         (matrix-data mat)))
@@ -235,14 +222,12 @@
 
 ;;@returns: row-**matrix** resulting from folding by two-argument **procedure** `fun` each column of **matrix** `mat`.
 (define (matrix-colfold fun ini mat)
-  (must-be (procedure? fun) (matrix? mat))
   (matrix-map* (lambda (col)
                  (column (column-fold fun ini col)))
                mat))
 
 ;;@returns: column-**matrix** resulting from folding by two-argument **procedure** `fun` each row of **matrix** `mat`.
 (define (matrix-rowfold fun ini mat)
-  (must-be (procedure? fun) (matrix? mat))
   (make-matrix
     (list (foldl (lambda (acc col)
                    (column-map fun acc col))
@@ -252,7 +237,6 @@
 
 ;;@returns: **any** resulting from folding by two-argument **procedure** `fun` all **matrix** `mat` entries.
 (define (matrix-allfold fun ini mat)
-  (must-be (procedure? fun) (matrix? mat))
   (foldl (lambda (acc col)
            (column-fold fun acc col))
          ini
@@ -262,14 +246,12 @@
 
 ;;@returns: **matrix** resulting from applying function to each entry of **matrix** `mat`.
 (define (matrix-map fun mat)
-  (must-be (procedure? fun) (matrix? mat))
   (matrix-map* (lambda (col)
                  (column-map fun col))
                mat))
 
 ;;@returns: **matrix** resulting from applying **procedure** `fun` to each element of **matrix**es `x`, `y`, expanded if necessary.
 (define (matrix-broadcast fun x y)
-  (must-be (procedure? fun) (matrix? x) (matrix? y))
   (let [(x-rows (matrix-rows x))
         (y-rows (matrix-rows y))
         (x-cols (matrix-cols x))
@@ -342,11 +324,16 @@
           [else
             (error 'matrix-broadcast "Dimension mismatch!")])))
 
-;;; Matrix Specifics ###########################################################
+;;; Matrix Specific ############################################################
+
+;;@returns: column **matrix** of vertically concatenated columns of **matrix** `mat`, aka (mathematical) vectorization.
+(define (matrix-vec mat)
+  (make-matrix
+    (list (apply column-concat (object-copy (matrix-data mat))))
+    1))
 
 ;;@returns: **matrix** of entries of **matrix** `mat` with swapped row and column indices.
 (define (matrix-transpose mat)
-  (must-be (matrix? mat))
   (make-matrix
     (apply column-fold* (lambda (acc . vals)
                           (cons (list->column vals) acc))
@@ -354,9 +341,12 @@
                         (matrix-data mat))
     (matrix-rows mat)))
 
+;;@returns: **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
+(define (matrix-scalar xt y)
+  (column-dot (head (matrix-data xt)) (head (matrix-data y))))
+
 ;;@returns: **matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`.
 (define (matrix-dot* xt y)
-  (must-be (matrix? xt) (matrix? y) (matrix-samerows? xt y))
   (define xt-data (matrix-data xt))
   (define xt-cols (matrix-cols xt))
   (matrix-map* (lambda (y-col)
@@ -369,30 +359,20 @@
                                              (rho (fx+1 idx) (tail lst)))))))
                y))
 
-;;@returns: **any** resulting from the scalar product of column-**matrix**es `x` and `y`.
-(define (matrix-scalar x y)
-  (must-be (matrix-col? x) (matrix-col? y) (matrix-samerows? x y))
-  (column-dot (head (matrix-data x)) (head (matrix-data y))))
-
 ;;@returns: **list**-of-column-**matrix**es from **matrix** `mat`.
 (define (matrix-explode mat)
-  (must-be (matrix? mat))
   (map (lambda (col)
-         (make-matrix (list col) 1))
+         (make-matrix (list (object-copy col)) 1))
        (matrix-data mat)))
 
 ;;@returns: **matrix** of horizontally concatenation of **list**-of-column-**matrix**es `lst`.
 (define (matrix-implode lst)
-  (must-be (list? lst) (not (empty? lst)) (apply = (map matrix-rows lst)) (all? matrix-col? lst))
-  (make-matrix
-    (map (compose object-copy head matrix-data) lst)
-    (length lst)))
+  (apply matrix-horcat lst))
 
 ;;; Matrix Utilities ###########################################################
 
 ;;@returns: **void**, prints **matrix** to terminal.
 (define (matrix-print fun mat)
-  (must-be (procedure? fun) (matrix? mat))
   (define rows (matrix-rows mat))
   (define rows-1 (fx-1 rows))
   (apply column-foreach-index (lambda (idx . row)
@@ -415,20 +395,19 @@
 
 ;;@returns: **void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path (**string**) `str`.
 (define (matrix-export str mat)
-  (must-be (string? str) (matrix? mat))
   (define (export-mat)
     (apply column-foreach (lambda row
                             (let rho [(lst row)]
                               (if (empty? lst) (newline)
                                                (begin
                                                  (display (head lst))
-                                                 (when (not (empty? (tail lst))) (display " "))))))
+                                                 (when (not (empty? (tail lst))) (display ","))
+                                                 (rho (tail lst))))))
                           (matrix-data mat)))
   (with-output-to-file str export-mat #:text))
 
 ;;@returns: **void**, writes matrix `mat` to new Scheme (SCM) file in relative path (**string**) `str`.
 (define (matrix-save str mat)
-  (must-be (string? str) (matrix? mat))
   (let [(save-mat (lambda ()
                     (display "'(;@matrico")
                     (newline)
@@ -439,7 +418,6 @@
 
 ;;@returns: **matrix** loaded from file in relative path (**string**) `str`.
 (define (matrix-load str)
-  (must-be (string? str))
   (define data (load* str))
   (make-matrix data (length data)))
 

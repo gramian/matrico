@@ -1,20 +1,16 @@
 ;;;; test-utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.2 (2022-07-07)
+;;@version: 0.3 (2022-09-16)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: utils module unit tests
 
 (import (chicken load))
 
-(load-relative "check.scm")
-
-(load-relative "../matrico.scm")
+(load-relative "../src/utils.scm")
 
 (import utils)
-
-(run-tests
 
 ;; append*
 (check 'append* '((('(0 1 2 3) 4) . (0 1 2 3 4))
@@ -76,6 +72,4 @@
                    (( 0 -1) . 0)
                    ((-1  0) . 0)
                    ((-1 -1) . 0)))
-
-)
 

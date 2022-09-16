@@ -1,10 +1,10 @@
 ;;;; matrico.egg
 
-((version "0.2")
+((version "0.3")
  (synopsis "A flonum matrix module for CHICKEN Scheme.")
  (author "Christian Himpe")
  (category math)
  (license "ZLIB-Acknowledgement")
- (components (extension matrico (csc-options "-O4" "-d0" "-C" "-O2")))
+ (components (extension matrico (csc-options "-O3" "-d0" "-C" "-O2")))
 )
 
