@@ -10,4 +10,5 @@
 (release "0.2rel")
 
 (release "0.3rc1")
+(release "0.3rel")
 

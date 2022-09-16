@@ -54,7 +54,7 @@
 
 ;; Solving a linear problem
 
-(matrico? 'mx-solve)
+(matrico 'mx-solve)
 
 (mx-print (mx-solve A b)) ; Print the solution to the linear problem A x = b
 

@@ -1,16 +1,10 @@
 # matrico Makefile
 
-CSC = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csc
-CSI = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csi
-CHICKEN_INSTALL = /home/ch/opt/CHICKEN/bin/chicken-install
-CHICKEN_PROFILE =/home/ch/opt/CHICKEN/bin/chicken-profile
-TEST_NEW_EGG = /home/ch/opt/CHICKEN/bin/test-new-egg
-
-#CSC = csc
-#CSI = csi
-#CHICKEN_INSTALL = chicken-install
-#CHICKEN_PROFILE = chicken-profile
-#TEST_NEW_EGG = test-new-egg
+CSC = csc
+CSI = csi
+CHICKEN_INSTALL = chicken-install
+CHICKEN_PROFILE = chicken-profile
+TEST_NEW_EGG = test-new-egg
 
 CLARG =
 LEVEL = -O3
