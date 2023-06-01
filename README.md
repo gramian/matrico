@@ -1,4 +1,4 @@
-![matrico 0.3](matrico-logo.svg) matrico
+![matrico 0.4](res/matrico-logo.svg) matrico
 ========================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.3 (2022-09-16)
+* **Version**: 0.4 (2023-06-01)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -22,6 +22,8 @@
 * **Category**: math (numerical mathematics)
 
 * **Audience**: MATLAB, Octave, Scilab, Julia, NumPy (Python) users
+
+* **Wikidata**: https://www.wikidata.org/wiki/Q113997718
 
 ## Table of Contents
 
@@ -125,22 +127,22 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 #### Meta Function
 
-* `(matrico)` returns **void**, prints help message on `matrico` function.
+* `(matrico)` returns **void**, prints help message for `matrico` function.
 
 * `(matrico sym)` returns **any**, depending on argument symbol `sym`:
-  * `'list` - returns **void**, prints list of "mx" functions;
+  * `'list` - returns **void**, prints list of "`mx`" functions;
   * `'about` - returns **void**, prints summary about `matrico`;
   * `'banner` - returns **void**, prints the `matrico` banner;
   * `'version` - returns **pair** holding major and minor version numbers of `matrico`;
   * `'citation` - returns **void**, prints citation information for `matrico`;
-  * `'benchmark` - returns **fixnum**, prints approximated million-instrictions-per-second for current machine;
-  * otherwise - returns **boolean** answering if argument is an exisiting function starting with "`mx`" and prints its docstring.
+  * `'benchmark` - returns **fixnum**, prints approximated million-instructions-per-second for current machine;
+  * otherwise - returns **boolean** answering if argument is a symbol matching an existing function, starting with "`mx`", and prints its docstring.
 
 #### Matrix Generators
 
 * `(mx rows cols val)` returns `rows`-by-`cols` **matrix** with all entries set to **flonum** `val` for positive **fixnum**s `rows` and `cols`.
 
-* `(mx% lst)` returns **matrix** from row-major **list**-of-**lists**-of**flonum**s `lst`.
+* `(mx% lst)` returns **matrix** from row-major **list**-of-**lists**-of-**flonum**s `lst`.
 
 * `(mx-identity dims)` returns `dims`-by-`dims` identity **matrix** for a positive **fixnum** `dims`.
 
@@ -156,23 +158,23 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-tridiag dims low mid upp)` returns `dims`-by-`dims` **matrix** with lower, main, upper band entries given by the **flonum**s `low`, `mid`, `upp` for a positive **fixnum** `dims`.
 
+* `(mx-unit dims num)` returns `dims`-by-one column-**matrix** of zeros except the positive **fixnum** `num`-th entry set to one, for a positive **fixnum** `dims`, aka canonical base vector.
+
+* `(mx-iota dims)` returns `dims`-by-one column-**matrix** with entries set to corresponding row index for a positive **fixnum** `dims`.
+
 * `(mx-linspace x y num)` returns **matrix** of positive **fixnum** `num` row-wise linearly spaced entries with endpoints given by **flonum**s or column-`matrix`es `x` and `y`.
 
 * `(mx-logspace x y num)` returns **matrix** of positive **fixnum** `num` row-wise (base-10) logarithmic spaced entries with endpoints given by **flonum**s or column-**matrix**es `x` and `y`.
 
-* `(mx-unit dims num)` returns `dims`-by-one **matrix** of zeros except the positive **fixnum** `num` entry set to one, for a positive **fixnum** `dims`, aka canonical base vector.
-
-* `(mx-iota dims)` returns `dims`-by-one **matrix** with entries set to corresponding row index for a positive **fixnum** `dims`.
-
 #### Matrix Dimensions
 
-* `(mx-cols mat)` returns **fixnum** of columns of **matrix** `mat`.
+* `(mx-cols mat)` returns **fixnum** number of columns of **matrix** `mat`.
 
-* `(mx-rows mat)` returns **fixnum** of rows of **matrix** `mat`.
+* `(mx-rows mat)` returns **fixnum** number of rows of **matrix** `mat`.
 
-* `(mx-numel mat)` returns **fixnum** of entries of **matrix** `mat`.
+* `(mx-numel mat)` returns **fixnum** number of entries of **matrix** `mat`.
 
-* `(mx-dims mat)` returns **fixnum** of dimensions of **matrix** `mat`.
+* `(mx-dims mat)` returns **fixnum** number of dimensions of **matrix** `mat`.
 
 #### Matrix Predicates
 
@@ -206,13 +208,13 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-ref mat row col)` **flonum** being **matrix** `mat` entry in row and column specified by positive **fixnum**s `row`, `col`.
 
-* `(mx-col mat col)` returns **matrix** being **matrix** `mat` column specified by positive **fixnum** `col`.
+* `(mx-col mat col)` returns **matrix** being **matrix** `mat`'s column specified by positive **fixnum** `col`.
 
-* `(mx-row mat row)` returns **matrix** being **matrix** `mat` row specified by positive **fixnum** `row`.
+* `(mx-row mat row)` returns **matrix** being **matrix** `mat`'s row specified by positive **fixnum** `row`.
 
 * `(mx-submatrix mat row1 row2 col1 col2)` returns **matrix** holding entries of **matrix** `mat` in rows specified by positive **fixnum**s `row1` to `row2` and columns specified by positive **fixnum**s `col1` to `col2`.
 
-* `(mx-diag mat)` returns column-**matrix** holding **matrix** `mat` diagonal entries.
+* `(mx-diag mat)` returns column-**matrix** holding **matrix** `mat`'s diagonal entries.
 
 * `(mx-set mat row col val)` returns **matrix** copy of **matrix** `mat` but with entry in row **fixnum** `row` and column **fixnum** `col` set to **flonum** or one-by-one **matrix** `val`.
 
@@ -224,21 +226,11 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx* x y)` returns **matrix** of entry-wise multiplication of **matrix**es `x` and `y`.
 
-* `(mx- x)` returns **matrix** of entry-wise negation of **matrix** `x`.
-
 * `(mx- x y)` returns **matrix** of entry-wise subtraction of **matrix**es `x` and `y`.
-
-* `(mx/ x)` returns **matrix** of entry-wise reciprocal of **matrix** `x`.
 
 * `(mx/ x y)` returns **matrix** of entry-wise division of **matrix**es `x` by `y`.
 
-* `(mx*2 x)` returns **matrix** of entry-wise doubling of **matrix** `x`.
-
-* `(mx^2 x)` returns **matrix** of entry-wise squaring of **matrix** `x`.
-
-* `(mx^ x y)` returns **matrix** of entry-wise exponentiation **matrix**es `x` to the `y`.
-
-* `(mx-log b x)` returns **matrix** of entry-wise base **matrix** `b` logarithms of **matrix** `x`.
+* `(mx^ x y)` returns **matrix** of entry-wise exponentiation of **matrix**es `x` to the `y`.
 
 * `(mx-dist x y)` returns **matrix** of entry-wise absolute differences of **matrix**es `x` and `y`, aka distance.
 
@@ -247,6 +239,16 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 * `(mx*+ a x y)` returns **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka axpy.
 
 #### Matrix Mappers
+
+##### Elementary Functions
+
+* `(mx- x)` returns **matrix** of entry-wise negation of **matrix** `x`.
+
+* `(mx/ x)` returns **matrix** of entry-wise reciprocal of **matrix** `x`.
+
+* `(mx*2 x)` returns **matrix** of entry-wise doubling of **matrix** `x`.
+
+* `(mx^2 x)` returns **matrix** of entry-wise squaring of **matrix** `x`.
 
 ##### Entry-Wise Rounding Functions
 
@@ -414,15 +416,17 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 ##### Linear Problems
 
-* `(mx-qr mat)` returns **pair** of orthogonal **matrix** Q and upper right triangular **matrix** R factoring full column rank argument **matrix** `mat`, via QR.
+* `(mx-qr mat)` returns **pair** of orthogonal **matrix** Q and upper right triangular **matrix** R factoring full column rank **matrix** `mat`, via QR.
 
-* `(mx-solver mat)` returns function returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and for argument column-**matrix** `vec`.
+* `(mx-solver mat)` returns **function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec`.
 
 * `(mx-solve mat vec)` returns column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and column-**matrix** `vec`.
 
+* `(mx-orth mat)` returns **matrix** orthogonalizing **matrix** `mat`.
+
 * `(mx-absdet mat)` returns **flonum** being absolute value of the determinant of **matrix** `mat`.
 
-* `(mx-logdet mat)` returns **flonum** being the logarithm of the determinant of **matrix** `mat`.
+* `(mx-logdet mat)` returns **flonum** being the (natural) logarithm of the determinant of **matrix** `mat`.
 
 ##### Traces
 
@@ -456,11 +460,15 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-cov mat)` returns **matrix** of covariances of **matrix** `mat`, representing columns of observations.
 
+* `(mx-var mat)` returns column **matrix** of variances of **matrix** `mat`, representing columns of observations.
+
 * `(mx-std mat)` returns column **matrix** of standard deviations of **matrix** `mat`, representing columns of observations.
 
 * `(mx-xcor x y)` returns **matrix** of cross-correlations of **matrix**es `x` and `y`, representing columns of observations.
 
 * `(mx-cor mat)` returns **matrix** of correlations of **matrix** `mat`, representing columns of observations.
+
+* `(mx-angle x y)` returns **matrix** of angles between **matrix**es `x` and `y`, representing columns of observations.
 
 * `(mx-coher x y)` returns **flonum** of distance coherence between **matrix**es `x` and `y`.
 
@@ -549,7 +557,7 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-set mat row col val)` returns **matrix** copy of **matrix** `mat` but with entry in row **fixnum** `row` and column **fixnum** `col` set to `val`.
 
-* `(matrix-set! mat row col val)` returns **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
+* `(matrix-set! mat row col val)` returns **any**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
 
 * `(matrix-col? mat)` returns **boolean** answering if **matrix** `mat` has only a single column.
 
@@ -674,8 +682,6 @@ Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 
 * `(fplg x)` returns **flonum** base-10 logarithm of **flonum** `x`.
 
-* `(fplogb b x)` returns **flonum** base `b` logarithm of **flonum** `x`.
-
 * `(fpsinh x)` returns **flonum** hyperbolic sine of **flonum** `x`.
 
 * `(fpcosh x)` returns **flonum** hyperbolic cosine of **flonum** `x`.
@@ -783,16 +789,6 @@ version-by-version performance evolution of this **pure** _Scheme_ implementatio
 
 ### Benchmarks
 
-#### MIPS
-
-* Based on [BogoMips](https://de.wikipedia.org/wiki/BogoMips)
-* Optimization level: `-O5`
-
-Run by:
-```
-make mips
-```
-
 #### MATMUL
 
 * Matrix dimension: 1000x1000
@@ -813,29 +809,28 @@ Run by:
 make linpack
 ```
 
+#### MIPS
+
+* Based on [BogoMips](https://de.wikipedia.org/wiki/BogoMips)
+* Optimization level: `-O5`
+
+Run by:
+```
+make mips
+```
+
 ### Systems
-
-#### ARM-64 Single-Board-Computer
-
-* `CPU:` Cortex-A72 (4 Cores @ 1.5Ghz)
-* `RAM:` 4GB (LPDDR4 @ 2400MT/s)
-* `SYS:` Raspberry Pi OS Lite (22-09-06)
-* `SCM:` CHICKEN Scheme (5.3)
-
-* MATMUL: `35` Megaflops
-* LINPACK: `9` Megaflops
-* BOGOMIPS: `550` Mips
 
 #### ARM-64 Laptop-Notebook
 
 * `CPU:` M2 (4+4 Cores @ 3.5Ghz)
 * `RAM:` 16GB (LPDDR5 @ 6400MT/s)
-* `SYS:` MacOS Monterey (12.5.1)
+* `SYS:` MacOS Monterey (12.6)
 * `SCM:` CHICKEN Scheme (5.3)
 
-* MATMUL: `250` Megaflops
-* LINPACK: `140` Megaflops
-* BOGOMIPS: `280` Mips
+* MATMUL: `1230` Megaflops
+* LINPACK: `185` Megaflops
+* BOGOMIPS: `275` Mips
 
 ## Development
 
@@ -853,7 +848,19 @@ make linpack
 
 ### Changelog
 
-* **0.3** (2022-09-16)
+<b>0.4</b> (2023-06-01)
+
+  * **ADDED** `mx-angle`
+  * **ADDED** `mx-var`
+  * **ADDED** `mx-orth`
+  * **IMPROVED** `mx-std`
+  * **IMPROVED** `mx-solver`
+  * **IMPROVED** `f64vector-dot`
+  * **REMOVED** `mx-logb`
+  * ... and many minor updates and fixes.
+
+<details><summary markdown="span"><b>0.3</b> (2022-09-16)</summary>
+
   * **ADDED** `matrico` function
   * **ADDED** `mx-set`
   * **ADDED** `mx-lnsinh`, `mx-lncosh`
@@ -867,7 +874,10 @@ make linpack
   * **REMOVED** `matrico-ver`, `matrico-cite`, `matrico-about`, `matrico?`
   * ... and many minor updates and fixes.
 
-* **0.2** (2022-07-07)
+</details>
+
+<details><summary markdown="span"><b>0.2</b> (2022-07-07)</summary>
+
   * **ADDED** `matrico-cite`
   * **ADDED** `mx-scalar`
   * **ADDED** (re)export of `fpmath` by `matrico`
@@ -881,8 +891,13 @@ make linpack
   * **REMOVED** `mx-repeat`
   * ... and many minor updates and fixes.
 
-* **0.1** (2022-05-01)
+</details>
+
+<details><summary markdown="span"><b>0.1</b> (2022-05-01)</summary>
+
   * Initial Release
+
+</details>
 
 ### Coding Guidelines
 

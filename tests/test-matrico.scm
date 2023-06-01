@@ -1,7 +1,7 @@
 ;;;; test-matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrico (compounding matrix/dense/mx) module unit tests
@@ -987,13 +987,13 @@
 ; TODO: test mx-cov
 
 ; mx-std
-(check 'mx-std `(((u33) . ,(mx% `((,(sqrt (/ 2.0 3.0)))
-                                  (,(sqrt (/ 2.0 3.0)))
-                                  (,(sqrt (/ 2.0 3.0))))))
-                 ((m33) . ,(mx% `((,(sqrt 26.0))
-                                  (,(sqrt  8.0))
-                                  (,(sqrt 26.0)))))
-                 ((m13) . ,(mx% `((,(sqrt 26.0)))))
+(check 'mx-std `(((u33) . ,(mx% `((,(sqrt (/ 2.0 9.0)))
+                                  (,(sqrt (/ 2.0 9.0)))
+                                  (,(sqrt (/ 2.0 9.0))))))
+                 ((m33) . ,(mx% `((,(sqrt (/ 26.0 3.0)))
+                                  (,(sqrt (/ 8.0 3.0)))
+                                  (,(sqrt (/ 26.0 3.0))))))
+                 ((m13) . ,(mx% `((,(sqrt (/ 26.0 3.0))))))
                  ((m31) . ,(mx% `((0.0)
                                   (0.0)
                                   (0.0))))

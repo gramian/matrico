@@ -1,7 +1,7 @@
 ;;;; RUNME.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: demo code
@@ -50,11 +50,10 @@
 
 (mx-print (mx-dot A b)) ; Print matrix-vector probuct of A and b
 
-(mx-print (mx-dot A A)) ; Print matrix-vector product of A and A
+(mx-print (mx-dot A A)) ; Print matrix-matrix product of A and A
 
 ;; Solving a linear problem
 
 (matrico 'mx-solve)
 
 (mx-print (mx-solve A b)) ; Print the solution to the linear problem A x = b
-

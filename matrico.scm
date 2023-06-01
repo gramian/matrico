@@ -1,7 +1,7 @@
 ;;;; matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: A CHICKEN Scheme flonum matrix module.
@@ -21,8 +21,7 @@
    mx-samecols? mx-samerows? mx-samedims?
    mx-any? mx-all? mx=?
    mx-ref11 mx-ref mx-set mx-set! mx-col mx-row mx-diag mx-submatrix
-   mx+ mx* mx- mx/ mx*2 mx^2
-   mx^ mx-log mx-where mx*+
+   mx+ mx* mx- mx/ mx*2 mx^2 mx^ mx-where mx*+
    mx-round mx-floor mx-ceil
    mx-abs mx-sign mx-delta mx-heaviside
    mx-sin mx-cos mx-tan
@@ -46,12 +45,12 @@
    mx-vec mx-transpose
    mx-sympart mx-skewpart
    mx-diagonal
-   mx-qr mx-solver mx-solve
-   mx-absdet mx-logdet
+   mx-qr mx-solver mx-solve mx-orth mx-absdet mx-logdet
    mx-trace mx-multrace mx-prodtrace* mx-prodtrace
    mx-scalar mx-dyadic mx-dot* mx-dot mx-gram mx-gram* mx-square
-   mx-xcov mx-cov mx-std
-   mx-xcor mx-cor mx-coher
+   mx-xcov mx-cov mx-var mx-std
+   mx-xcor mx-cor
+   mx-angle mx-coher
    mx-diff mx-trapz mx-ode2-hyp mx-ode2-ssp
    mx-print mx-export mx-save mx-load)
 
@@ -68,7 +67,7 @@
              [else])
 
 ;;@assigns: matrico version number as pair.
-(define-constant version '(0 . 3))
+(define-constant version '(0 . 4))
 
 ;;@returns
 (define (matrico . s)
@@ -82,7 +81,7 @@
                     (print "(matrico 'banner) - Returns void, prints \"matrico\" banner.")
                     (print "(matrico 'version) - Returns pair of major and minor version number.")
                     (print "(matrico 'citation) - Returns void, prints \"matrico\" citation information.")
-                    (print "(matrico 'benchmark) - Returns million-additions-per-second for current machine.")
+                    (print "(matrico 'benchmark) - Returns million-instructions-per-second for this machine.")
                     (print "(matrico s) - Returns #t if argument symbol is \"mx\" function, prints docstring.")
                     (newline))]
 

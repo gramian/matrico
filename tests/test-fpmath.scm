@@ -1,7 +1,7 @@
 ;;;; test-fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: fpmath module unit tests
@@ -139,15 +139,6 @@
                (      (100.0) . 2.0)
                (    (10000.0) . 4.0)
                ((100000000.0) . 8.0)))
-
-;;fplogb
-(check 'fplogb '((  (2.0 0.0) . -inf.0)
-                 (  (2.0 1.0) . 0.0)
-                 (  (0.5 0.0) . +inf.0)
-                 (  (0.5 0.5) . 1.0)
-                 (  (2.0 2.0) . 1.0)
-                 (  (3.0 3.0) . 1.0)
-                 ((10.0 10.0) . 1.0)))
 
 ;; fpsinh
 (check 'fpsinh `((   (0.0) . 0.0)

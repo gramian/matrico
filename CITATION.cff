@@ -7,8 +7,8 @@ authors:
 title: matrico
 type: software
 abstract: "A flonum matrix module for CHICKEN Scheme."
-version: 0.3
-date-released: 2022-09-16
+version: 0.4
+date-released: 2023-06-01
 commit:
 license: zlib-Acknowledgement
 repository: https://github.com/gramian/matrico

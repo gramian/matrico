@@ -8,7 +8,7 @@ A flonum matrix module for CHICKEN Scheme.
 == matrico Function
 
 <procedure>(matrico)</procedure>
-returns ''void'', prints help message on '''matrico''' function.
+returns ''void'', prints help message for '''matrico''' function.
 
 <procedure>(matrico sym)</procedure>
 returns ''any'', depending on argument ''symbol'' {{sym}}:
@@ -17,8 +17,8 @@ returns ''any'', depending on argument ''symbol'' {{sym}}:
 * {{'banner}} - returns ''void'', prints the '''matrico''' banner;
 * {{'version}} - returns ''pair'' holding major and minor version numbers of '''matrico''';
 * {{'citation}} - returns ''void'', prints citation information for '''matrico''';
-* {{'benchmark}} - returns ''fixnum'', prints approximated million-instrictions-per-second for current machine;
-* otherwise - returns ''boolean'' answering if argument is an exisiting function starting with "{{mx}}" and prints its docstring.
+* {{'benchmark}} - returns ''fixnum'', prints approximated million-instructions-per-second for current machine;
+* otherwise - returns ''boolean'' answering if argument is a symbol matching an existing function, starting with "{{mx}}", and prints its docstring.
 
 == Matrix Type
 
@@ -32,7 +32,7 @@ This record type is not directly accessible, and can only be manipulated through
 returns {{rows}}-by-{{cols}} ''matrix'' with all entries set to ''flonum'' {{val}} for positive ''fixnum''s {{rows}} and {{cols}}.
 
 <procedure>(mx% lst)</procedure>
-returns ''matrix'' from row-major ''list''-of-''lists''-''flonum''s {{lst}}.
+returns ''matrix'' from row-major ''list''-of-''lists''-of-''flonum''s {{lst}}.
 
 <procedure>(mx-identity dims)</procedure>
 returns {{dims}}-by-{{dims}} identity ''matrix'' for a positive ''fixnum'' {{dims}}.
@@ -56,10 +56,10 @@ returns {{rows}}-by-{{cols}} uniformly distributed random ''matrix'' in the inte
 returns {{dims}}-by-{{dims}} ''matrix'' with lower, main, upper band entries given by the ''flonum''s {{low}}, {{mid}}, {{upp}} for a positive ''fixnum'' {{dims}}.
 
 <procedure>(mx-unit rows num)</procedure>
-returns {{dims}}-by-one ''matrix'' with of zeros except the positive ''fixnum'' {{num}} entry set to one for a positive ''fixnum'' {{dims}}, aka canonical base vector.
+returns {{dims}}-by-one column-''matrix'' of zeros except the positive ''fixnum'' {{num}}-th entry set to one for a positive ''fixnum'' {{dims}}, aka canonical base vector.
 
 <procedure>(mx-iota dims)</procedure>
-returns {{dims}}-by-one ''matrix'' with entries set to corresponding row index for a positive ''fixnum'' {{dims}}.
+returns {{dims}}-by-one column-''matrix'' with entries set to corresponding row index for a positive ''fixnum'' {{dims}}.
 
 <procedure>(mx-linspace x y num)</procedure>
 returns ''matrix'' of positive ''fixnum'' {{num}} row-wise linearly spaced entries with endpoints given by ''flonum''s or column-''matrix''es {{x}} and {{y}}.
@@ -70,16 +70,16 @@ returns ''matrix'' of positive ''fixnum'' {{num}} row-wise (base-10) logarithmic
 == Matrix Dimensions
 
 <procedure>(mx-cols mat)</procedure>
-returns ''fixnum'' of columns of ''matrix'' {{mat}}.
+returns ''fixnum'' number of columns of ''matrix'' {{mat}}.
 
 <procedure>(mx-rows mat)</procedure>
-returns ''fixnum'' of rows of ''matrix'' {{mat}}.
+returns ''fixnum'' number of rows of ''matrix'' {{mat}}.
 
 <procedure>(mx-numel mat)</procedure>
-returns ''fixnum'' of entries of ''matrix'' {{mat}}.
+returns ''fixnum'' number of entries of ''matrix'' {{mat}}.
 
 <procedure>(mx-dims mat)</procedure>
-returns ''fixnum'' of dimensions of ''matrix'' {{mat}}.
+returns ''fixnum'' number of dimensions of ''matrix'' {{mat}}.
 
 == Matrix Predicates
 
@@ -128,19 +128,19 @@ returns ''flonum'' being the entry in the first row and first column of ''matrix
 returns ''flonum'' being ''matrix'' {{mat}} entry in row and column specified by ''fixnum''s {{row}}, {{col}}.
 
 <procedure>(mx-set mat row col val)</procedure>
-returns: ''matrix'' copy of ''matrix'' {{mat}} but with entry in row ''fixnum'' {{row}} and column ''fixnum'' {{col}} set to ''flonum'' or one-by-one ''matrix'' {{val}}.
+returns ''matrix'' copy of ''matrix'' {{mat}} but with entry in row ''fixnum'' {{row}} and column ''fixnum'' {{col}} set to ''flonum'' or one-by-one ''matrix'' {{val}}.
 
 <procedure>(mx-set! mat row col val)</procedure>
 returns ''void'', sets entry of ''matrix'' {{mat}} in row and column specified by ''fixnum''s {{row}} and {{col}} to ''flonum'' or one-by-one ''matrix'' {{val}}.
 
 <procedure>(mx-col mat col)</procedure>
-returns ''matrix'' being ''matrix'' {{mat}} column specified by ''fixnum'' {{col}}.
+returns ''matrix'' being ''matrix'' {{mat}}'s column specified by ''fixnum'' {{col}}.
 
 <procedure>(mx-row mat row)</procedure>
-returns ''matrix'' being ''matrix'' {{mat}} row specified by ''fixnum'' {{row}}.
+returns ''matrix'' being ''matrix'' {{mat}}'s row specified by ''fixnum'' {{row}}.
 
 <procedure>(mx-diag mat)</procedure>
-returns column-''matrix'' holding square ''matrix'' {{mat}} diagonal entries.
+returns column-''matrix'' holding square ''matrix'' {{mat}}'s diagonal entries.
 
 <procedure>(mx-submatrix mat row1 row2 col1 col2)</procedure>
 returns ''matrix'' holding entries of ''matrix'' {{mat}} in rows specified by ''fixnum''s {{row1}} to {{row2}} and columns specified by ''fixnum''s {{col1}} to {{col2}}.
@@ -153,29 +153,14 @@ returns ''matrix'' of entry-wise addition of ''matrix''es {{x}} and {{y}}.
 <procedure>(mx* x y)</procedure>
 returns ''matrix'' of entry-wise multiplication of ''matrix''es {{x}} and {{y}}.
 
-<procedure>(mx- x)</procedure>
-returns ''matrix'' of entry-wise negation of ''matrix'' {{x}}.
-
 <procedure>(mx- x y)</procedure>
 returns ''matrix'' of entry-wise subtraction of ''matrix''es {{x}} and {{y}}.
-
-<procedure>(mx/ x)</procedure>
-returns ''matrix'' of entry-wise reciprocal of ''matrix'' {{x}}.
 
 <procedure>(mx/ x y)</procedure>
 returns ''matrix'' of entry-wise division of ''matrix''es {{x}} by {{y}}.
 
-<procedure>(mx*2 x)</procedure>
-returns ''matrix'' of entry-wise doubling of ''matrix'' {{x}}.
-
-<procedure>(mx^2 x)</procedure>
-returns ''matrix'' of entry-wise squaring of ''matrix'' {{x}}.
-
 <procedure>(mx^ x y)</procedure>
-returns ''matrix'' of entry-wise exponentiation ''matrix''es {{x}} to the {{y}}.
-
-<procedure>(mx-log x y)</procedure>
-returns ''matrix'' of entry-wise base ''matrix'' {{x}} logarithms of ''matrix'' {{y}}.
+returns ''matrix'' of entry-wise exponentiation of ''matrix''es {{x}} to the {{y}}.
 
 <procedure>(mx-where pred x y)</procedure>
 returns ''matrix'' of entries of ''matrix''es {{x}} or {{y}} based on predicate ''procedure'' {{pred}}.
@@ -184,6 +169,20 @@ returns ''matrix'' of entries of ''matrix''es {{x}} or {{y}} based on predicate 
 returns ''matrix'' of entry-wise generalized addition of ''flonum'' {{a}} times ''matrix'' {{x}} plus ''matrix'' {{y}}.
 
 == Matrix Mappers
+
+=== Entry-Wise Elementary Functions
+
+<procedure>(mx- x)</procedure>
+returns ''matrix'' of entry-wise negation of ''matrix'' {{x}}.
+
+<procedure>(mx/ x)</procedure>
+returns ''matrix'' of entry-wise reciprocal of ''matrix'' {{x}}.
+
+<procedure>(mx*2 x)</procedure>
+returns ''matrix'' of entry-wise doubling of ''matrix'' {{x}}.
+
+<procedure>(mx^2 x)</procedure>
+returns ''matrix'' of entry-wise squaring of ''matrix'' {{x}}.
 
 === Entry-Wise Rounding Functions
 
@@ -413,27 +412,30 @@ returns diagonal ''matrix'' from column ''matrix'' {{mat}}.
 === Linear Problems
 
 <procedure>(mx-qr mat)</procedure>
-returns ''pair'' of orthogonal ''matrix'' (Q) and upper right triangular ''matrix'' (R) factoring full column rank argument ''matrix'' {{mat}}.
+returns ''pair'' of orthogonal ''matrix'' (Q) and upper right triangular ''matrix'' (R) factoring full column rank ''matrix'' {{mat}}.
 
 <procedure>(mx-solver mat)</procedure>
-function returning column-''matrix'' solving the linear (least-squares) problem of ''matrix'' {{mat}} and for argument column-''matrix'' {{vec}}.
+returns ''function'' returning column-''matrix'' solving the linear (least-squares) problem of ''matrix'' {{mat}}, given a column-''matrix'' {{vec}} via QR decomposition.
 
 <procedure>(mx-solve mat vec)</procedure>
-returns column-''matrix'' solving the linear problem of ''matrix'' {{mat}} and column-''matrix'' {{vec}}.
+returns column-''matrix'' solving the linear problem of ''matrix'' {{mat}} and column-''matrix'' {{vec}} via QR decomposition.
+
+<procedure>(mx-orth mat)</procedure>
+returns ''matrix'' orthogonalizing ''matrix'' {{mat}}.
 
 <procedure>(mx-absdet mat)</procedure>
 returns ''flonum'' being absolute value of the determinant of ''matrix'' {{mat}}.
 
 <procedure>(mx-logdet mat)</procedure>
-returns ''flonum'' being the logarithm of the determinant of ''matrix'' {{mat}}.
+returns ''flonum'' being the (natural) logarithm of the determinant of ''matrix'' {{mat}}.
 
 === Traces
 
 <procedure>(mx-trace mat)</procedure>
-returns ''flonum'' being sum of square ''matrix'' {{mat}} diagonal entries.
+returns ''flonum'' being sum of square ''matrix'' {{mat}}'s diagonal entries.
 
 <procedure>(mx-multrace mat)</procedure>
-returns ''flonum'' being product of square ''matrix'' {{mat}} diagonal entries.
+returns ''flonum'' being product of square ''matrix'' {{mat}}'s diagonal entries.
 
 <procedure>(mx-prodtrace* x yt)</procedure>
 returns ''flonum'' being the trace of the matrix product of ''matrix'' {{x}} and transposed ''matrix'' {{yt}}.
@@ -472,6 +474,9 @@ returns ''matrix'' of cross-covariances of ''matrix''es {{x}} and {{y}}, represe
 <procedure>(mx-cov mat)</procedure>
 returns ''matrix'' of covariances of ''matrix'' {{mat}}, representing columns of observations.
 
+<procedure>(mx-var mat)</procedure>
+returns column ''matrix'' of variances of ''matrix'' {{mat}}, representing columns of observations.
+
 <procedure>(mx-std mat)</procedure>
 returns column ''matrix'' of standard deviations of ''matrix'' {{mat}}, representing columns of observations.
 
@@ -480,6 +485,9 @@ returns ''matrix'' of cross-correlations of ''matrix''es {{x}} and {{y}}, repres
 
 <procedure>(mx-cor mat)</procedure>
 returns ''matrix'' of correlations of ''matrix'' {{mat}}, representing columns of observations.
+
+<procedure>(mx-angle x y)</procedure>
+returns ''matrix'' of angles between ''matrix''es {{x}} and {{y}}, representing columns of observations.
 
 <procedure>(mx-coher x y)</procedure>
 returns ''flonum'' of distance coherence between ''matrix''es {{x}} and {{y}}.
@@ -532,3 +540,4 @@ Copyright (c) 2022 Christian Himpe. [[https://spdx.org/licenses/zlib-acknowledge
 
 ; 0.3 : Major Update ([[https://github.com/gramian/matrico#changelog|details]])
 
+; 0.4 : Minor Update ([[https://github.com/gramian/matrico#changelog|details]])

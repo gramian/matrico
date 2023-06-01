@@ -1,7 +1,7 @@
 ;;;; utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: helper utilities module
@@ -11,7 +11,8 @@
   (define-syntax-rule alias must-be comment
    nil head tail empty?
    fx+1 fx-1 fx=0? fx<0? fx>0? fx<=0? fx>=0?
-   append* sublist any? all?
+   append* sublist
+   any? all?
    factorial binomial
    define* load*)
 
@@ -103,6 +104,8 @@
         [(fx>0? end)   (cons (head lst) (sublist (tail lst) 0 (fx-1 end)))]
         [else          (cons (head lst) nil)]))
 
+;;; List Predicates ############################################################
+
 ;;@returns: **boolean** answering if any element of **list** `lst` fulfills predicate **procedure** `pred`.
 (define (any? pred lst)
   (cond [(empty? lst)      #f]
@@ -137,7 +140,7 @@
 
 ;;; Standard Variants ##########################################################
 
-;;@returns: **macro** generating function binding with docstring in `'returns` property list.
+;;@returns: **macro** generating function binding with docstring in `'returns` property list, see @6.
 (define-syntax define*
   (syntax-rules (returns)
     [(_ (name args ...) (returns str) body ...)
@@ -153,7 +156,7 @@
         (put! 'returns 'name str)
         (define name (body ...)))]))
 
-;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @6 , @7.
+;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @7, @8.
 (define (load* str)
   (let [(ret nil)
         (vrb (load-verbose #f))]
@@ -176,7 +179,8 @@
 
 ;;@5: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
 
-;;@6: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
+;;@6: Docstrings in my Chicken. https://demonastery.org/2011/11/docstrings-in-my-chicken/
 
-;;@7: What load returns. https://docs.scheme.org/surveys/what-load-returns/
+;;@7: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
 
+;;@8: What load returns. https://docs.scheme.org/surveys/what-load-returns/

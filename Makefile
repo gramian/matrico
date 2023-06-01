@@ -1,10 +1,22 @@
 # matrico Makefile
 
+#CSC = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csc
+#CSI = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csi
+#CHICKEN_INSTALL = /home/ch/opt/CHICKEN/bin/chicken-install
+#CHICKEN_PROFILE =/home/ch/opt/CHICKEN/bin/chicken-profile
+#TEST_NEW_EGG = /home/ch/opt/CHICKEN/bin/test-new-egg
+
+TAR = tar
+SED = sed
 CSC = csc
 CSI = csi
 CHICKEN_INSTALL = chicken-install
 CHICKEN_PROFILE = chicken-profile
 TEST_NEW_EGG = test-new-egg
+
+TAR = gtar
+SED = gsed
+TEST_NEW_EGG = /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
 
 CLARG =
 LEVEL = -O3
@@ -24,15 +36,15 @@ test:
 	$(CSI) tests/run.scm
 
 test_egg_local:
-	tar cvzf matrico-$(VERSION).tar.gz --transform 's,^,matrico/,' \
-                AUTHORS CITATION.cff LICENSE README.md \
-                matrico.egg matrico.release-info matrico-logo.svg \
-                matrico.scm RUNME.scm version.scm \
-                src/dense.scm src/f64vector.scm src/fpmath.scm src/matrix.scm src/mx.scm src/utils.scm \
-                tests/check.scm tests/run.scm tests/test-f64vector.scm tests/test-fpmath.scm tests/test-matrico.scm tests/test-utils.scm
+	$(TAR) cvzf matrico-$(VERSION).tar.gz --transform 's,^,matrico/,' \
+              AUTHORS CITATION.cff LICENSE README.md \
+              matrico.egg matrico.release-info res/matrico-logo.svg \
+              matrico.scm RUNME.scm version.scm \
+              src/dense.scm src/f64vector.scm src/fpmath.scm src/matrix.scm src/mx.scm src/utils.scm \
+              tests/check.scm tests/run.scm tests/test-f64vector.scm tests/test-fpmath.scm tests/test-matrico.scm tests/test-utils.scm
 	python3 -m http.server --bind 127.0.0.1 &
 	sleep 1
-	sed -e '3 c\(uri targz \"http://0.0.0.0:8000/{egg-name}-{egg-release}.tar.gz\")' matrico.release-info > matrico-dev.release-info
+	$(SED) -e '3 c\(uri targz \"http://0.0.0.0:8000/{egg-name}-{egg-release}.tar.gz\")' matrico.release-info > matrico-dev.release-info
 	$(TEST_NEW_EGG) matrico http://0.0.0.0:8000/matrico-dev.release-info
 	pkill -9 -f 'python3 -m http.server'
 	rm matrico-dev.release-info
@@ -45,11 +57,11 @@ test_install:
 	CHICKEN_REPOSITORY_PATH="/tmp/matrico:`$(CHICKEN_INSTALL) -repository`" $(CSI) -e "(import matrico) (matrico 'citation)"
 
 iprofile:
-	make matmul LEVEL='-O4' FLAGS='-profile' DIM=100
+	make matmul LEVEL='-O3' FLAGS='-profile' DIM=100
 	ls -1 PROFILE.* | sort -n | head -n1 | $(CHICKEN_PROFILE)
-
+ 
 sprofile:
-	make matmul LEVEL='-O4' DEBUG='-d3' DIM=1000 CLARG='-:P1000'
+	make linpack LEVEL='-O4' DEBUG='-d3' DIM=1000 CLARG='-:P1000'
 	ls -1 PROFILE.* | sort -n | head -n1 | $(CHICKEN_PROFILE)
 
 mips:LEVEL=-O5
@@ -68,10 +80,10 @@ matmul:
 	       (import (chicken time)) \
 	       (define A (mx-random $(DIM) $(DIM) -1.0 1.0)) \
 	       (define B (mx-random $(DIM) $(DIM) -1.0 1.0)) \
-	       (define t0 (current-seconds)) \
+	       (define t0 (current-process-milliseconds)) \
 	       (define C (time (mx-dot* A B))) \
-	       (define t1 (current-seconds)) \
-	       (print "Megaflops:" #\space (inexact->exact (floor (/ (* $(DIM) $(DIM) $(DIM)) (* (- t1 t0) 1000.0 1000.0))))) \
+	       (define t1 (current-process-milliseconds)) \
+	       (print "Megaflops:" #\space (inexact->exact (floor (/ (* $(DIM) $(DIM) $(DIM)) (* (- t1 t0) 1000.0))))) \
 	       (newline) \
 	       (exit)" | $(CSC) $(LEVEL) $(FLAGS) - -o /tmp/matmul
 	@/tmp/matmul $(CLARG) 2> matmul.txt
@@ -84,10 +96,10 @@ linpack:
 	       (import (chicken time)) \
 	       (define A (mx-random $(DIM) $(DIM) -1.0 1.0)) \
 	       (define b (mx-rowsum A)) \
-	       (define t0 (current-seconds)) \
+	       (define t0 (current-process-milliseconds)) \
 	       (define solver (time (mx-solver A))) \
-	       (define t1 (current-seconds)) \
-	       (print "Megaflops:" #\space (inexact->exact (floor (/ (* $(DIM) $(DIM) $(DIM)) (* (- t1 t0) 1000.0 1000.0))))) \
+	       (define t1 (current-process-milliseconds)) \
+	       (print "Megaflops:" #\space (inexact->exact (floor (/ (* $(DIM) $(DIM) $(DIM)) (* (- t1 t0) 1000.0))))) \
 	       (print "Residual:" #\space (mx-norm (mx- (solver b) 1.0) 2)) \
 	       (newline) \
 	       (exit)" | $(CSC) $(LEVEL) $(FLAGS) - -o /tmp/linpack
@@ -98,5 +110,5 @@ clean:
 	rm -f test.csv test.mx linpack.txt matmul.txt \
 	      matrico.so matrico.import.scm matrico.import.so matrico.static.o \
 	      matrico.build.sh matrico.install.sh matrico.link matrico.static.so \
-	      matrico-$(VERSION).tar.gz
+	      matrico-$(VERSION).tar.gz PROFILE.*
 

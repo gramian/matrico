@@ -1,7 +1,7 @@
 ;;;; f64vector.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: homogeneous flonum vector library
@@ -87,7 +87,7 @@
                                       (rho (fx+1 idx))))))]
 
                [(fun . vecs) (let* [(dim (f64vector-length (head vecs)))
-                                   (ret (make-f64vector dim))]
+                                    (ret (make-f64vector dim))]
                               (let rho [(idx 0)]
                                 (if (fx= idx dim) ret
                                   (begin
@@ -106,7 +106,7 @@
 
 ;;@returns: **void**, applies **procedure** `fun` to all corresponding **f64vector**(s) `vecs` elements.
 (define (f64vector-foreach fun . vecs)
-  (let* [(dim (f64vector-length (head vecs)))]
+  (let [(dim (f64vector-length (head vecs)))]
     (let rho [(idx 0)]
       (if (fx= idx dim) (void)
                         (begin
@@ -115,7 +115,7 @@
 
 ;;@returns: **void**, applies **procedure** `fun` to index and all corresponding **f64vector**(s) `vecs` elements.
 (define (f64vector-foreach-index fun . vecs)
-  (let* [(dim (f64vector-length (head vecs)))]
+  (let [(dim (f64vector-length (head vecs)))]
     (let rho [(idx 0)]
       (if (fx= idx dim) (void)
                         (begin
@@ -140,16 +140,27 @@
                      (rho (fx-1 idx) (apply fun ret (map (cut f64vector-ref <> idx) vecs))))))
 
 ;;@returns: **flonum** resulting from applying fused-multiply-add to zero initialized accumulator and sequentially to all **f64vector**s `x`, `y` elements from left to right.
-(define (f64vector-dot x y)
-  (let [(dim (f64vector-length x))]
-    (let rho [(ret 0.0)
-              (idx 0)]
-      (if (fx= idx dim) ret
-                        (rho (fp*+ (f64vector-ref x idx) (f64vector-ref y idx) ret) (fx+1 idx))))))
+(define (f64vector-dot x y) ;@marker: Hot
+  (let [(dot (cond-expand
+              [compiling
+                (begin
+                  (import (chicken foreign))
+                  (foreign-lambda* double ((f64vector x) (f64vector y) (size_t dim))
+" double res = 0.0;
+  for(ptrdiff_t i = 0; i < dim; ++i)
+    //res = fma(x[i], y[i], res);
+    res += x[i] * y[i];
+  C_return(res);"))]
+              [else
+                (lambda (x y dim)
+                  (let rho [(ret 0.0)
+                            (idx 0)]
+                    (if (fx= idx dim) ret
+                                      (rho (fp*+ (f64vector-ref x idx) (f64vector-ref y idx) ret) (fx+1 idx)))))]))]
+    (dot x y (f64vector-length x))))
 
 );end module
 
 ;;; References #################################################################
 
 ;;@1: Vector family. Gauche Reference Manual, 6.13. https://practical-scheme.net/gauche/man/gauche-refe/Vector-family.html
-

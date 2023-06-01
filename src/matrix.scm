@@ -1,7 +1,7 @@
 ;;;; matrix.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.
@@ -37,68 +37,52 @@
 
 ;;; Matrix Type ################################################################
 
-;;@returns: **void**, provides make-matrix constructor, matrix? predicate, matrix-data and matrix-cols accessors.
-(define-record matrix data cols)
+;;@returns: **void**, provides make-matrix constructor, matrix? predicate, matrix-cols and matrix-data accessors.
+(define-record matrix cols data)
 
 ;;; Private Functions ##########################################################
 
 ;;@returns: **matrix** resulting from applying **procedure** `fun` to each column of each **matrix** `x`.
 (define-inline (matrix-map* fun x)
-  (make-matrix
-    (map fun (matrix-data x))
-    (matrix-cols x)))
+  (make-matrix (matrix-cols x) (map fun (matrix-data x))))
 
 ;;@returns: **matrix** resulting from applying **procedure** `fun` to each column of each **matrix**es `x` and `y`.
 (define-inline (matrix-map** fun x y)
-  (make-matrix
-    (map fun (matrix-data x) (matrix-data y))
-    (matrix-cols x)))
+  (make-matrix (matrix-cols x) (map fun (matrix-data x) (matrix-data y))))
 
 ;;; Matrix Generators ##########################################################
 
 ;;@returns: `rows`-by-`cols` **matrix** with all entries set to `val` for **fixnum**s `rows`, `cols`.
 (define (make-matrix* rows cols val)
-  (make-matrix
+  (make-matrix cols
     (let rho [(idx cols)
               (dat nil)]
       (if (fx=0? idx) dat
-                      (rho (fx-1 idx) (cons (make-column rows val) dat))))
-    cols))
+                      (rho (fx-1 idx) (cons (make-column rows val) dat))))))
 
 ;;@returns: **matrix** from row-major **list**-of-**list**s `lst`.
 (define (make-matrix** lst)
-  (define cols (length (head lst)))
-  (assert (all? (lambda (l)
-                  (and (list? l) (fx= cols (length l))))
-                (tail lst)))
-  (make-matrix
-    (apply map column lst)
-    cols))
+  (make-matrix (length (head lst)) (apply map column lst)))
 
 ;;@returns: `rows`-by-`cols` **matrix** generated procedurally from applying **procedure** `fun`, and **fixnum**s `rows`, `cols`.
 (define (matrix-generate fun rows cols)
-  (make-matrix
-    (let rho ([col cols]
-              [lst nil])
+  (make-matrix cols
+    (let rho [(col cols)
+              (lst nil)]
       (if (fx=0? col) lst
                       (rho (fx-1 col) (cons (column-unfold rows (lambda (row)
                                                                   (fun row (fx-1 col))))
-                                            lst))))
-    cols))
+                                            lst))))))
 
 ;;; Matrix Combiners ###########################################################
 
 ;;@returns: **matrix** of horizontally concatenating **matrix**es from **list**-of-**matrix**es `mat`.
 (define (matrix-horcat . mat)
-  (make-matrix
-    (apply append (map (compose object-copy matrix-data) mat))
-    (foldl fx+ 0 (map matrix-cols mat))))
+  (make-matrix (foldl fx+ 0 (map matrix-cols mat)) (apply append (map (compose object-copy matrix-data) mat))))
 
 ;;@returns: **matrix** of vertically concatenating **matrix**es from **list**-of-**matrix**es `mat`.
 (define (matrix-vercat . mat)
-  (make-matrix
-    (apply map column-concat (map (compose object-copy matrix-data) mat))
-    (matrix-cols (head mat))))
+  (make-matrix (matrix-cols (head mat)) (apply map column-concat (map (compose object-copy matrix-data) mat))))
 
 ;;; Matrix Dimensions ##########################################################
 
@@ -136,14 +120,14 @@
     (column-set! (list-ref (matrix-data ret) col) row val)
     ret))
 
-;;@returns: **void**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
+;;@returns: **any**, sets entry of **matrix** `mat` in row **fixnum** `row` and column **fixnum** `col` to `val`.
 (define (matrix-set! mat row col val)
-  (column-set! (list-ref (matrix-data mat) col) row val))
+  (column-set! (list-ref (matrix-data mat) col) row val)
+  val)
 
 ;;@returns: **matrix** being column of **matrix** `mat` specified by **fixnum** `col`.
 (define (matrix-col mat col)
-  (make-matrix
-    (list (object-copy (list-ref (matrix-data mat) col))) 1))
+  (make-matrix 1 (list (object-copy (list-ref (matrix-data mat) col)))))
 
 ;;@returns: **matrix** being row of **matrix** `mat` specified by **fixnum** `row`.
 (define (matrix-row mat row)
@@ -156,21 +140,20 @@
          (col  (make-column rows))]
     (let rho [(idx 0)
               (lst (matrix-data mat))]
-      (if (fx= idx rows) (make-matrix (list col) 1)
+      (if (fx= idx rows) (make-matrix 1 (list col))
                          (begin
                            (column-set! col idx (column-ref (head lst) idx))
                            (rho (fx+1 idx) (tail lst)))))))
 
 ;;@returns: **matrix** holding entries of **matrix** `mat` from rows **fixnum**s `row1` to `row2` in columns from **fixnum**s `col1` to `col2`.
 (define (matrix-submatrix mat row1 row2 col1 col2)
-  (make-matrix
+  (make-matrix (fx+1 (fx- col2 col1))
     (object-copy (let [(cols (if (and (fx=0? col1) (fx= (fx+1 col2) (matrix-cols mat))) (matrix-data mat)
                                                                                         (sublist (matrix-data mat) col1 col2)))]
                    (if (and (fx=0? row1) (fx= (fx+1 row2) (matrix-rows mat))) cols
                                                                               (map (lambda (col)
                                                                                      (subcolumn col row1 (fx+1 row2)))
-                                                                                   cols))))
-    (fx+1 (fx- col2 col1))))
+                                                                                   cols))))))
 
 ;;; Matrix Predicates ##########################################################
 
@@ -228,12 +211,11 @@
 
 ;;@returns: column-**matrix** resulting from folding by two-argument **procedure** `fun` each row of **matrix** `mat`.
 (define (matrix-rowfold fun ini mat)
-  (make-matrix
+  (make-matrix 1
     (list (foldl (lambda (acc col)
                    (column-map fun acc col))
                  (make-column (matrix-rows mat) ini)
-                 (matrix-data mat)))
-    1))
+                 (matrix-data mat)))))
 
 ;;@returns: **any** resulting from folding by two-argument **procedure** `fun` all **matrix** `mat` entries.
 (define (matrix-allfold fun ini mat)
@@ -258,9 +240,7 @@
         (y-cols (matrix-cols y))]
     (cond [(and (fx= x-rows y-rows) (fx= x-cols y-cols))  ; matrix o matrix
              (matrix-map** (lambda (x-col y-col)
-                             (column-map (lambda (x-row y-row)
-                                           (fun x-row y-row))
-                                         x-col y-col))
+                             (column-map fun x-col y-col))
                            x y)]
 
           [(and (fx= 1 x-rows) (fx= 1 x-cols))            ; scalar o matrix
@@ -328,18 +308,15 @@
 
 ;;@returns: column **matrix** of vertically concatenated columns of **matrix** `mat`, aka (mathematical) vectorization.
 (define (matrix-vec mat)
-  (make-matrix
-    (list (apply column-concat (object-copy (matrix-data mat))))
-    1))
+  (make-matrix 1 (list (apply column-concat (object-copy (matrix-data mat))))))
 
 ;;@returns: **matrix** of entries of **matrix** `mat` with swapped row and column indices.
 (define (matrix-transpose mat)
-  (make-matrix
+  (make-matrix (matrix-rows mat)
     (apply column-fold* (lambda (acc . vals)
                           (cons (list->column vals) acc))
                         nil
-                        (matrix-data mat))
-    (matrix-rows mat)))
+                        (matrix-data mat))))
 
 ;;@returns: **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
 (define (matrix-scalar xt y)
@@ -362,7 +339,7 @@
 ;;@returns: **list**-of-column-**matrix**es from **matrix** `mat`.
 (define (matrix-explode mat)
   (map (lambda (col)
-         (make-matrix (list (object-copy col)) 1))
+         (make-matrix 1 (list col)))
        (matrix-data mat)))
 
 ;;@returns: **matrix** of horizontally concatenation of **list**-of-column-**matrix**es `lst`.
@@ -419,7 +396,7 @@
 ;;@returns: **matrix** loaded from file in relative path (**string**) `str`.
 (define (matrix-load str)
   (define data (load* str))
-  (make-matrix data (length data)))
+  (make-matrix (length data) data))
 
 ); end functor
 
@@ -440,4 +417,3 @@
 ;;@7: I. Ferguson, E. Martin, B. Kaufman: The Schemer's Guide (Second Edition), 4 Data Structures.
 
 ;;@8: C. Hanson, G.J. Sussman: Software Design for Flexibility, 3 Variations on an Arithmetic Theme (Ex. 3.6). https://mitpress.mit.edu/books/software-design-flexibility
-

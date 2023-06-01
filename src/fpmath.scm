@@ -1,7 +1,7 @@
 ;;;; fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: floating-point add-on module
@@ -15,7 +15,7 @@
    fp*2 fp^2 fprec fp*+
    fptau fpeul fpphi
    fpdelta fpheaviside fpsign
-   fpln fplb fplg fplogb
+   fpln fplb fplg
    fpsinh fpcosh fptanh
    fpasinh fpacosh fpatanh
    fphsin fphcos
@@ -113,10 +113,6 @@
     (lambda (x)
       (fp/ (fplog x) log10))))
 
-;;@returns: **flonum** base `b` logarithm of **flonum** `x`.
-(define (fplogb b x)
-  (fp/ (fplog x) (fplog b)))
-
 ;;; Hyperbolic Functions #######################################################
 
 ;;@returns: **flonum** hyperbolic sine of **flonum** `x`: `sinh(x) = 0.5 * (exp(x) - exp(-x))`.
@@ -151,7 +147,7 @@
 (define (fphsin x)
   (fp* 0.5 (fp- 1.0 (fpcos x))))
 
-;;@returns: **flonum** haversed cosine of **flonum** `x`: `cosh(x) = 0.5 * (1 + cos(x))`, see @11.
+;;@returns: **flonum** haversed cosine of **flonum** `x`: `hcos(x) = 0.5 * (1 + cos(x))`, see @11.
 (define (fphcos x)
   (fp* 0.5 (fp+ 1.0 (fpcos x))))
 
@@ -238,4 +234,3 @@
 ;;@11: Versine. Wikipedia. https://en.wikipedia.org/wiki/Versine
 
 ;;@12: Hyperbolic Trigonometric Functions. GNU Scientific Library. https://www.gnu.org/software/gsl/doc/html/specfunc.html#hyperbolic-trigonometric-functions
-

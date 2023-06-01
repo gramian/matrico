@@ -1,7 +1,7 @@
 ;;;; demo-flame.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.3 (2022-09-16)
+;;@version: 0.4 (2023-06-01)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: flame demo code
@@ -36,4 +36,3 @@
 (define X (mx-ode2-hyp 11 (cons f g) (cons h 1.0) x0))
 
 (mx-export "flame.csv" X)
-
