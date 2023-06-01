@@ -834,7 +834,6 @@
                                                     (cmgs (fx+1 i) (mx*+ (fpneg Rik) (head Qi) Qk) (tail Qi)))]))
                            (cons Rk R))))))
 
-; TODO:
 ;;@returns: **function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.
 (define* (mx-solver mat)
   (returns "**function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.")

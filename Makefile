@@ -1,22 +1,12 @@
 # matrico Makefile
 
-#CSC = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csc
-#CSI = CHICKEN_REPOSITORY_PATH="/home/ch/opt/CHICKEN/lib/chicken/11/" /home/ch/opt/CHICKEN/bin/csi
-#CHICKEN_INSTALL = /home/ch/opt/CHICKEN/bin/chicken-install
-#CHICKEN_PROFILE =/home/ch/opt/CHICKEN/bin/chicken-profile
-#TEST_NEW_EGG = /home/ch/opt/CHICKEN/bin/test-new-egg
-
-TAR = tar
-SED = sed
+TAR = tar # homebrew: gtar
+SED = sed # homebrew: gsed
 CSC = csc
 CSI = csi
 CHICKEN_INSTALL = chicken-install
 CHICKEN_PROFILE = chicken-profile
-TEST_NEW_EGG = test-new-egg
-
-TAR = gtar
-SED = gsed
-TEST_NEW_EGG = /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
+TEST_NEW_EGG = test-new-egg # homebrew: /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
 
 CLARG =
 LEVEL = -O3
@@ -111,4 +101,3 @@ clean:
 	      matrico.so matrico.import.scm matrico.import.so matrico.static.o \
 	      matrico.build.sh matrico.install.sh matrico.link matrico.static.so \
 	      matrico-$(VERSION).tar.gz PROFILE.*
-
