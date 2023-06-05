@@ -165,9 +165,6 @@ returns ''matrix'' of entry-wise exponentiation of ''matrix''es {{x}} to the {{y
 <procedure>(mx-where pred x y)</procedure>
 returns ''matrix'' of entries of ''matrix''es {{x}} or {{y}} based on predicate ''procedure'' {{pred}}.
 
-<procedure>(mx*+ a x y)</procedure>
-returns ''matrix'' of entry-wise generalized addition of ''flonum'' {{a}} times ''matrix'' {{x}} plus ''matrix'' {{y}}.
-
 == Matrix Mappers
 
 === Entry-Wise Elementary Functions
@@ -400,6 +397,9 @@ returns ''matrix'' of vertically concatenated columns of ''matrix'' {{mat}}, aka
 <procedure>(mx-transpose mat)</procedure>
 returns ''matrix'' of entries of ''matrix'' {{mat}} with swapped row and column indices.
 
+<procedure>(mx-axpy a x y)</procedure>
+returns ''matrix'' of entry-wise generalized addition of ''flonum'' {{a}} times ''matrix'' {{x}} plus ''matrix'' {{y}}.
+
 <procedure>(mx-sympart mat)</procedure>
 returns ''matrix'' being symmetric part of square ''matrix'' {{mat}}.
 
@@ -536,8 +536,10 @@ Copyright (c) 2022 Christian Himpe. [[https://spdx.org/licenses/zlib-acknowledge
 
 ; 0.1 : Initial Release
 
-; 0.2 : Major Update ([[https://github.com/gramian/matrico#changelog|details]])
+; 0.2 : Major Update
 
-; 0.3 : Major Update ([[https://github.com/gramian/matrico#changelog|details]])
+; 0.3 : Major Update
 
-; 0.4 : Minor Update ([[https://github.com/gramian/matrico#changelog|details]])
+; 0.4 : Minor Update
+
+; 0.5 : Minor Update ([[https://github.com/gramian/matrico#changelog|details]])

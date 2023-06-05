@@ -1,7 +1,7 @@
 ;;;; matrix.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.
@@ -15,7 +15,7 @@
                     column-ref subcolumn
                     column-set!
                     column-any? column-all?
-                    column-map column-map-index column-foreach column-foreach-index
+                    column-map column-map-index column-foreach column-foreach-index column-axpy
                     column-fold column-fold* column-dot
                     list->column)))
 
@@ -30,7 +30,7 @@
    matrix-any? matrix-all?
    matrix-colfold matrix-rowfold matrix-allfold
    matrix-map matrix-broadcast
-   matrix-vec matrix-transpose matrix-scalar matrix-dot* matrix-explode matrix-implode
+   matrix-vec matrix-transpose matrix-axpy matrix-scalar matrix-dot* matrix-explode matrix-implode
    matrix-print matrix-export matrix-save matrix-load)
 
   (import scheme (chicken base) (chicken module) (only (chicken memory representation) object-copy) utils column)
@@ -317,6 +317,12 @@
                           (cons (list->column vals) acc))
                         nil
                         (matrix-data mat))))
+
+;;@returns: **matrix** resulting from scaling **matrix** `x` by **any** `a` and add **matrix** `y`.
+(define (matrix-axpy a x y)
+  (matrix-map** (lambda (xcol ycol)
+                  (column-axpy a xcol ycol))
+                x y))
 
 ;;@returns: **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
 (define (matrix-scalar xt y)

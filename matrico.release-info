@@ -14,3 +14,5 @@
 
 (release "0.4rc1")
 (release "0.4rel")
+
+(release "0.5rc1")

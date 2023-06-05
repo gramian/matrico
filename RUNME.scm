@@ -1,7 +1,7 @@
 ;;;; RUNME.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: demo code

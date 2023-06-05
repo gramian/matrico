@@ -1,7 +1,7 @@
 ;;;; demo-flame.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: flame demo code
@@ -19,6 +19,7 @@
 (define 2/h (/ 0.5 h))
 
 (define A^T (mx-tridiag N (* 1.0 2/h) (* -4.0 2/h) (* 3.0 2/h)))
+(mx-set! A^T (sub1 N) N (* 4.0 2/h))
 (define B (mx-set (mx N 1 0.0) 1 1 (* 1.0 2/h)))
 (define C^T (mx-set (mx N 1 0.0) N 1 1.0))
 

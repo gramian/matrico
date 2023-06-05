@@ -1,7 +1,7 @@
 ;;;; f64vector.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: homogeneous flonum vector library
@@ -15,7 +15,9 @@
    f64vector-any? f64vector-all?
    f64vector-map f64vector-map-index
    f64vector-foreach f64vector-foreach-index
-   f64vector-fold f64vector-fold* f64vector-dot)
+   f64vector-axpy
+   f64vector-fold f64vector-fold*
+   f64vector-dot)
 
   (import scheme (chicken base) (chicken module) srfi-4 utils fpmath)
 
@@ -122,6 +124,16 @@
                           (apply fun idx (map (cut f64vector-ref <> idx) vecs))
                           (rho (fx+1 idx)))))))
 
+;;@returns: **f64vector** resulting from applying fused-multiply-add to the **flonum** `a` and to all **f64vector**s `x`, `y` elements.
+(define (f64vector-axpy a x y) ;@marker: Hot
+  (define dim (f64vector-length x))
+  (define ret (make-f64vector dim))
+  (let rho [(idx 0)]
+    (if (fx= idx dim) ret
+      (begin
+        (f64vector-set! ret idx (fp*+ a (f64vector-ref x idx) (f64vector-ref y idx)))
+        (rho (fx+1 idx))))))
+
 ;;; Vector Reducers ############################################################
 
 ;;@returns: **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**(s) `vecs` elements from left to right.
@@ -141,23 +153,11 @@
 
 ;;@returns: **flonum** resulting from applying fused-multiply-add to zero initialized accumulator and sequentially to all **f64vector**s `x`, `y` elements from left to right.
 (define (f64vector-dot x y) ;@marker: Hot
-  (let [(dot (cond-expand
-              [compiling
-                (begin
-                  (import (chicken foreign))
-                  (foreign-lambda* double ((f64vector x) (f64vector y) (size_t dim))
-" double res = 0.0;
-  for(ptrdiff_t i = 0; i < dim; ++i)
-    //res = fma(x[i], y[i], res);
-    res += x[i] * y[i];
-  C_return(res);"))]
-              [else
-                (lambda (x y dim)
-                  (let rho [(ret 0.0)
-                            (idx 0)]
-                    (if (fx= idx dim) ret
-                                      (rho (fp*+ (f64vector-ref x idx) (f64vector-ref y idx) ret) (fx+1 idx)))))]))]
-    (dot x y (f64vector-length x))))
+  (define dim (f64vector-length x))
+  (let rho [(idx 0)
+            (ret 0.0)]
+    (if (fx= idx dim) ret
+                      (rho (fx+1 idx) (fp*+ (f64vector-ref x idx) (f64vector-ref y idx) ret)))))
 
 );end module
 

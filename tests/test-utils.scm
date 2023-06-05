@@ -1,7 +1,7 @@
 ;;;; test-utils.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: utils module unit tests
@@ -44,7 +44,6 @@
                (    (zero? '(1)) . #f)
                (     (zero? '()) . #t)))
 
-
 ;; factorial
 (check 'factorial '(( (0) . 1)
                     ( (1) . 1)
@@ -72,4 +71,3 @@
                    (( 0 -1) . 0)
                    ((-1  0) . 0)
                    ((-1 -1) . 0)))
-

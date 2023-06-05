@@ -1,7 +1,7 @@
 ;;;; fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: floating-point add-on module
@@ -116,30 +116,48 @@
 ;;; Hyperbolic Functions #######################################################
 
 ;;@returns: **flonum** hyperbolic sine of **flonum** `x`: `sinh(x) = 0.5 * (exp(x) - exp(-x))`.
-(define (fpsinh x)
-  (fp* 0.5 (fp- (fpexp x) (fpexp (fpneg x)))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fpsinh x)
+       (fp* 0.5 (fp- (fpexp x) (fpexp (fpneg x)))))]
+  [else])
 
 ;;@returns: **flonum** hyperbolic cosine of **flonum** `x`: `cosh(x) = 0.5 * (exp(x) + exp(-x))`.
-(define (fpcosh x)
-  (fp* 0.5 (fp+ (fpexp x) (fpexp (fpneg x)))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fpcosh x)
+       (fp* 0.5 (fp+ (fpexp x) (fpexp (fpneg x)))))]
+  [else])
 
 ;;@returns: **flonum** hyperbolic tangent of **flonum** `x`: `tanh(x) = 1 - 2 / (exp(2 * x) + 1)`.
-(define (fptanh x)
-  (fp- 1.0 (fp/ 2.0 (fp+ (fpexp (fp*2 x)) 1.0))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fptanh x)
+       (fp- 1.0 (fp/ 2.0 (fp+ (fpexp (fp*2 x)) 1.0))))]
+  [else])
 
 ;;; Inverse Hyperbolic Functions ###############################################
 
 ;;@returns: **flonum** area hyperbolic sine of **flonum** `x`: `asinh(x) = log(x + sqrt(x^2 + 1))`.
-(define (fpasinh x)
-  (fp* (fpsign x) (fplog (fp+ (fpabs x) (fpsqrt (fp+ (fp^2 x) 1.0))))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fpasinh x)
+       (fp* (fpsign x) (fplog (fp+ (fpabs x) (fpsqrt (fp+ (fp^2 x) 1.0))))))]
+  [else])
 
 ;;@returns: **flonum** area hyperbolic cosine of **flonum** `x`: `acosh(x) = log(x + sqrt(x^2 - 1))`.
-(define (fpacosh x)
-  (fplog (fp+ x (fpsqrt (fp- (fp^2 x) 1.0)))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fpacosh x)
+       (fplog (fp+ x (fpsqrt (fp- (fp^2 x) 1.0)))))]
+  [else])
 
 ;;@returns: **flonum** area hyperbolic tangent of **flonum** `x`: `atanh(x) = 0.5 * log((1 + x) / (1 - x))`.
-(define (fpatanh x)
-  (fp* 0.5 (fplog (fp/ (fp+ 1.0 x) (fp- 1.0 x)))))
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fpatanh x)
+       (fp* 0.5 (fplog (fp/ (fp+ 1.0 x) (fp- 1.0 x)))))]
+  [else])
 
 ;;; Haversed Trigonometric Functions ###########################################
 

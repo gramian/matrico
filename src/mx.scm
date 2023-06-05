@@ -1,7 +1,7 @@
 ;;;; mx.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type front-end
@@ -360,12 +360,6 @@
   (returns "**matrix** of entries of **matrix**es `x` or `y` based on predicate **procedure** `pred`.")
   (must-be (matrix-or-flonum? x) (matrix-or-flonum? y))
   (matrix-broadcast (lambda (x y) (if (pred x y) x y)) (ensure-mx x) (ensure-mx y)))
-
-;;@returns: **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka "axpy" (a times x plus y), see @2.
-(define* (mx*+ a x y)
-  (returns "**matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`.")
-  (must-be (scalar-or-flonum? a) (matrix-or-flonum? x) (matrix-or-flonum? y))
-  (matrix-broadcast (cute fp*+ (ensure-fp a) <> <>) (ensure-mx x) (ensure-mx y)))
 
 ;;; Matrix Mappers #############################################################
 
@@ -786,6 +780,12 @@
   (must-be (matrix? mat))
   (matrix-transpose mat))
 
+;;@returns: **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka "a times x plus y", see @2.
+(define* (mx-axpy a x y)
+  (returns "**matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`.")
+  (must-be (scalar-or-flonum? a) (matrix-samedims? x y))
+  (matrix-axpy (ensure-fp a) (ensure-mx x) (ensure-mx y)))
+
 ;;@returns: **matrix** being symmetric part of square **matrix** `mat`.
 (define* (mx-sympart mat)
   (returns "**matrix** being symmetric part of square **matrix** `mat`.")
@@ -811,47 +811,41 @@
 
 ; TODO: sort by Rkk value and keep largest
 ;;@returns: **pair** of an orthogonal **matrix** (Q) and upper-right triangular **matrix** (R) factoring full column rank **matrix** `mat`, via column-wise modified Gram-Schmidt, see @5, @6.
-(define* (mx-qr mat)
+(define* (mx-qr mat . rev)
   (returns "**pair** of an orthogonal **matrix** (Q) and upper-right triangular **matrix** (R) factoring full column rank **matrix** `mat`.")
   (must-be (matrix? mat))
-  (define cols (matrix-cols mat))
-  (define rows (matrix-rows mat))
+  (define qrows (matrix-rows mat))
+  (define rrows (fxmin (matrix-cols mat) qrows))
   (let rho [(Ak (matrix-explode mat))
             (Q  nil)
             (R  nil)]
-    (if (empty? Ak) (cons (matrix-implode Q) (matrix-implode (reverse R)))
-                    (let [(Rk (mx (fxmin cols rows) 1 0.0))]
+    (if (empty? Ak) (cons (matrix-implode Q) (matrix-implode (if (optional rev #t) (reverse R) R)))
+                    (let [(Rk (make-matrix* rrows 1 0.0))]
                       (rho (tail Ak)
                            (let cmgs [(i  0)
                                       (Qk (head Ak))
                                       (Qi Q)]
-                             (cond [(fx>= i rows) Q]
-                                   [(empty? Qi)   (let [(Rkk (mx-norm Qk 'fro))]
-                                                    (matrix-set! Rk i 0 Rkk)
-                                                    (append* Q (mx/ Qk Rkk)))]
-                                   [else          (let [(Rik (matrix-scalar (head Qi) Qk))]
-                                                    (matrix-set! Rk i 0 Rik)
-                                                    (cmgs (fx+1 i) (mx*+ (fpneg Rik) (head Qi) Qk) (tail Qi)))]))
+                             (cond [(fx>= i qrows) Q]
+                                   [(empty? Qi)    (append* Q (mx/ Qk (matrix-set! Rk i 0 (mx-norm Qk 'fro))))]
+                                   [else           (cmgs (fx+1 i) (mx-axpy (fpneg (matrix-set! Rk i 0 (matrix-scalar (head Qi) Qk))) (head Qi) Qk) (tail Qi))]))
                            (cons Rk R))))))
 
 ;;@returns: **function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.
 (define* (mx-solver mat)
   (returns "**function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.")
   (must-be (matrix? mat))
-  (let [(qr (mx-qr mat))]
+  (let* [(qr (mx-qr mat #f))]
     (lambda (vec)
       (let [(x (mx-dot* (head qr) vec))]
-        (let rho [(rcol (matrix-explode (tail qr)))]
-          (if (empty? rcol) (fx-1 (matrix-cols (tail qr)))
-                            (let* [(cur (rho (tail rcol)))
-                                   (val (fpneg (matrix-set! x cur 0 (fp/ (matrix-ref*0 x cur) (matrix-ref*0 (head rcol) cur)))))
-                                   (nxt (fx-1 cur))]
-                              (let sho [(idx nxt)]
-                                (if (fx<0? idx) nxt
+        (let rho [(rcol (matrix-explode (tail qr)))
+                  (xrow (fx-1 (matrix-cols (tail qr))))]
+          (if (empty? rcol) x
+                            (let [(val (fpneg (matrix-set! x xrow 0 (fp/ (matrix-ref*0 x xrow) (matrix-ref*0 (head rcol) xrow)))))]
+                              (let sho [(idx (fx-1 xrow))]
+                                (if (fx<0? idx) (rho (tail rcol) (fx-1 xrow))
                                                 (begin
                                                   (matrix-set! x idx 0 (fp*+ val (matrix-ref*0 (head rcol) idx) (matrix-ref*0 x idx)))
-                                                  (sho (fx-1 idx))))))))
-        x))))
+                                                  (sho (fx-1 idx))))))))))))
 
 ;;@returns: column-**matrix** solving the linear (least-squares) problem of **matrix** `mat` and column-**matrix** `vec` via QR decomposition.
 (define* (mx-solve mat vec)
@@ -1010,7 +1004,7 @@
 (define* (mx-trapz mat)
   (returns "column-**matrix** trapezoid approximate integral of **matrix** `mat` being columns data-points of rows-dimensional function.")
   (must-be (matrix? mat))
-  (mx*+ -0.5 (mx-col mat -1) (mx*+ -0.5 (mx-col mat 1) (mx-rowsum mat))))
+  (mx-axpy -0.5 (mx-col mat -1) (mx-axpy -0.5 (mx-col mat 1) (mx-rowsum mat))))
 
 ; TODO: type checking
 ;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`, see @7.
@@ -1033,7 +1027,7 @@
                   (let rho [(cur coeff)
                             (ret xk)]
                     (if (empty? cur) ret
-                                     (rho (tail cur) (mx*+ (fp* dt (head cur)) (vf (fp*+ dt (head cur) tk) ret) xk))))))]
+                                     (rho (tail cur) (mx-axpy (fp* dt (head cur)) (vf (fp*+ dt (head cur) tk) ret) xk))))))]
     (time-stepper hyp sys tim x0)))
 
 ; TODO: type checking
@@ -1047,8 +1041,8 @@
                   (let rho [(cur (fx-1 num))
                             (c   tk)
                             (ret xk)]
-                    (if (fx=0? cur) (mx/ (mx*+ dt (vf c ret) (mx*+ s-1 ret xk)) (fp num))
-                                    (rho (fx-1 cur) (fp+ tk dt/s-1) (mx*+ dt/s-1 (vf c ret) ret)))))))]
+                    (if (fx=0? cur) (mx/ (mx-axpy dt (vf c ret) (mx-axpy s-1 ret xk)) (fp num))
+                                    (rho (fx-1 cur) (fp+ tk dt/s-1) (mx-axpy dt/s-1 (vf c ret) ret)))))))]
     (time-stepper ssp sys tim x0)))
 
 ;;; Matrix Utilities ###########################################################

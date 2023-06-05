@@ -1,7 +1,7 @@
 ;;;; dense.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: dense column function aliases
@@ -28,6 +28,7 @@
                               (f64vector-map-index column-map-index)
                               (f64vector-foreach column-foreach)
                               (f64vector-foreach-index column-foreach-index)
+                              (f64vector-axpy column-axpy)
                               (f64vector-fold column-fold)
                               (f64vector-fold* column-fold*)
                               (f64vector-dot column-dot)

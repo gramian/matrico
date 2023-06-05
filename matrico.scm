@@ -1,7 +1,7 @@
 ;;;; matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: A CHICKEN Scheme flonum matrix module.
@@ -21,7 +21,7 @@
    mx-samecols? mx-samerows? mx-samedims?
    mx-any? mx-all? mx=?
    mx-ref11 mx-ref mx-set mx-set! mx-col mx-row mx-diag mx-submatrix
-   mx+ mx* mx- mx/ mx*2 mx^2 mx^ mx-where mx*+
+   mx+ mx* mx- mx/ mx*2 mx^2 mx^ mx-where
    mx-round mx-floor mx-ceil
    mx-abs mx-sign mx-delta mx-heaviside
    mx-sin mx-cos mx-tan
@@ -43,6 +43,7 @@
    mx-rownorm mx-colnorm mx-norm
    mx-horcat mx-vercat
    mx-vec mx-transpose
+   mx-axpy
    mx-sympart mx-skewpart
    mx-diagonal
    mx-qr mx-solver mx-solve mx-orth mx-absdet mx-logdet
@@ -67,7 +68,7 @@
              [else])
 
 ;;@assigns: matrico version number as pair.
-(define-constant version '(0 . 4))
+(define-constant version '(0 . 5))
 
 ;;@returns
 (define (matrico . s)

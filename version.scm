@@ -1,2 +1,1 @@
-(define (matrico-version) "0.4rel")
-
+(define (matrico-version) "0.5rc1")

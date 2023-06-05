@@ -1,4 +1,4 @@
-![matrico 0.4](res/matrico-logo.svg) matrico
+![matrico 0.5](res/matrico-logo.svg) matrico
 ========================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.4 (2023-06-01)
+* **Version**: 0.5 (2023-06-06)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -37,6 +37,12 @@
 
 `matrico` is a _Scheme_ module for numerical matrix computations encapsulated in a _CHICKEN Scheme_ egg.
 
+### Clone and Try `matrico` Code
+
+```shell
+./matrico.sh
+```
+
 ### Install and Test `matrico` Egg
 
 ```shell
@@ -49,26 +55,18 @@ CHICKEN_INSTALL_REPOSITORY="/my/egg/directory/" chicken-install -test matrico
 CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 ```
 
-### Clone and Try `matrico` Code
+### Run Demo Codes
 
-```scheme
-(load "matrico.scm")
-
-(import matrico)
+```shell
+csi RUNME.scm
 ```
 
-### Run Demo Code
-
-```scheme
-(load "RUNME.scm")
+```shell
+csi demos/heat.scm
 ```
 
-```scheme
-(load "demos/heat.scm")
-```
-
-```scheme
-(load "demos/flame.scm")
+```shell
+csi demos/flame.scm
 ```
 
 ### Minimal Explanation
@@ -250,8 +248,6 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 
 * `(mx-where pred x y)` returns **matrix** of entries of **matrix**es `x` or `y` based on predicate **procedure** `pred`.
 
-* `(mx*+ a x y)` returns **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka axpy.
-
 #### Matrix Mappers
 
 ##### Elementary Functions
@@ -421,6 +417,8 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 * `(mx-vec mat)` returns **matrix** of vertically concatenated columns of **matrix** `mat`, aka vectorization.
 
 * `(mx-transpose mat)` returns **matrix** of entries of **matrix** `mat` with swapped row and column indices.
+
+* `(mx-axpy a x y)` returns **matrix** of entry-wise generalized addition of **flonum** `a` times **matrix** `x` plus **matrix** `y`, aka "a times x plus y".
 
 * `(mx-sympart mat)` returns **matrix** being symmetric part of square **matrix** `mat`.
 
@@ -611,6 +609,8 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-transpose mat)` returns **matrix** of entries of **matrix** `mat` with swapped row and column indices.
 
+* `(matrix-axpy a x y)` returns **matrix** resulting from scaling **matrix** `x` by **any** `a` and add **matrix** `y`.
+
 * `(matrix-scalar xt y)` returns **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
 
 * `(matrix-dot* xt y)` returns **matrix** resulting from matrix multiplication of transposed of **matrix** `xt` and **matrix** `y`.
@@ -655,6 +655,8 @@ Provides homogeneous vector transformations analogous to vectors.
 
 * `(f64vector-foreach-index fun . vecs)` returns **void**, applies **procedure** `fun` to index and all corresponding **f64vector**(s) `vecs` elements.
 
+* `(f64vector-axpy a x y)` returns **f64vector** resulting from applying fused-multiply-add to the **flonum** `a` and to all **f64vector**s `x`, `y` elements. 
+
 * `(f64vector-fold fun ini . vecs)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**(s) `vecs` elements from left to right.
 
 * `(f64vector-fold* fun ini . vecs)` returns **any** resulting from applying **procedure** `fun` to `ini` initialized accumulator and sequentially to all **f64vector**(s) `vecs` elements from right to left.
@@ -678,7 +680,7 @@ Provides additional mathematical functions, extending CHICKEN's `flonum` module.
 
 * `(fprec x)` returns **flonum** reciprocal of **flonum** `x`.
 
-* `(fp*+ z x y)` returns **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`.
+* `(fp*+ x y z)` returns **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`.
 
 * `(fptau)` returns **flonum** circle constant Tau via fraction.
 
@@ -844,8 +846,8 @@ make mips
 * `SYS:` MacOS Monterey (12.6)
 * `SCM:` CHICKEN Scheme (5.3)
 
-* MATMUL: `1230` Megaflops
-* LINPACK: `185` Megaflops
+* MATMUL: `267` Megaflops
+* LINPACK: `319` Megaflops
 * BOGOMIPS: `275` Mips
 
 ## Development
@@ -858,13 +860,21 @@ make mips
 
 * [`mx`]      Add rank-revealing QR and pseudo-inverse via QR
 
-* [`mx`]      Add Eigenvalue decomposition and singular value decomposition
+* [`mx`]      Add Eigenvalue decomposition and singular value decomposition via QR
 
-* [`mx`]      Add [`asciichart`](https://github.com/kroitor/asciichart) interface or functionality
+* [`mx`]      Add [`UnicodePlot`](https://github.com/JuliaPlots/UnicodePlots.jl)-like lineplot functionality
 
 ### Changelog
 
-<b>0.4</b> (2023-06-01)
+<b>0.5</b> (2023-06-06)
+
+ * **ADDED** `f64vector-axpy`
+ * **ADDED** `matrix-axpy`
+ * **CHANGED** `mx*+` to `mx-axpy`
+ * **IMPROVED** `mx-qr`
+ * **IMPROVED** `mx-solver`
+
+<details><summary markdown="span"><b>0.4</b> (2023-06-01)</summary>
 
   * **ADDED** `mx-angle`
   * **ADDED** `mx-var`
@@ -874,6 +884,8 @@ make mips
   * **IMPROVED** `f64vector-dot`
   * **REMOVED** `mx-logb`
   * ... and many minor updates and fixes.
+
+</details>
 
 <details><summary markdown="span"><b>0.3</b> (2022-09-16)</summary>
 
@@ -937,12 +949,4 @@ make mips
 
 * `matrico` can be build with `-O5` if `matrico.scm` is included into the source.
 
-### Ideas
-
-* Alias for `.bashrc`:
-```
-alias matrico='CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi -R matrico'
-```
-
 ## [`matrico`](https://git.io/matrico) — a (:chicken: λ) :egg: for numerical schemers!
-

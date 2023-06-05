@@ -1,7 +1,7 @@
 ;;;; test-f64vector.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.4 (2023-06-01)
+;;@version: 0.5 (2023-06-06)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: f64vector module unit tests
@@ -24,7 +24,7 @@
                            (               (#f64(1.0 2.0)) . #f64(1.0 2.0))
                            (                      (#f64()) . #f64())))
 
-;; f64vector-or?
+;; f64vector-any?
 (check 'f64vector-any? '(( (zero? #f64(0.0 1.0 2.0)) . #t)
                          ( (zero? #f64(1.0 2.0 0.0)) . #t)
                          ( (zero? #f64(0.0 0.0 0.0)) . #t)
@@ -32,7 +32,7 @@
                          ( (zero? #f64(1.0 2.0 3.0)) . #f)
                          (            (zero? #f64()) . #f)))
 
-;; f64vector-and?
+;; f64vector-all?
 (check 'f64vector-all? '(( (zero? #f64(0.0 1.0 2.0)) . #f)
                          ( (zero? #f64(1.0 2.0 0.0)) . #f)
                          ( (zero? #f64(0.0 0.0 0.0)) . #t)
@@ -55,6 +55,12 @@
 
 ; TODO f64vector-foreach-index
 
+;; f64vector-axpy
+(check 'f64vector-axpy '(((2.0 #f64(1.0 2.0 3.0) #f64(1.0 2.0 3.0)) . #f64(3.0 6.0 9.0))
+                         ((0.0 #f64(1.0 2.0 3.0) #f64(1.0 2.0 3.0)) . #f64(1.0 2.0 3.0))
+                         ((2.0 #f64(0.0 0.0 0.0) #f64(1.0 2.0 3.0)) . #f64(1.0 2.0 3.0))
+                         ((2.0 #f64(1.0 2.0 3.0) #f64(0.0 0.0 0.0)) . #f64(2.0 4.0 6.0))))
+
 ;; f64vector-fold
 (check 'f64vector-fold '(((+ 0.0 #f64(1.0 2.0 3.0)) . 6.0)
                          (        (+ 0.0 #f64(1.0)) . 1.0)
@@ -65,7 +71,7 @@
                           (        (+ 0.0 #f64(1.0)) . 1.0)
                           (           (+ 0.0 #f64()) . 0.0)))
 
+;; f64vector-dot
 (check 'f64vector-dot '(((#f64(2.0) #f64(3.0)) . 6.0)
                         ((#f64(1.0 2.0 3.0) #f64(2.0 3.0 4.0)) . 20.0)
                         ((#f64() #f64()) . 0.0)))
-

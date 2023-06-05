@@ -8,6 +8,11 @@ CHICKEN_INSTALL = chicken-install
 CHICKEN_PROFILE = chicken-profile
 TEST_NEW_EGG = test-new-egg # homebrew: /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
 
+# DEV-TEMP
+TAR = gtar
+SED = gsed
+TEST_NEW_EGG = /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
+
 CLARG =
 LEVEL = -O3
 DEBUG = -d0
@@ -47,7 +52,7 @@ test_install:
 	CHICKEN_REPOSITORY_PATH="/tmp/matrico:`$(CHICKEN_INSTALL) -repository`" $(CSI) -e "(import matrico) (matrico 'citation)"
 
 iprofile:
-	make matmul LEVEL='-O3' FLAGS='-profile' DIM=100
+	make linpack LEVEL='-O3' FLAGS='-profile' DIM=1000
 	ls -1 PROFILE.* | sort -n | head -n1 | $(CHICKEN_PROFILE)
  
 sprofile:
@@ -100,4 +105,4 @@ clean:
 	rm -f test.csv test.mx linpack.txt matmul.txt \
 	      matrico.so matrico.import.scm matrico.import.so matrico.static.o \
 	      matrico.build.sh matrico.install.sh matrico.link matrico.static.so \
-	      matrico-$(VERSION).tar.gz PROFILE.*
+	      matrico-$(VERSION).tar.gz PROFILE.* heat.csv flame.csv
