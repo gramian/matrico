@@ -873,6 +873,7 @@ make mips
  * **CHANGED** `mx*+` to `mx-axpy`
  * **IMPROVED** `mx-qr`
  * **IMPROVED** `mx-solver`
+ * ... and many minor updates and fixes.
 
 <details><summary markdown="span"><b>0.4</b> (2023-06-01)</summary>
 

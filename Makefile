@@ -8,11 +8,6 @@ CHICKEN_INSTALL = chicken-install
 CHICKEN_PROFILE = chicken-profile
 TEST_NEW_EGG = test-new-egg # homebrew: /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
 
-# DEV-TEMP
-TAR = gtar
-SED = gsed
-TEST_NEW_EGG = /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
-
 CLARG =
 LEVEL = -O3
 DEBUG = -d0
