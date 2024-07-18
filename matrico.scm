@@ -1,7 +1,7 @@
-;;;; matrico.scm
+;;;; matrico.scm (CHICKEN Scheme)
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: A CHICKEN Scheme flonum matrix module.
@@ -53,7 +53,7 @@
    mx-xcor mx-cor
    mx-angle mx-coher
    mx-diff mx-trapz mx-ode2-hyp mx-ode2-ssp
-   mx-print mx-export mx-save mx-load)
+   mx->list mx-print mx-export mx-save mx-load)
 
   (import scheme (chicken module) (chicken base) (chicken plist) (chicken random) (chicken time) utils fpmath dense)
 
@@ -68,7 +68,7 @@
              [else])
 
 ;;@assigns: matrico version number as pair.
-(define-constant version '(0 . 5))
+(define-constant version '(0 . 6))
 
 ;;@returns
 (define (matrico . s)

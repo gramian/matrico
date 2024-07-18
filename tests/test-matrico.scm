@@ -1,7 +1,7 @@
 ;;;; test-matrico.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrico (compounding matrix/dense/mx) module unit tests
@@ -287,10 +287,11 @@
 (check 'mx-diag `(((m33) . ,(mx% '((8.0)
                                    (5.0)
                                    (2.0))))
-                  ((m31) . ,'xfail)
-                  ((m13) . ,'xfail)
+                  ((m31) . ,m11)
+                  ((m13) . ,m11)
                   ((m11) . ,m11)))
 
+;; mx-set
 (check 'mx-set `(((m33 3 3 0.0) . ,(mx% '((8.0 1.0 6.0)
                                           (3.0 5.0 7.0)
                                           (4.0 9.0 0.0))))
@@ -855,7 +856,7 @@
 ;; mx-qr TODO: add tests
 (check 'mx-qr `(((u33) . ,(cons (mx% '((1.0 0.0 0.0) (0.0 1.0 0.0) (0.0 0.0 1.0))) (mx% '((1.0 0.0 0.0) (0.0 1.0 0.0) (0.0 0.0 1.0)))))
                 ((u32) . ,(cons (mx% '((1.0 0.0) (0.0 1.0) (0.0 0.0))) (mx% '((1.0 0.0) (0.0 1.0)))))
-                ((u23) . ,(cons (mx% '((1.0 0.0) (0.0 1.0))) (mx% '((1.0 0.0 0.0) (0.0 1.0 0.0)))))))
+                ((u23) . ,(cons (mx% '((1.0 0.0 0.0) (0.0 1.0 0.0))) (mx% '((1.0 0.0 0.0) (0.0 1.0 0.0) (0.0 0.0 0.0)))))))
 
 ; TODO: test mx-solver
 
@@ -1011,8 +1012,14 @@
 
 ; TODO: test mx-ode2-ssp
 
+;; mx->list
+(check 'mx->list `(((m13) . (8.0 1.0 6.0))
+                   ((m31) . (8.0 3.0 4.0))
+                   ((m11) . (8.0))
+                   ((m33) . ,'xfail)))
+
 (mx-save "test.mx" m33)
 
-(mx-export "test.csv" m33)
+(mx-export "test.csv" m33 #\;)
 
 (check 'mx-load `((("test.mx") . ,m33)))

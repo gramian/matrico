@@ -1,7 +1,7 @@
-;;;; fpmath.scm
+;;;; fpmath.scm (CHICKEN Scheme)
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: floating-point add-on module
@@ -12,15 +12,14 @@
 
   (fp fp%
    fpzero?? fpzero?
-   fp*2 fp^2 fprec fp*+
+   fp*2 fp^2 fprec
    fptau fpeul fpphi
    fpdelta fpheaviside fpsign
    fpln fplb fplg
-   fpsinh fpcosh fptanh
-   fpasinh fpacosh fpatanh
    fphsin fphcos
    fplnsinh fplncosh
    fpsignsqrt fpsinc fpsigm fpgauss fpstirling
+   fp*+
    fptaper)
 
   (import scheme (chicken base) (chicken module) (chicken flonum) utils)
@@ -59,13 +58,6 @@
 ;;@returns: **flonum** reciprocal of **flonum** `x`.
 (define (fprec x)
   (fp/ 1.0 x))
-
-;;@returns: **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`, see @1, @2, @3.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fp*+ x y z)
-       (fp+ (fp* x y) z))]
-  [else])
 
 ;;; Constants Thunks ###########################################################
 
@@ -113,52 +105,6 @@
     (lambda (x)
       (fp/ (fplog x) log10))))
 
-;;; Hyperbolic Functions #######################################################
-
-;;@returns: **flonum** hyperbolic sine of **flonum** `x`: `sinh(x) = 0.5 * (exp(x) - exp(-x))`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fpsinh x)
-       (fp* 0.5 (fp- (fpexp x) (fpexp (fpneg x)))))]
-  [else])
-
-;;@returns: **flonum** hyperbolic cosine of **flonum** `x`: `cosh(x) = 0.5 * (exp(x) + exp(-x))`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fpcosh x)
-       (fp* 0.5 (fp+ (fpexp x) (fpexp (fpneg x)))))]
-  [else])
-
-;;@returns: **flonum** hyperbolic tangent of **flonum** `x`: `tanh(x) = 1 - 2 / (exp(2 * x) + 1)`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fptanh x)
-       (fp- 1.0 (fp/ 2.0 (fp+ (fpexp (fp*2 x)) 1.0))))]
-  [else])
-
-;;; Inverse Hyperbolic Functions ###############################################
-
-;;@returns: **flonum** area hyperbolic sine of **flonum** `x`: `asinh(x) = log(x + sqrt(x^2 + 1))`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fpasinh x)
-       (fp* (fpsign x) (fplog (fp+ (fpabs x) (fpsqrt (fp+ (fp^2 x) 1.0))))))]
-  [else])
-
-;;@returns: **flonum** area hyperbolic cosine of **flonum** `x`: `acosh(x) = log(x + sqrt(x^2 - 1))`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fpacosh x)
-       (fplog (fp+ x (fpsqrt (fp- (fp^2 x) 1.0)))))]
-  [else])
-
-;;@returns: **flonum** area hyperbolic tangent of **flonum** `x`: `atanh(x) = 0.5 * log((1 + x) / (1 - x))`.
-(cond-expand
-  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
-     (define (fpatanh x)
-       (fp* 0.5 (fplog (fp/ (fp+ 1.0 x) (fp- 1.0 x)))))]
-  [else])
-
 ;;; Haversed Trigonometric Functions ###########################################
 
 ;;@returns: **flonum** haversed sine of **flonum** `x`: `hsin(x) = 0.5 * (1 - cos(x))`, see @11.
@@ -203,6 +149,13 @@
   (fpround (fp* (fpsqrt (fp* (fptau) x)) (fpexpt (fp/ x (fpeul)) x))))
 
 ;;; Utilities ##################################################################
+
+;;@returns: **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`, see @1, @2, @3.
+(cond-expand
+  [(or chicken-5.0 chicken-5.1 chicken-5.2 chicken-5.3)
+     (define (fp*+ x y z)
+       (fp+ (fp* x y) z))]
+  [else])
 
 ;;@returns **string** representation of **flonum** `x` formatted to 8 character fixed width.
 (define (fptaper x)

@@ -1,4 +1,5 @@
 #! /bin/sh
+
 #|
 exec csi -R matrico -q "$0" "$@"
 |#

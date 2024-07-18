@@ -1,7 +1,7 @@
 ;;;; demo-flame.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: flame demo code

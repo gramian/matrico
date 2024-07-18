@@ -1,7 +1,7 @@
-;;;; mx.scm
+;;;; mx.scm (CHICKEN Scheme)
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type front-end
@@ -42,8 +42,8 @@
           [(and (fx<0? idx) (fx<= (fxneg idx) rows)) (fx+ rows idx)]
           [else                                      (error "Illegal row index" 'idx)])))
 
-;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by method **procedure** `typ`, with vector field **procedure** or vector field and output function **pair**-of-**procedure**s `sys`, time step and time horizon **pair**-of**flonum**s `tim`, initial state column-**matrix** `x0`.
-(define (time-stepper typ sys tim x0)
+;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by method **procedure** `typ`, with vector field **procedure** or vector field and output function **pair**-of-**procedure**s `sys`, time step and time horizon **pair**-of-**flonum**s `tim`, initial state column-**matrix** `x0`.
+(define (stepper typ sys tim x0)
   (let [(vec (if (pair? sys) (head sys) sys))
         (out (if (pair? sys) (tail sys) (lambda (x y) y)))
         (dt (head tim))
@@ -60,7 +60,7 @@
 ;;@returns: `rows`-by-`cols` **matrix** with all entries set to **flonum** `val` for positive **fixnum**s `rows` and `cols`.
 (define* (mx rows cols val)
   (returns "`rows`-by-`cols` **matrix** with all entries set to **flonum** `val` for positive **fixnum**s `rows` and `cols`.")
-  (must-be (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols) (flonum? val))
+  (must-be (fx>0? cols) (fx>0? rows) (flonum? val))
   (make-matrix* rows cols val))
 
 ;;@returns: **matrix** from row-major **list**-of-**lists**-of-**flonum**s `lst`.
@@ -72,7 +72,7 @@
 ;;@returns: `dims`-by-`dims` identity **matrix** for positive **fixnum** `dims`.
 (define* (mx-identity dims)
   (returns "`dims`-by-`dims` identity **matrix** for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims))
+  (must-be (fx>0? dims))
   (matrix-generate (lambda (i j)
                      (if (fx= i j) 1.0 0.0))
                    dims dims))
@@ -80,7 +80,7 @@
 ;;@returns: `dims`-by-`dims` exchange **matrix** for positive **fixnum** `dims`.
 (define* (mx-exchange dims)
   (returns "`dims`-by-`dims` exchange **matrix** for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims))
+  (must-be (fx>0? dims))
   (matrix-generate (lambda (i j)
                      (if (fx= (fx- dims i) (fx+1 j)) 1.0 0.0))
                    dims dims))
@@ -88,7 +88,7 @@
 ;;@returns: `dims`-by-`dims` Hilbert **matrix** for positive **fixnum** `dims`.
 (define* (mx-hilbert dims)
   (returns "`dims`-by-`dims` Hilbert **matrix** for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims))
+  (must-be (fx>0? dims))
   (matrix-generate (lambda (i j)
                      (fprec (fp (fx+1 (fx+ i j)))))
                    dims dims))
@@ -96,7 +96,7 @@
 ;;@returns: `dims`-by-`dims` (lower triangular) Pascal **matrix** for positive **fixnum** `dims`.
 (define* (mx-pascal dims)
   (returns "`dims`-by-`dims` (lower triangular) Pascal **matrix** for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims))
+  (must-be (fx>0? dims))
   (matrix-generate (lambda (i j)
                      (fp (binomial i j)))
                    dims dims))
@@ -104,7 +104,7 @@
 ;;@returns: `rows`-by-`cols` Lehmer **matrix** for positive **fixnum**s `rows` and `cols`.
 (define* (mx-lehmer rows cols)
   (returns "`rows`-by-`cols` Lehmer **matrix** for positive **fixnum**s `rows` and `cols`.")
-  (must-be (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols))
+  (must-be (fx>0? rows) (fx>0? cols))
   (matrix-generate (lambda (i j)
                      (fp% (fx+1 (fxmin i j)) (fx+1 (fxmax i j))))
                    rows cols))
@@ -112,7 +112,7 @@
 ;;@returns: `rows`-by-`cols` uniformly distributed random **matrix** in the interval **flonum** `low` to **flonum** `upp` for positive **fixnum**s `rows` and `cols`.
 (define* (mx-random rows cols low upp)
   (returns "`rows`-by-`cols` uniformly distributed random **matrix** in the interval **flonum** `low` to **flonum** `upp` for positive **fixnum**s `rows` and `cols`.")
-  (must-be (fixnum? rows) (fx>0? rows) (fixnum? cols) (fx>0? cols) (flonum? low) (flonum? upp))
+  (must-be (fx>0? rows) (fx>0? cols) (flonum? low) (flonum? upp))
   (define ran (fp- upp low))
   (matrix-generate (lambda (i j)
                      (fp*+ ran (pseudo-random-real) low))
@@ -121,7 +121,7 @@
 ;;@returns: `dims`-by-`dims` **matrix** with lower, main, upper band entries given by **flonum**s `low`, `mid`, `upp` for positive **fixnum** `dims`.
 (define* (mx-tridiag dims low mid upp)
   (returns "`dims`-by-`dims` **matrix** with lower, main, upper band entries given by **flonum**s `low`, `mid`, `upp` for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims) (flonum? low) (flonum? mid) (flonum? upp))
+  (must-be (fx>0? dims) (flonum? low) (flonum? mid) (flonum? upp))
   (matrix-generate (lambda (i j)
                      (cond [(fx= i j)                            mid]
                            [(and (fx<= j dims) (fx= i (fx+1 j))) low]
@@ -132,7 +132,7 @@
 ;;@returns: `dims`-by-one column **matrix** of zeros except the positive **fixnum** `num`-th entry set to one, for positive **fixnum** `dims`, aka canonical base vector.
 (define* (mx-unit dims num)
   (returns "`dims`-by-one column **matrix** of zeros except the positive **fixnum** `num` entry set to one, for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fixnum? num) (fx>0? num) (fx<= num dims))
+  (must-be (fx>0? dims) (fx>0? num) (fx<= num dims))
   (matrix-generate (lambda (i j)
                      (if (fx= (fx+1 i) num) 1.0 0.0))
                    dims 1))
@@ -140,7 +140,7 @@
 ;;@returns: `dims`-by-one column **matrix** with entries set to corresponding row index for positive **fixnum** `dims`.
 (define* (mx-iota dims)
   (returns "`dims`-by-one column **matrix** with entries set to corresponding row index for positive **fixnum** `dims`.")
-  (must-be (fixnum? dims) (fx>0? dims))
+  (must-be (fx>0? dims))
   (matrix-generate (lambda (i j)
                      (fp i))
                    dims 1))
@@ -148,7 +148,7 @@
 ;;@returns: **matrix** of positive **fixnum** `num` row-wise linearly spaced entries with endpoints given by column-**matrix**es `x` and `y`.
 (define* (mx-linspace x y num)
   (returns "**matrix** of positive **fixnum** `num` row-wise linearly spaced entries with endpoints given by column-**matrix**es `x` and `y`.")
-  (must-be (column-or-flonum? x) (column-or-flonum? y) (fixnum? num) (fx>0? num))
+  (must-be (column-or-flonum? x) (column-or-flonum? y) (fx>0? num))
   (mx+ x (mx* (mx/ (mx- (ensure-mx y) (ensure-mx x)) (fp (fx-1 num))) (matrix-transpose (mx-iota num)))))
 
 ;;@returns: **matrix** of positive **fixnum** `num` row-wise (base-10) logarithmic spaced entries with endpoints given by column-**matrix**es `x` and `y`.
@@ -253,7 +253,7 @@
 (define* (mx=? x y tol)
   (returns "**boolean** answering if all entry-wise distances between **matrix**es `x` and `y` are below tolerance **flonum** `tol`.")
   (must-be (matrix? x) (matrix? y))
-  (mx-all? (lambda (z) (fpzero? z tol)) (mx- x y)))
+  (mx-all? (cut fpzero? <> tol) (mx- x y)))
 
 ;;; Matrix Accessors ###########################################################
 
@@ -296,13 +296,13 @@
 ;;@returns: column-**matrix** holding **matrix** `mat`'s diagonal entries.
 (define* (mx-diag mat)
   (returns "column-**matrix** holding **matrix** `mat`'s diagonal entries.")
-  (must-be (matrix-square? mat))
+  (must-be (matrix? mat))
   (matrix-diag mat))
 
 ;;@returns: **matrix** holding entries of **matrix** `mat` of rows specified by positive **fixnum**s `row1` to `row2` in columns specified by positive **fixnum**s `col1` to `col2`.
 (define* (mx-submatrix mat row1 row2 col1 col2)
   (returns "**matrix** holding entries of **matrix** `mat` of rows specified by positive **fixnum**s `row1` to `row2` in columns specified by positive **fixnum**s `col1` to `col2`.")
-  (must-be (matrix? mat) (fixnum? row1) (fixnum? row2) (fixnum? col1) (fixnum? col2) (fx<= (translate-rows mat row1) (translate-rows mat row2)) (fx<= (translate-cols mat col1) (translate-cols mat col2)))
+  (must-be (matrix? mat) (fx<= (translate-rows mat row1) (translate-rows mat row2)) (fx<= (translate-cols mat col1) (translate-cols mat col2)))
   (matrix-submatrix mat (translate-rows mat row1) (translate-rows mat row2) (translate-cols mat col1) (translate-cols mat col2)))
 
 ;;; Matrix Expanders ###########################################################
@@ -358,7 +358,7 @@
 ;;@returns: **matrix** of entries of **matrix**es `x` or `y` based on predicate **procedure** `pred`, see @1.
 (define* (mx-where pred x y)
   (returns "**matrix** of entries of **matrix**es `x` or `y` based on predicate **procedure** `pred`.")
-  (must-be (matrix-or-flonum? x) (matrix-or-flonum? y))
+  (must-be (procedure? pred) (matrix-or-flonum? x) (matrix-or-flonum? y))
   (matrix-broadcast (lambda (x y) (if (pred x y) x y)) (ensure-mx x) (ensure-mx y)))
 
 ;;; Matrix Mappers #############################################################
@@ -503,7 +503,7 @@
   (must-be (matrix? mat))
   (matrix-map fphcos mat))
 
-;; Logarithmic Hyperblic Functions
+;; Logarithmic Hyperbolic Functions
 
 ;;@returns: **matrix** with entry-wise log-sinh of **matrix** `mat`.
 (define* (mx-lnsinh mat)
@@ -809,32 +809,34 @@
 
 ;; Linear Problems
 
-; TODO: sort by Rkk value and keep largest
 ;;@returns: **pair** of an orthogonal **matrix** (Q) and upper-right triangular **matrix** (R) factoring full column rank **matrix** `mat`, via column-wise modified Gram-Schmidt, see @5, @6.
 (define* (mx-qr mat . rev)
   (returns "**pair** of an orthogonal **matrix** (Q) and upper-right triangular **matrix** (R) factoring full column rank **matrix** `mat`.")
   (must-be (matrix? mat))
   (define qrows (matrix-rows mat))
-  (define rrows (fxmin (matrix-cols mat) qrows))
+  (define rrows (matrix-cols mat))
   (let rho [(Ak (matrix-explode mat))
             (Q  nil)
             (R  nil)]
-    (if (empty? Ak) (cons (matrix-implode Q) (matrix-implode (if (optional rev #t) (reverse R) R)))
+    (if (empty? Ak) (cons (matrix-implode Q)
+                          (matrix-implode (if (optional rev #t) (reverse R) R)))
                     (let [(Rk (make-matrix* rrows 1 0.0))]
                       (rho (tail Ak)
                            (let cmgs [(i  0)
                                       (Qk (head Ak))
                                       (Qi Q)]
-                             (cond [(fx>= i qrows) Q]
-                                   [(empty? Qi)    (append* Q (mx/ Qk (matrix-set! Rk i 0 (mx-norm Qk 'fro))))]
-                                   [else           (cmgs (fx+1 i) (mx-axpy (fpneg (matrix-set! Rk i 0 (matrix-scalar (head Qi) Qk))) (head Qi) Qk) (tail Qi))]))
+                             (cond [(empty? Qi) (let [(qk (mx-norm Qk 'fro))]
+                                                  (append* Q (if (fpzero?? qk) (mx qrows 1 0.0) (mx/ Qk (matrix-set! Rk i 0 qk)))))]
+                                   [else        (cmgs (fx+1 i)
+                                                      (matrix-axpy (fpneg (matrix-set! Rk i 0 (matrix-scalar (head Qi) Qk))) (head Qi) Qk)
+                                                      (tail Qi))]))
                            (cons Rk R))))))
 
 ;;@returns: **function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.
 (define* (mx-solver mat)
   (returns "**function** returning column-**matrix** solving the linear (least-squares) problem of **matrix** `mat`, given a column-**matrix** `vec` via QR decomposition.")
   (must-be (matrix? mat))
-  (let* [(qr (mx-qr mat #f))]
+  (let [(qr (mx-qr mat #f))]
     (lambda (vec)
       (let [(x (mx-dot* (head qr) vec))]
         (let rho [(rcol (matrix-explode (tail qr)))
@@ -856,21 +858,27 @@
 ;;@returns: **matrix** orthogonalizing **matrix** `mat`.
 (define* (mx-orth mat)
   (returns "**matrix** orthogonalizing **matrix** `mat`.")
-  (head (mx-qr mat)))
+  (let [(qr (mx-qr mat))]
+    (let rho [(q   (head qr))
+              (r   (matrix->list (mx-abs (matrix-diag (tail qr)))))
+              (ret '())]
+      (if (empty? r) (matrix-implode (reverse ret))
+                     (rho (tail q) (tail r) (if (fpzero?? (head r)) ret
+                                                                    (cons (head q) ret)))))))
 
 ;;@returns: **flonum** being the absolute value of the determinant of **matrix** `mat`.
 (define* (mx-absdet mat)
   (returns "**flonum** being the absolute value of the determinant of **matrix** `mat`.")
   (must-be (matrix-square? mat))
-  (let [(qr (mx-qr mat))]
-    (mx-prod (matrix-diag (tail qr)))))
+  (let [(r (tail (mx-qr mat)))]
+    (fpabs (mx-prod (matrix-diag r)))))
 
 ;;@returns: **flonum** being the (natural) logarithm of the determinant of **matrix** `mat`.
 (define* (mx-logdet mat)
   (returns "**flonum** being the (natural) logarithm of the determinant of **matrix** `mat`.")
   (must-be (matrix-square? mat))
-  (let [(qr (mx-qr mat))]
-    (mx-sum (mx-ln (matrix-diag (tail qr))))))
+  (let [(r (tail (mx-qr mat)))]
+    (mx-sum (mx-ln (matrix-diag r)))))
 
 ;; Traces
 
@@ -913,7 +921,7 @@
 
 ;;@returns: **matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`.
 (define* (mx-dot* xt y)
-  (returns "**matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`.")
+  (returns "**matrix** resulting from matrix multiplication of transposed **matrix** `xt` and **matrix** `y`. This function should be preferred for matrix multiplication.")
   (must-be (matrix? xt) (matrix? y) (matrix-samerows? xt y))
   (matrix-dot* xt y))
 
@@ -983,7 +991,7 @@
 ;;@returns: **matrix** of angles between **matrix**es `x` and `y`, representing columns of observations.
 (define* (mx-angle x y)
   (returns "**matrix** of angles between **matrix**es `x` and `y`, representing columns of observations.")
-  (must-be (matrix? x) (matrix? y) (matrix-samerows? x y))
+  (must-be (matrix? x) (matrix? y) (matrix-samecols? x y))
   (mx-acos (mx-dot* (mx/ x (mx-colnorm x 2)) (mx/ y mx-colnorm y 2))))
 
 ;;@returns: **flonum** of distance coherence between **matrix**es `x` and `y`.
@@ -1007,9 +1015,9 @@
   (mx-axpy -0.5 (mx-col mat -1) (mx-axpy -0.5 (mx-col mat 1) (mx-rowsum mat))))
 
 ; TODO: type checking
-;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`, see @7.
+;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`, see @7.
 (define* (mx-ode2-hyp num sys tim x0)
-  (returns "states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`.")
+  (returns "states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`.")
   (must-be (fixnum? num) (<= 2 num 12))
   (let* [(coeff (case num [ (2) (list (fp% 1 2)  1.0)]
                           [ (3) (list (fp% 1 3)  (fp% 1 2)  1.0)]
@@ -1028,13 +1036,13 @@
                             (ret xk)]
                     (if (empty? cur) ret
                                      (rho (tail cur) (mx-axpy (fp* dt (head cur)) (vf (fp*+ dt (head cur) tk) ret) xk))))))]
-    (time-stepper hyp sys tim x0)))
+    (stepper hyp sys tim x0)))
 
 ; TODO: type checking
-;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`, see @8.
+;;@returns: states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`, see @8.
 (define* (mx-ode2-ssp num sys tim x0)
-  (returns "states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`.")
-  (must-be (fixnum? num) (fx>0? num))
+  (returns "states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`.")
+  (must-be (fx>0? num))
   (let* [(s-1 (fp (fx-1 num)))
          (ssp (lambda (vf dt tk xk)
                 (let [(dt/s-1 (fp/ dt s-1))]
@@ -1043,9 +1051,15 @@
                             (ret xk)]
                     (if (fx=0? cur) (mx/ (mx-axpy dt (vf c ret) (mx-axpy s-1 ret xk)) (fp num))
                                     (rho (fx-1 cur) (fp+ tk dt/s-1) (mx-axpy dt/s-1 (vf c ret) ret)))))))]
-    (time-stepper ssp sys tim x0)))
+    (stepper ssp sys tim x0)))
 
 ;;; Matrix Utilities ###########################################################
+
+;;@returns: **list** of entries of one-dimensional **matrix** `mat`.
+(define* (mx->list mat)
+  (returns "**list** of entries of one-dimensional **matrix** `mat`.")
+  (must-be (matrix-vector? mat))
+  (matrix->list mat))
 
 ;;@returns: **void**, prints **matrix** `mat` to terminal.
 (define* (mx-print mat)
@@ -1056,12 +1070,12 @@
   (flonum-print-precision prec)
   (void))
 
-;;@returns: **void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path **string** `str`.
-(define* (mx-export str mat)
-  (returns "**void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path **string** `str`.")
-  (must-be (string? str) (matrix? mat))
+;;@returns: **void**, writes **matrix** `mat` to new **character** `sep`-separated-value file in relative path **string** `str`, by default `sep` is `,` resulting in CSV.
+(define* (mx-export str mat . sep)
+  (returns "**void**, writes **matrix** `mat` to new **character** `sep`-separated-value file in relative path **string** `str`, by default `sep` is `,` resulting in CSV.")
+  (must-be (string? str) (matrix? mat) (or nil (char? sep)))
   (define prec (flonum-print-precision 18))
-  (matrix-export str mat)
+  (matrix-export str mat (optional sep ','))
   (flonum-print-precision prec)
   (void))
 

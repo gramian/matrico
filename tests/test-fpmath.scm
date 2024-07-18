@@ -1,7 +1,7 @@
 ;;;; test-fpmath.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: fpmath module unit tests
@@ -139,43 +139,6 @@
                (      (100.0) . 2.0)
                (    (10000.0) . 4.0)
                ((100000000.0) . 8.0)))
-
-;; fpsinh
-(check 'fpsinh `((   (0.0) . 0.0)
-                 (  (-1.0) . ,(- (fpsinh 1.0)))
-                 ((+inf.0) . +inf.0)
-                 ((-inf.0) . -inf.0)))
-
-;; fpcosh
-(check 'fpcosh `((   (0.0) . 1.0)
-                 (  (-1.0) . ,(fpcosh 1.0))
-                 ((+inf.0) . +inf.0)
-                 ((-inf.0) . +inf.0)))
-
-;; fptanh 
-(check 'fptanh `((   (0.0) . 0.0)
-                 ( (-20.0) . ,(- (fptanh 20.0)))
-                 ((+inf.0) . 1.0)
-                 ((-inf.0) . -1.0)))
-
-;; fpasinh
-(check 'fpasinh `((   (0.0) . 0.0)
-                  (  (-0.1) . ,(- (fpasinh 0.1)))
-                  ((+inf.0) . +inf.0)
-                  ((-inf.0) . -inf.0)
-                  (((fpsinh 0.5)) . 0.5)))
-
-;; fpacosh
-(check 'fpacosh '((   (1.0) . 0.0)
-                  ((+inf.0) . +inf.0)
-                  (((fpcosh 2.0)) . 2.0)))
-
-;; fpatanh
-(check 'fpatanh `((         (0.0) . 0.0)
-                  (        (-0.5) . ,(- (fpatanh 0.5)))
-                  (         (1.0) . +inf.0)
-                  (        (-1.0) . -inf.0)
-                  (((fptanh 0.5)) . 0.5)))
 
 ;; fphsin
 (check 'fphsin '((        (0.0) . 0.0)

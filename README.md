@@ -1,5 +1,5 @@
-![matrico 0.5](res/matrico-logo.svg) matrico
-========================================
+![matrico 0.6](res/matrico-logo.svg) matrico
+============================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
 
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.5 (2023-06-06)
+* **Version**: 0.6 (2024-07-18)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -25,6 +25,8 @@
 
 * **Wikidata**: https://www.wikidata.org/wiki/Q113997718
 
+* **Container**: https://hub.docker.com/r/gramian/matrico
+
 ## Table of Contents
 
 * [Getting Started](#getting-started)
@@ -36,6 +38,12 @@
 ## Getting Started
 
 `matrico` is a _Scheme_ module for numerical matrix computations encapsulated in a _CHICKEN Scheme_ egg.
+
+### Try `matrico` Container
+
+```shell
+docker run -it gramian/matrico
+```
 
 ### Clone and Try `matrico` Code
 
@@ -58,7 +66,7 @@ CHICKEN_REPOSITORY_PATH="`chicken-install -repository`:/my/egg/directory/" csi
 ### Run Demo Codes
 
 ```shell
-csi RUNME.scm
+./RUNME.sh
 ```
 
 ```shell
@@ -117,6 +125,8 @@ csi demos/flame.scm
 
 * Common Lisp [CLEM](https://github.com/slyrus/clem)
 
+* Chez Scheme [chez-matrices](https://github.com/LiamPack/chez-matrices)
+
 * Racket [math/matrix](https://docs.racket-lang.org/math/matrices.html)
 
 * Racket [flomat](https://docs.racket-lang.org/manual-flomat/)
@@ -130,7 +140,7 @@ csi demos/flame.scm
     * `dense` Module (Column Interface Specialization)
     * `matrix` Functor (Functional Matrix Backend)
     * `f64vector` Module (Homogeneous Flonum Vector Functions)
-    * `fpmath` Module (Additional Flonum Functions)
+    * `fpmath` Module (User-Facing Additional Flonum Functions)
     * `utils` Module (Additional Foundational Functions)
 * Extra Tools
     * `check` Library (Testing Helper Functions)
@@ -212,7 +222,7 @@ csi demos/flame.scm
 
 * `(mx-any? pred mat)` returns **boolean** answering if any entry of **matrix** `mat` fulfills predicate **procedure** `pred`.
 
-* `(mx-all? pred mat)` returns **boolean** answering if all entries of **matrix** `mat` fulfills predicate **procedure** `pred`.
+* `(mx-all? pred mat)` returns **boolean** answering if all entries of **matrix** `mat` fulfill predicate **procedure** `pred`.
 
 * `(mx=? x y tol)` returns **boolean** answering if all entry-wise distances between **matrix**es `x` and `y` are below tolerance **flonum** `tol`.
 
@@ -490,19 +500,75 @@ csi demos/flame.scm
 
 * `(mx-trapz mat)` returns column-**matrix** trapezoid approximate integral of **matrix** `mat` being columns data-points of rows-dimensional function.
 
-* `(mx-ode2-hyp num fun x0 dt tf)` returns states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`.
+* `(mx-ode2-hyp num sys tim x0)` states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`.
 
-* `(mx-ode2-ssp num fun x0 dt tf)` returns states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`.
+* `(mx-ode2-ssp num sys tim x0)` states-times-steps **matrix** trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of **fixnum** `num` stages, with vector field **procedure** or **pair** of vector field and output **procedure**s `sys`, time step **flonum** and time horizon **flonum** in **pair** `tim`, initial state column-**matrix** `x0`.
 
 #### Matrix Utilities
 
+* `(mx->list mat)` returns **list** of entries of one-dimensional **matrix** `mat`.
+
 * `(mx-print mat)` returns **void**, prints **matrix** `mat` to terminal.
 
-* `(mx-export str mat)` returns **void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path **string** `str`.
+* `(mx-export str mat . sep)` **void**, writes **matrix** `mat` to new **character** `sep`-separated-value file in relative path **string** `str`, by default `sep` is `,` resulting in CSV.
 
 * `(mx-save str mat)` returns **void**, writes **matrix** `mat` to new Scheme (SCM) file in relative path **string** `str`.
 
 * `(mx-load str)` returns **matrix** loaded from SCM file in relative path **string** `str`.
+
+#### Extra Flonum Functions
+
+The **matrico** module implicitly exports the [(chicken flonum)](http://wiki.call-cc.org/man/5/Module%20(chicken%20flonum)) module, as well as the following additional `flonum` operations:
+
+* `fp` is **alias** for `exact->inexact`.
+
+* `(fp% n d)` returns **flonum** fraction with numerator **fixnum** `n` and denominator **fixnum** `d`.
+
+* `(fpzero?? x)` returns **boolean** answering if **flonum** `x` is exactly zero.
+
+* `(fpzero? x tol)` returns **boolean** answering if absolute value of **flonum** `x` is less than **flonum** `tol`.
+
+* `(fp*2 x)` returns **flonum** double of **flonum** `x`.
+
+* `(fp^2 x)` returns **flonum** square of **flonum** `x`.
+
+* `(fprec x)` returns **flonum** reciprocal of **flonum** `x`.
+
+* `(fptau)` returns **flonum** circle constant Tau via fraction.
+
+* `(fpeul)` returns **flonum** Euler's number via fraction.
+
+* `(fpphi)` returns **flonum** golden ratio via fraction of consecutive Fibonacci numbers.
+
+* `(fpdelta x)` returns **flonum** Kronecker delta of **flonum** `x`.
+
+* `(fpheaviside x)` returns **flonum** Heaviside step function of **flonum** `x`.
+
+* `(fpsign x)` returns **flonum** sign of **flonum** `x`.
+
+* `(fpln x)` returns **flonum** natural logarithm of **flonum** `x`.
+
+* `(fplb x)` returns **flonum** base-2 logarithm of **flonum** `x`.
+
+* `(fplg x)` returns **flonum** base-10 logarithm of **flonum** `x`.
+
+* `(fphsin x)` returns **flonum** haversed sine of **flonum** `x`.
+
+* `(fphcos x)` returns **flonum** haversed cosine of **flonum** `x`.
+
+* `(fplnsinh x)` returns **flonum** log-sinh of **flonum** `x`.
+
+* `(fplncosh x)` returns **flonum** log-cosh of **flonum** `x`.
+
+* `(fpsignsqrt x)` returns **flonum** sign times square root of absolute value of **flonum** `x`.
+
+* `(fpsinc x)` returns **flonum** cardinal sine function with removed singularity of **flonum** `x`.
+
+* `(fpsigm x)` returns **flonum** standard logistic function of **flonum** `x`, aka sigmoid.
+
+* `(fpgauss x)` returns **flonum** Gauss bell curve function evaluation of **flonum** `x`.
+
+* `(fpstirling x)` returns **flonum** Stirling approximation of factorial of **flonum** `x`.
 
 </details>
 
@@ -528,7 +594,7 @@ csi demos/flame.scm
 
 * `(translate-rows idx)` returns **fixnum** for **matrix** `mat` translated row index **fixnum** `idx` (from 1-based to 0-based and from end).
 
-* `(time-stepper typ fun x0 dt tf)` states-times-steps **matrix** trajectory solving an ordinary differential equation, by method **procedure** `typ`, with vector field **procedure** `fun`, initial state column-**matrix** `x0`, time step **flonum** `dt`, and time horizon **flonum** `tf`.
+* `(time-stepper typ sys tim x0)` states-times-steps **matrix** trajectory solving an ordinary differential equation, by method **procedure** `typ`, with vector field **procedure** or vector field and output function **pair**-of-**procedure**s `sys`, time step and time horizon **pair**-of-**flonum**s `tim`, initial state column-**matrix** `x0`.
 
 #### Matrix Backend Library
 Defines the matrix type (record) as column-major list-of-columns and provides generic basic and functional methods wrapped in a functor
@@ -595,11 +661,11 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-all? pred mat)` returns **boolean** answering if all entries of **matrix** `mat` fulfill predicate **procedure** `pred`.
 
-* `(matrix-colfold fun ini mat)` returns row **matrix** resulting from folding by two-argument **procedure** `fun each column of **matrix** `mat`.
+* `(matrix-colfold fun ini mat)` returns row **matrix** resulting from folding by two-argument **procedure** `fun` each column of **matrix** `mat`.
 
-* `(matrix-rowfold fun ini mat)` returns column **matrix** resulting from folding by two-argument **procedure** `fun each row of **matrix** `mat`.
+* `(matrix-rowfold fun ini mat)` returns column **matrix** resulting from folding by two-argument **procedure** `fun` each row of **matrix** `mat`.
 
-* `(matrix-allfold fun ini mat)` returns **any** resulting from folding by two-argument **procedure** `fun all **matrix** `mat` entries.
+* `(matrix-allfold fun ini mat)` returns **any** resulting from folding by two-argument **procedure** `fun` all **matrix** `mat` entries.
 
 * `(matrix-map fun mat)` returns **matrix** resulting from applying **procedure** `fun` to each entry of **matrix** `mat`.
 
@@ -619,9 +685,11 @@ Defines the matrix type (record) as column-major list-of-columns and provides ge
 
 * `(matrix-implode lst)` returns **matrix** of horizontally concatenated **list**-of-column-**matrix**es `lst`.
 
+* `(matrix->list mat)` returns: **list** of entries of one-dimensional **matrix** `mat`.
+
 * `(matrix-print mat)` returns **void**, prints **matrix** `mat` to terminal.
 
-* `(matrix-export str mat)` returns **void**, writes **matrix** `mat` to new comma-seperated-value (CSV) file in relative path (**string**) `str`.
+* `(matrix-export str mat sep)` returns **void**, writes **matrix** `mat` to new **character** `sep`-separated-value file in relative path (**string**) `str`.
 
 * `(matrix-save str mat)` returns **void**, writes **matrix** `mat` to new Scheme (SCM) file in relative path (**string**) `str`.
 
@@ -663,72 +731,10 @@ Provides homogeneous vector transformations analogous to vectors.
 
 * `(f64vector-dot x y)` returns **flonum** resulting from applying fused-multiply-add to zero initialized accumulator and sequentially to all **f64vector**s `x`, `y` elements from left to right.
 
-#### Floating-Point Module
-Provides additional mathematical functions, extending CHICKEN's `flonum` module.
+#### Flonum Module
+Provides extra flonum procedures.
 
-* `fp` is **alias** for `exact->inexact`.
-
-* `(fp% n d)` returns **flonum** fraction with numerator **fixnum** `n` and denominator **fixnum** `d`.
-
-* `(fpzero? x tol)` returns **boolean** answering if absolute value of **flonum** `x` is less than **flonum** `tol`.
-
-* `(fpzero?? x)` returns **boolean** answering if **flonum** `x` is exactly zero.
-
-* `(fp*2 x)` returns **flonum** double of **flonum** `x`.
-
-* `(fp^2 x)` returns **flonum** square of **flonum** `x`.
-
-* `(fprec x)` returns **flonum** reciprocal of **flonum** `x`.
-
-* `(fp*+ x y z)` returns **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`.
-
-* `(fptau)` returns **flonum** circle constant Tau via fraction.
-
-* `(fpeul)` returns **flonum** Euler number via fraction.
-
-* `(fpphi)` returns **flonum** golden ratio via fraction of consecutive Fibonacci numbers.
-
-* `(fpdelta x)` returns **flonum** Kronecker delta of **flonum** `x`.
-
-* `(fpheaviside x)` returns **flonum** Heaviside step function of **flonum** `x`.
-
-* `(fpsign x)` returns **flonum** sign of **flonum** `x`.
-
-* `(fpln x)` returns **flonum** natural logarithm of **flonum** `x`.
-
-* `(fplb x)` returns **flonum** base-2 logarithm of **flonum** `x`.
-
-* `(fplg x)` returns **flonum** base-10 logarithm of **flonum** `x`.
-
-* `(fpsinh x)` returns **flonum** hyperbolic sine of **flonum** `x`.
-
-* `(fpcosh x)` returns **flonum** hyperbolic cosine of **flonum** `x`.
-
-* `(fptanh x)` returns **flonum** hyperbolic tangent of **flonum** `x`.
-
-* `(fpasinh x)` returns **flonum** area hyperbolic sine of **flonum** `x`.
-
-* `(fpacosh x)` returns **flonum** area hyperbolic cosine of **flonum** `x`.
-
-* `(fpatanh x)` returns **flonum** area hyperbolic tangent of **flonum** `x`.
-
-* `(fphsin x)` returns **flonum** haversed sine of **flonum** `x`.
-
-* `(fphcos x)` returns **flonum** haversed cosine of **flonum** `x`.
-
-* `(fplnsinh x)` returns **flonum** log-sinh of **flonum** `x`.
-
-* `(fplncosh x)` returns **flonum** log-cosh of **flonum** `x`.
-
-* `(fpsignsqrt x)` returns **flonum** sign times square root of absolute value of **flonum** `x`.
-
-* `(fpsinc x)` returns **flonum** cardinal sine function with removed singularity of **flonum** `x`.
-
-* `(fpsigm x)` returns **flonum** standard logistic function of **flonum** `x`, aka sigmoid.
-
-* `(fpgauss x)` returns **flonum** Gauss bell curve function evaluation of **flonum** `x`.
-
-* `(fpstirling x)` returns **flonum** Stirling approximation of factorial of **flonum** `x`.
+* `(fp*+ x y z)` returns **flonum** sum with product: `x * y + z` of **flonum**s `x`, `y`, `z`. (Fallback)
 
 * `(fptaper x)` returns **string** representation of **flonum** `x` formatted to 8 character fixed width.
 
@@ -737,9 +743,7 @@ Provides a few base functions, macros and aliases for convenience.
 
 * `(define-syntax-rule (name args) (body ...))` returns **macro** generating single-rule macro.
 
-* `(alias aka name)` returns **macro** replacing `aka` with `name`.
-
-* `(must-be args)` **macro** wrapping `assert` of `and` with variable number of arguments.
+* `(must-be . args)` **macro** wrapping `assert` of `and` with variable number of arguments.
 
 * `(comment . any)` returns **void**.
 
@@ -843,12 +847,12 @@ make mips
 
 * `CPU:` M2 (4+4 Cores @ 3.5Ghz)
 * `RAM:` 16GB (LPDDR5 @ 6400MT/s)
-* `SYS:` MacOS Monterey (12.6)
-* `SCM:` CHICKEN Scheme (5.3)
+* `SYS:` MacOS Monterey (12.7)
+* `SCM:` CHICKEN Scheme (5.4)
 
 * MATMUL: `267` Megaflops
-* LINPACK: `319` Megaflops
-* BOGOMIPS: `275` Mips
+* LINPACK: `313` Megaflops
+* BOGOMIPS: `273` Mips
 
 ## Development
 
@@ -866,7 +870,16 @@ make mips
 
 ### Changelog
 
-<b>0.5</b> (2023-06-06)
+<b>0.6</b> (2024-07-18)
+
+ * **ADDED** `mx->list`
+ * **IMPROVED** `mx-export`
+ * **CHANGED** `mx-diag`
+ * **CHANGED** `mx-qr`
+ * **CHANGED** `mx-orth`
+ * ... and many minor updates and fixes.
+
+<details><summary markdown="span"><b>0.5</b> (2023-06-06)</summary>
 
  * **ADDED** `f64vector-axpy`
  * **ADDED** `matrix-axpy`
@@ -874,6 +887,8 @@ make mips
  * **IMPROVED** `mx-qr`
  * **IMPROVED** `mx-solver`
  * ... and many minor updates and fixes.
+
+</details>
 
 <details><summary markdown="span"><b>0.4</b> (2023-06-01)</summary>
 
@@ -950,4 +965,4 @@ make mips
 
 * `matrico` can be build with `-O5` if `matrico.scm` is included into the source.
 
-## [`matrico`](https://git.io/matrico) — a (:chicken: λ) :egg: for numerical schemers!
+## [`matrico`](https://git.io/matrico) - a (:chicken: λ) :egg: for numerical schemers!

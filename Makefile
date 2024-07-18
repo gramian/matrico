@@ -6,7 +6,7 @@ CSC = csc
 CSI = csi
 CHICKEN_INSTALL = chicken-install
 CHICKEN_PROFILE = chicken-profile
-TEST_NEW_EGG = test-new-egg # homebrew: /opt/homebrew/Cellar/chicken/5.3.0_1/bin/test-new-egg
+TEST_NEW_EGG = test-new-egg # homebrew: /opt/homebrew/Cellar/chicken/5.4.0/bin/test-new-egg
 
 CLARG =
 LEVEL = -O3
@@ -29,7 +29,7 @@ test_egg_local:
 	$(TAR) cvzf matrico-$(VERSION).tar.gz --transform 's,^,matrico/,' \
               AUTHORS CITATION.cff LICENSE README.md \
               matrico.egg matrico.release-info res/matrico-logo.svg \
-              matrico.scm RUNME.scm version.scm \
+              matrico.scm RUNME.sh version.scm \
               src/dense.scm src/f64vector.scm src/fpmath.scm src/matrix.scm src/mx.scm src/utils.scm \
               tests/check.scm tests/run.scm tests/test-f64vector.scm tests/test-fpmath.scm tests/test-matrico.scm tests/test-utils.scm
 	python3 -m http.server --bind 127.0.0.1 &
@@ -60,8 +60,8 @@ mips:
 	       (import matrico) \
 	       (print "BogoMips:" #\space (matrico 'benchmark)) \
 	       (newline) \
-	       (exit)" | $(CSC) $(LEVEL) $(FLAGS) - -o /tmp/miads
-	@/tmp/miads
+	       (exit)" | $(CSC) $(LEVEL) $(FLAGS) - -o /tmp/mips
+	@/tmp/mips
 
 matmul:LEVEL=-O5
 matmul:
@@ -96,8 +96,14 @@ linpack:
 	@/tmp/linpack $(CLARG) 2> linpack.txt
 	@cat linpack.txt
 
+heat:
+	csi -b demos/heat.scm
+
+flame:
+	csi -b demos/flame.scm
+
 clean:
 	rm -f test.csv test.mx linpack.txt matmul.txt \
-	      matrico.so matrico.import.scm matrico.import.so matrico.static.o \
+	      matrico.so *.import.scm *.import.so matrico.static.o \
 	      matrico.build.sh matrico.install.sh matrico.link matrico.static.so \
 	      matrico-$(VERSION).tar.gz PROFILE.* heat.csv flame.csv

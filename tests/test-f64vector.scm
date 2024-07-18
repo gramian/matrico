@@ -1,7 +1,7 @@
 ;;;; test-f64vector.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: f64vector module unit tests
@@ -51,9 +51,9 @@
                               ( (+ #f64(1.0 2.0 3.0 4.0) #f64(2.0 3.0 4.0 5.0)) . #f64(3.0 6.0 9.0 12.0))
                               (                                      (+ #f64()) . #f64())))
 
-; TODO f64vector-foreach
+; TODO: f64vector-foreach
 
-; TODO f64vector-foreach-index
+; TODO: f64vector-foreach-index
 
 ;; f64vector-axpy
 (check 'f64vector-axpy '(((2.0 #f64(1.0 2.0 3.0) #f64(1.0 2.0 3.0)) . #f64(3.0 6.0 9.0))

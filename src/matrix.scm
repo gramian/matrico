@@ -1,7 +1,7 @@
-;;;; matrix.scm
+;;;; matrix.scm (CHICKEN Scheme)
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: matrix type back-end via list-of-vectors, see @1, @2, @3, @4, @5, @6, @7, @8.
@@ -31,7 +31,7 @@
    matrix-colfold matrix-rowfold matrix-allfold
    matrix-map matrix-broadcast
    matrix-vec matrix-transpose matrix-axpy matrix-scalar matrix-dot* matrix-explode matrix-implode
-   matrix-print matrix-export matrix-save matrix-load)
+   matrix->list matrix-print matrix-export matrix-save matrix-load)
 
   (import scheme (chicken base) (chicken module) (only (chicken memory representation) object-copy) utils column)
 
@@ -70,9 +70,7 @@
     (let rho [(col cols)
               (lst nil)]
       (if (fx=0? col) lst
-                      (rho (fx-1 col) (cons (column-unfold rows (lambda (row)
-                                                                  (fun row (fx-1 col))))
-                                            lst))))))
+                      (rho (fx-1 col) (cons (column-unfold rows (cute fun <> (fx-1 col))) lst))))))
 
 ;;; Matrix Combiners ###########################################################
 
@@ -136,7 +134,7 @@
 
 ;;@returns column-**matrix** holding **matrix** `mat` diagonal entries.
 (define (matrix-diag mat)
-  (let* [(rows (matrix-rows mat))
+  (let* [(rows (min (matrix-rows mat) (matrix-cols mat)))
          (col  (make-column rows))]
     (let rho [(idx 0)
               (lst (matrix-data mat))]
@@ -151,9 +149,7 @@
     (object-copy (let [(cols (if (and (fx=0? col1) (fx= (fx+1 col2) (matrix-cols mat))) (matrix-data mat)
                                                                                         (sublist (matrix-data mat) col1 col2)))]
                    (if (and (fx=0? row1) (fx= (fx+1 row2) (matrix-rows mat))) cols
-                                                                              (map (lambda (col)
-                                                                                     (subcolumn col row1 (fx+1 row2)))
-                                                                                   cols))))))
+                                                                              (map (cute subcolumn <> row1 (fx+1 row2)) cols))))))
 
 ;;; Matrix Predicates ##########################################################
 
@@ -191,15 +187,11 @@
 
 ;;@returns: **boolean** answering if any entry of **matrix** `mat` fulfills predicate **procedure** `pred`.
 (define (matrix-any? pred mat)
-  (any? (lambda (x)
-          (column-any? pred x))
-        (matrix-data mat)))
+  (any? (cut column-any? pred <>) (matrix-data mat)))
 
 ;;@returns: **boolean** answering if all entries of **matrix** `mat` fulfill predicate **procedure** `pred`.
 (define (matrix-all? pred mat)
-  (all? (lambda (x)
-          (column-all? pred x))
-        (matrix-data mat)))
+  (all? (cut column-all? pred <>) (matrix-data mat)))
 
 ;;; Matrix Reducers ############################################################
 
@@ -211,26 +203,17 @@
 
 ;;@returns: column-**matrix** resulting from folding by two-argument **procedure** `fun` each row of **matrix** `mat`.
 (define (matrix-rowfold fun ini mat)
-  (make-matrix 1
-    (list (foldl (lambda (acc col)
-                   (column-map fun acc col))
-                 (make-column (matrix-rows mat) ini)
-                 (matrix-data mat)))))
+  (make-matrix 1 (list (foldl (cut column-map fun <> <>) (make-column (matrix-rows mat) ini) (matrix-data mat)))))
 
 ;;@returns: **any** resulting from folding by two-argument **procedure** `fun` all **matrix** `mat` entries.
 (define (matrix-allfold fun ini mat)
-  (foldl (lambda (acc col)
-           (column-fold fun acc col))
-         ini
-         (matrix-data mat)))
+  (foldl (cut column-fold fun <> <>) ini (matrix-data mat)))
 
 ;;; Matrix Mappers #############################################################
 
 ;;@returns: **matrix** resulting from applying function to each entry of **matrix** `mat`.
 (define (matrix-map fun mat)
-  (matrix-map* (lambda (col)
-                 (column-map fun col))
-               mat))
+  (matrix-map* (cut column-map fun <>) mat))
 
 ;;@returns: **matrix** resulting from applying **procedure** `fun` to each element of **matrix**es `x`, `y`, expanded if necessary.
 (define (matrix-broadcast fun x y)
@@ -239,66 +222,40 @@
         (x-cols (matrix-cols x))
         (y-cols (matrix-cols y))]
     (cond [(and (fx= x-rows y-rows) (fx= x-cols y-cols))  ; matrix o matrix
-             (matrix-map** (lambda (x-col y-col)
-                             (column-map fun x-col y-col))
-                           x y)]
+             (matrix-map** (cut column-map fun <> <>) x y)]
 
           [(and (fx= 1 x-rows) (fx= 1 x-cols))            ; scalar o matrix
-             (let [(x0 (matrix-ref00 x))]
-               (matrix-map (lambda (yk)
-                             (fun x0 yk))
-                           y))]
+             (matrix-map (cute fun (matrix-ref00 x) <>) y)]
 
           [(and (fx= 1 y-rows) (fx= 1 y-cols))            ; matrix o scalar
-             (let [(y0 (matrix-ref00 y))]
-               (matrix-map (lambda (xk)
-                             (fun xk y0))
-                           x))]
+             (matrix-map (cute fun <> (matrix-ref00 y)) x)]
 
           [(and (fx= 1 x-rows) (fx= x-cols y-cols))       ; row o matrix
              (matrix-map** (lambda (x-col y-col)
-                             (let [(x0 (column-ref x-col 0))]
-                               (column-map (lambda (y-row)
-                                              (fun x0 y-row))
-                                            y-col)))
+                             (column-map (cute fun (column-ref x-col 0) <>) y-col))
                            x y)]
 
           [(and (fx= 1 y-rows) (fx= x-cols y-cols))       ; matrix o row
              (matrix-map** (lambda (x-col y-col)
-                             (let [(y0 (column-ref y-col 0))]
-                                (column-map (lambda (x-row)
-                                               (fun x-row y0))
-                                             x-col)))
+                             (column-map (cute fun <> (column-ref y-col 0)) x-col))
                            x y)]
 
           [(and (fx= 1 x-cols) (fx= x-rows y-rows))       ; column o matrix
-             (let [(x0 (head (matrix-data x)))]
-               (matrix-map* (lambda (y-col)
-                              (column-map fun x0 y-col))
-                            y))]
+             (matrix-map* (cute column-map fun (head (matrix-data x)) <>) y)]
 
           [(and (fx= 1 y-cols) (fx= x-rows y-rows))       ; matrix o column
-             (let [(y0 (head (matrix-data y)))]
-               (matrix-map* (lambda (x-col)
-                              (column-map fun x-col y0))
-                            x))]
+             (matrix-map* (cute column-map fun <> (head (matrix-data y))) x)]
 
           [(and (fx= 1 x-rows) (fx= 1 y-cols))            ; row o column
              (let [(y0 (head (matrix-data y)))]
                (matrix-map* (lambda (x-col)
-                              (let [(x0 (column-ref x-col 0))]
-                                (column-map (lambda (y-row)
-                                               (fun x0 y-row))
-                                             y0)))
+                              (column-map (cute fun (column-ref x-col 0) <>) y0))
                             x))]
 
           [(and (fx= 1 x-cols) (fx= 1 y-rows))            ; column o row
              (let [(x0 (head (matrix-data x)))]
                (matrix-map* (lambda (y-col)
-                              (let [(y0 (column-ref y-col 0))]
-                                (column-map (lambda (x-row)
-                                               (fun x-row y0))
-                                             x0)))
+                              (column-map (cute fun <> (column-ref y-col 0)) x0))
                             y))]
 
           [else
@@ -320,9 +277,7 @@
 
 ;;@returns: **matrix** resulting from scaling **matrix** `x` by **any** `a` and add **matrix** `y`.
 (define (matrix-axpy a x y)
-  (matrix-map** (lambda (xcol ycol)
-                  (column-axpy a xcol ycol))
-                x y))
+  (matrix-map** (cut column-axpy a <> <>) x y))
 
 ;;@returns: **any** resulting from the scalar product of column-**matrix**es `xt` and `y`.
 (define (matrix-scalar xt y)
@@ -354,6 +309,12 @@
 
 ;;; Matrix Utilities ###########################################################
 
+;;@returns: **list** of entries of one-dimensional **matrix** `mat`.
+(define (matrix->list mat)
+  (cond [(matrix-row? mat) (map (cut column-ref <> 0) (matrix-data mat))]
+        [(matrix-col? mat) (column->list (head (matrix-data mat)))]
+        [else              (error 'matrix->list "Not row or column!")]))
+
 ;;@returns: **void**, prints **matrix** to terminal.
 (define (matrix-print fun mat)
   (define rows (matrix-rows mat))
@@ -376,15 +337,15 @@
                               (matrix-data mat))
   (newline))
 
-;;@returns: **void**, writes **matrix** `mat` to new comma-separated-value (CSV) file in relative path (**string**) `str`.
-(define (matrix-export str mat)
+;;@returns: **void**, writes **matrix** `mat` to new **character** `sep`-separated-value file in relative path (**string**) `str`.
+(define (matrix-export str mat sep)
   (define (export-mat)
     (apply column-foreach (lambda row
                             (let rho [(lst row)]
                               (if (empty? lst) (newline)
                                                (begin
                                                  (display (head lst))
-                                                 (when (not (empty? (tail lst))) (display ","))
+                                                 (when (not (empty? (tail lst))) (display sep))
                                                  (rho (tail lst))))))
                           (matrix-data mat)))
   (with-output-to-file str export-mat #:text))

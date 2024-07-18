@@ -114,10 +114,10 @@ returns ''boolean'' answering if ''matrix''es {{x}} and {{y}} have same number o
 returns ''boolean'' answering if any entry of ''matrix'' {{mat}} fulfills predicate ''procedure'' {{pred}}.
 
 <procedure>(mx-all? pred mat)</procedure>
-returns ''boolean'' answering if all entries of ''matrix'' {{mat}} fulfills predicate ''procedure'' {{pred}}.
+returns ''boolean'' answering if all entries of ''matrix'' {{mat}} fulfill predicate ''procedure'' {{pred}}.
 
 <procedure>(mx=? x y tol)</procedure>
-returns ''boolean'' answering if all entry-wise distances between ''matrix''es {{x}} and {{y}} are below tolerance ''flonum'' `tol`.
+returns ''boolean'' answering if all entry-wise distances between ''matrix''es {{x}} and {{y}} are below tolerance ''flonum'' {{tol}}.
 
 == Matrix Accessors
 
@@ -500,25 +500,108 @@ returns ''matrix'' of differences of consecutives columns of ''matrix'' {{mat}}.
 <procedure>(mx-trapz mat)</procedure>
 returns column-''matrix'' trapezoid approximate integral of ''matrix'' {{mat}} being columns data-points of rows-dimensional function.
 
-<procedure>(mx-ode2-hyp num fun x0 dt tf)</procedure>
-returns states-times-steps ''matrix'' trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of ''fixnum'' {{num}} stages, with vector field ''procedure'' {{fun}}, initial state column-''matrix'' {{x0}}, time step ''flonum'' {{dt}}, and time horizon ''flonum'' {{tf}}.
+<procedure>(mx-ode2-hyp num sys tim x0)</procedure>
+returns states-times-steps ''matrix'' trajectory solving an ordinary differential equation, by a 2nd order hyperbolic Runge-Kutta method of ''fixnum'' {{num}} stages, with vector field ''procedure'' or ''pair'' of vector field and output ''procedure''s {{sys}}, time step ''flonum'' and time horizon ''flonum'' in ''pair'' {{tim}}, initial state column-''matrix'' {{x0}}.
 
-<procedure>(mx-ode2-ssp num fun x0 dt tf)</procedure>
-returns states-times-steps ''matrix'' trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of ''fixnum'' {{num}} stages, with vector field ''procedure'' {{fun}}, initial state column-''matrix'' {{x0}}, time step ''flonum'' {{dt}}, and time horizon ''flonum'' {{tf}}.
+<procedure>(mx-ode2-ssp num sys tim x0)</procedure>
+returns states-times-steps ''matrix'' trajectory solving an ordinary differential equation, by a 2nd order strong stability preserving Runge-Kutta method of ''fixnum'' {{num}} stages, with vector field ''procedure'' or ''pair'' of vector field and output ''procedure''s {{sys}}, time step ''flonum'' and time horizon ''flonum'' in ''pair'' {{tim}}, initial state column-''matrix'' {{x0}}.
 
 == Matrix Utilities
+
+<procedure>(mx->list mat)</procedure>
+returns ''list'' of entries of one-dimensional ''matrix'' {{mat}}.
 
 <procedure>(mx-print mat)</procedure>
 returns ''void'', prints ''matrix'' {{mat}} to terminal.
 
-<procedure>(mx-export str mat)</procedure>
-returns ''void'', writes ''matrix'' {{mat}} to new comma-separated-value (CSV) file with name ''string'' {{str}}.
+<procedure>(mx-export str mat . sep)</procedure>
+returns ''void'', writes ''matrix'' {{mat}} to new ''character'' {{sep}}-separated-value file in relative path ''string'' {{str}}, by default {{sep}} is {{,}} resulting in CSV.
 
 <procedure>(mx-save str mat)</procedure>
 returns ''void'', writes ''matrix'' {{mat}} to new Scheme (SCM) file with name ''string'' {{str}}.
 
 <procedure>(mx-load str)</procedure>
 returns ''matrix'' loaded from SCM file in relative path specified by ''string'' {{str}}.
+
+== Additional Flonum Operations
+
+The '''matrico''' module implicitly exports the [[http://wiki.call-cc.org/man/5/Module%20(chicken%20flonum)|'''(chicken flonum)''']] module,
+as well as the following additional ''flonum'' operations:
+
+<procedure>fp</procedure>
+is an alias for {{exact->inexact}}.
+
+<procedure>(fp% n d)</procedure>
+returns ''flonum'' fraction with numerator ''fixnum'' {{n}} and denominator ''fixnum'' {{d}}.
+
+<procedure>(fpzero?? x)</procedure>
+returns ''boolean'' answering if ''flonum'' {{x}} is exactly zero.
+
+<procedure>(fpzero? x tol)</procedure>
+returns ''boolean'' answering if absolute value of ''flonum'' {{x}} is less than ''flonum'' {{tol}}.
+
+<procedure>(fp*2 x)</procedure>
+returns ''flonum'' double of ''flonum'' {{x}}.
+
+<procedure>(fp^2 x)</procedure>
+returns ''flonum'' square of ''flonum'' {{x}}.
+
+<procedure>(fprec x)</procedure>
+returns ''flonum'' reciprocal of ''flonum'' {{x}}.
+
+<procedure>(fptau)</procedure>
+returns ''flonum'' [[https://tauday.com|circle constant Tau]] via fraction.
+
+<procedure>(fpeul)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/E_(mathematical_constant)|Euler's number]] via fraction.
+
+<procedure>(fpphi)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Golden_ratio|golden ratio]] via fraction of consecutive Fibonacci numbers.
+
+<procedure>(fpdelta x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Kronecker_delta|Kronecker delta]] of ''flonum'' {{x}}.
+
+<procedure>(fpheaviside x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Heaviside_step_function|Heaviside step function]] of ''flonum'' {{x}}.
+
+<procedure>(fpsign x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Sign_function|sign]] of ''flonum'' {{x}}.
+
+<procedure>(fpln x)</procedure>
+returns ''flonum'' natural logarithm of ''flonum'' {{x}}.
+
+<procedure>(fplb x)</procedure>
+returns ''flonum'' base-2 logarithm of ''flonum'' {{x}}.
+
+<procedure>(fplg x)</procedure>
+returns ''flonum'' base-10 logarithm of ''flonum'' {{x}}.
+
+<procedure>(fphsin x)</procedure>
+returns ''flonum'' [[https://mathworld.wolfram.com/Haversine.html|haversed sine]] of ''flonum'' {{x}}.
+
+<procedure>(fphcos x)</procedure>
+returns ''flonum'' [[https://mathworld.wolfram.com/Havercosine.html|haversed cosine]] of ''flonum'' {{x}}.
+
+<procedure>(fplnsinh x)</procedure>
+returns ''flonum'' log-of-sinh of ''flonum'' {{x}}.
+
+<procedure>(fplncosh x)</procedure>
+returns ''flonum'' log-of-cosh of ''flonum'' {{x}}.
+
+<procedure>(fpsignsqrt x)</procedure>
+returns ''flonum'' sign times square root of absolute value of ''flonum'' {{x}}.
+
+<procedure>(fpsinc x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Sinc_function|cardinal sine function]] with removed singularity of ''flonum'' {{x}}.
+
+<procedure>(fpsigm x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Sigmoid_function|standard logistic function]] of ''flonum'' {{x}}, aka sigmoid.
+
+<procedure>(fpgauss x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Gaussian_function|Gauss bell curve function]] evaluation of ''flonum'' {{x}}.
+
+<procedure>(fpstirling x)</procedure>
+returns ''flonum'' [[https://en.wikipedia.org/wiki/Stirling%27s_approximation|Stirling approximation]] of factorial of ''flonum'' {{x}}.
 
 == Authors
 
@@ -542,4 +625,6 @@ Copyright (c) 2022 Christian Himpe. [[https://spdx.org/licenses/zlib-acknowledge
 
 ; 0.4 : Minor Update
 
-; 0.5 : Minor Update ([[https://github.com/gramian/matrico#changelog|details]])
+; 0.5 : Minor Update
+
+; 0.6 : Major Update ([[https://github.com/gramian/matrico#changelog|details]])

@@ -1,14 +1,14 @@
-;;;; utils.scm
+;;;; utils.scm (CHICKEN Scheme)
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.5 (2023-06-06)
+;;@version: 0.6 (2024-07-18)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: helper utilities module
 
 (module utils
 
-  (define-syntax-rule alias must-be comment
+  (define-syntax-rule must-be comment
    nil head tail empty?
    fx+1 fx-1 fx=0? fx<0? fx>0? fx<=0? fx>=0?
    append* sublist
@@ -30,23 +30,13 @@
        (syntax-rules ()
          ((_ args ...) (body ...))))]))
 
-;;@returns: **macro** replacing `aka` with `name`, see @2 , @3.
-(define-syntax alias
-  (syntax-rules ()
-    [(_ aka name)
-     (define-syntax aka
-       (syntax-rules ()
-         ((_ . args) (name . args))))]))
-
 ;;@returns: **macro** wrapping `assert` of `and` with variable number of arguments.
-(define-syntax must-be
-  (syntax-rules ()
-    [(_ args ...) (assert (and args ...))]))
+(define-syntax-rule (must-be (pred name ...) ...)
+  (begin (assert (pred name ...) "Guard failed for" 'name ...) ...))
 
-;;@returns: **void**, see @4, @5.
-(define-syntax comment
-  (syntax-rules ()
-    [(_ . any) (void)]))
+;;@returns: **void**, see @2, @3.
+(define-syntax-rule (comment any ...)
+  (void))
 
 ;;; List Aliases ###############################################################
 
@@ -140,7 +130,7 @@
 
 ;;; Standard Variants ##########################################################
 
-;;@returns: **macro** generating function binding with docstring in `'returns` property list, see @6.
+;;@returns: **macro** generating function binding with docstring in `'returns` property list, see @4.
 (define-syntax define*
   (syntax-rules (returns)
     [(_ (name args ...) (returns str) body ...)
@@ -156,7 +146,7 @@
         (put! 'returns 'name str)
         (define name (body ...)))]))
 
-;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @7, @8.
+;;@returns: **any** result of the last expressions in loaded and evaluated file with path **string** `str`, see @5, @6.
 (define (load* str)
   (let [(ret nil)
         (vrb (load-verbose #f))]
@@ -171,16 +161,12 @@
 
 ;;@1: Syntax-rules Macros. Guile Reference Manual, 6.8.2.3. https://www.gnu.org/software/guile/manual/html_node/Syntax-Rules.html#Shorthands
 
-;;@2: PC Scheme User's Guide & Software, 7-9.
+;;@2: Miscellaneous Features. The T Manual, 13. http://mumble.net/~jar/tproject/
 
-;;@3: Aliases. Chez Scheme User Guide, 11. https://cisco.github.io/ChezScheme/csug9.5/syntax.html#./syntax:s38
+;;@3: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
 
-;;@4: Miscellaneous Features. The T Manual, 13. http://mumble.net/~jar/tproject/
+;;@4: Docstrings in my Chicken. https://demonastery.org/2011/11/docstrings-in-my-chicken/
 
-;;@5: comment. ClojureDocs, https://clojuredocs.org/clojure.core/comment
+;;@5: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
 
-;;@6: Docstrings in my Chicken. https://demonastery.org/2011/11/docstrings-in-my-chicken/
-
-;;@7: [Scheme-reports] return value(s) of load. http://scheme-reports.org/mail/scheme-reports/msg02021.html
-
-;;@8: What load returns. https://docs.scheme.org/surveys/what-load-returns/
+;;@6: What load returns. https://docs.scheme.org/surveys/what-load-returns/
