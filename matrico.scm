@@ -55,7 +55,7 @@
    mx-diff mx-trapz mx-ode2-hyp mx-ode2-ssp
    mx->list mx-print mx-export mx-save mx-load)
 
-  (import scheme (chicken module) (chicken base) (chicken plist) (chicken random) (chicken time) utils fpmath dense)
+  (import scheme (chicken module) (chicken base) (chicken base) (chicken plist) (chicken random) (chicken time) utils fpmath dense)
 
   (reexport (except fpmath fptaper))
 

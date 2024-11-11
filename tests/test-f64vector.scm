@@ -1,7 +1,7 @@
 ;;;; test-f64vector.scm
 
 ;;@project: matrico (numerical-schemer.xyz)
-;;@version: 0.6 (2024-07-18)
+;;@version: 0.7 (2024-11-??)
 ;;@authors: Christian Himpe (0000-0003-2194-6754)
 ;;@license: zlib-acknowledgement (spdx.org/licenses/zlib-acknowledgement.html)
 ;;@summary: f64vector module unit tests

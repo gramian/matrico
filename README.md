@@ -1,4 +1,4 @@
-![matrico 0.6](res/matrico-logo.svg) matrico
+![matrico 0.7](res/matrico-logo.svg) matrico
 ============================================
 
 * **Project**: matrico ([Esperanto for "matrix"](https://translate.google.com/?sl=eo&tl=en&text=matrico&op=translate))
@@ -9,7 +9,7 @@
 
 * **License**: [zlib-acknowledgement](https://spdx.org/licenses/zlib-acknowledgement.html)
 
-* **Version**: 0.6 (2024-07-18)
+* **Version**: 0.7 (2024-11-??)
 
 * **Depends**: [CHICKEN Scheme](http://call-cc.org) (>= 5.1)
 
@@ -870,6 +870,13 @@ make mips
 
 ### Changelog
 
+<details><summary markdown="span"><b>0.7</b> (2024-11-??)</summary>
+
+ * **FIXED** readded integrated `fpXXX` functions for pre 5.4 compatibility
+ * ... and many minor updates and fixes.
+
+</details>
+
 <b>0.6</b> (2024-07-18)
 
  * **ADDED** `mx->list`
@@ -878,6 +885,8 @@ make mips
  * **CHANGED** `mx-qr`
  * **CHANGED** `mx-orth`
  * ... and many minor updates and fixes.
+
+</details>
 
 <details><summary markdown="span"><b>0.5</b> (2023-06-06)</summary>
 

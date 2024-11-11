@@ -1,6 +1,6 @@
 ;;;; matrico.egg
 
-((version "0.6")
+((version "0.7")
  (synopsis "A flonum matrix module for CHICKEN Scheme.")
  (author "Christian Himpe")
  (category math)
