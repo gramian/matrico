@@ -870,14 +870,12 @@ make mips
 
 ### Changelog
 
-<details><summary markdown="span"><b>0.7</b> (2024-11-??)</summary>
+<b>0.7</b> (2024-11-??)
 
  * **FIXED** readded integrated `fpXXX` functions for pre 5.4 compatibility
  * ... and many minor updates and fixes.
 
-</details>
-
-<b>0.6</b> (2024-07-18)
+<details><summary markdown="span"><b>0.6</b> (2024-07-18)</summary>
 
  * **ADDED** `mx->list`
  * **IMPROVED** `mx-export`
